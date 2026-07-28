@@ -13,7 +13,7 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
   return (
     <div className="max-w-4xl mx-auto px-6 py-16">
       {course.image && (
-        <div className="relative w-full max-w-md mx-auto aspect-[4/3] rounded-xl overflow-hidden mb-8">
+        <div className="relative w-full max-w-md mx-auto aspect-[1080/1520] rounded-xl overflow-hidden mb-8">
           <img src={course.image} alt={course.title} className="w-full h-full object-cover" />
         </div>
       )}

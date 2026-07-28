@@ -13,7 +13,7 @@ export default function CursosPage() {
             key={c.slug}
             className="card rounded-xl overflow-hidden flex flex-col hover:border-magenta/60 transition-colors"
           >
-            <div className="relative w-full aspect-[4/3] bg-parchment">
+            <div className="relative w-full aspect-[1080/1520] bg-parchment">
               {c.image ? (
                 <img src={c.image} alt={c.title} className="w-full h-full object-cover" />
               ) : (

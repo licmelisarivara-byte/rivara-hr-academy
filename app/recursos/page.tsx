@@ -54,7 +54,7 @@ export default function RecursosPage() {
                   : "card rounded-xl p-6 flex flex-col"
               }
             >
-              <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden mb-4 bg-parchment border border-black/5">
+              <div className="relative w-full aspect-[1080/1520] rounded-lg overflow-hidden mb-4 bg-parchment border border-black/5">
                 {r.image ? (
                   <img src={r.image} alt={r.title} className="w-full h-full object-cover" />
                 ) : (
