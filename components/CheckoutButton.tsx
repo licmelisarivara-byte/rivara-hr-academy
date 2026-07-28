@@ -7,6 +7,19 @@ export default function CheckoutButton({ course }: { course: Course }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  if (course.mpPaymentLink) {
+    return (
+      <a
+        href={course.mpPaymentLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="btn-cta inline-block bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors"
+      >
+        Inscribirme →
+      </a>
+    );
+  }
+
   if (course.externalCheckout) {
     return (
       <a

@@ -18,6 +18,7 @@ export type Course = {
   faqs?: FAQ[];
   schedule?: string;
   externalCheckout?: string; // e.g. link to Hotmart if it's sold there
+  mpPaymentLink?: string; // link de pago fijo de Mercado Pago (mientras la API de Checkout Pro esté bloqueada)
   freePreviewVideoId?: string; // YouTube ID, unlisted is fine
 };
 
@@ -106,6 +107,7 @@ export const courses: Course[] = [
     ],
     schedule:
       "Martes 11 y martes 18 de agosto · 17 a 18:30 hs (ARG) · por Google Meet · incluye grabación y certificado de asistencia",
+    mpPaymentLink: "https://mpago.la/1urEhEV",
   },
   {
     slug: "claude-para-seleccion",
