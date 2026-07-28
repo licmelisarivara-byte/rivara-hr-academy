@@ -30,20 +30,18 @@ export default function AboutSection() {
         <div className="mt-10 lg:mt-0">
           <p className="eyebrow mb-4">Sobre mí</p>
           <h2 className="font-display text-3xl sm:text-4xl text-bone mb-6 leading-tight">
-            Lic. en RRHH, estudiante de psicología,
-            <br />
-            <span className="text-magenta">y obsesionada con la IA aplicada.</span>
+            Sobre <span className="text-magenta">RIVARA HR Academy</span>
           </h2>
           <p className="text-bone/70 leading-relaxed mb-4">
-            Soy Melisa Rivara, fundadora de RIVARA Consultora. Soy selectora
-            de personal — no recruiter — y me especializo en implementar IA
-            en procesos reales de selección: análisis de CVs, entrevistas,
-            informes ejecutivos, todo lo que antes me llevaba horas.
+            Soy Melisa Rivara, Licenciada en RRHH y especialista en selección
+            de personal con IA. Creé RIVARA HR Academy para ayudar a
+            recruiters y profesionales de recursos humanos a dejar de perder
+            horas en tareas repetitivas y enfocarse en lo que realmente
+            importa: evaluar, entrevistar y decidir con criterio.
           </p>
           <p className="text-bone/70 leading-relaxed mb-8">
-            RIVARA HR Academy nació para compartir eso mismo con colegas de
-            RRHH — de colega a colega, sin humo ni jerga corporativa. Lo que
-            enseño es lo que uso yo todos los días con mis propios clientes.
+            Todos mis cursos y materiales son 100% prácticos, sin tecnicismos
+            innecesarios. Salís con herramientas funcionando desde el día 1.
           </p>
           <div className="flex flex-wrap gap-3 text-sm">
             <span className="px-4 py-2 rounded-full border border-black/15 text-bone/70">

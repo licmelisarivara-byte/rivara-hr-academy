@@ -41,9 +41,9 @@ export const courses: Course[] = [
         ],
       },
     ],
-    price: "Consultar precio",
-    priceNote: "Early bird: 25% off hasta el viernes 7 de agosto",
-    schedule: "Martes 11 y jueves 13 de agosto, 17:00 a 18:30 hs, por Google Meet",
+    price: "Desde $45.000 ARS",
+    priceNote: "Precio con descuento hasta el 9/8",
+    schedule: "Martes 11 y Jueves 13 de agosto · 17 a 18:30 hs (ARG)",
   },
   {
     slug: "claude-para-seleccion",

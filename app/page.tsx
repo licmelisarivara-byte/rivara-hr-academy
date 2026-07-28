@@ -1,9 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
-import { courses } from "@/lib/courses";
-import { freeResources } from "@/lib/resources";
+import { freeResources, paidResources } from "@/lib/resources";
 import AboutSection from "@/components/AboutSection";
-import AudienceSection from "@/components/AudienceSection";
+import ResourceCheckoutButton from "@/components/ResourceCheckoutButton";
+
+function formatARS(n: number) {
+  return `$${n.toLocaleString("es-AR")}`;
+}
 
 export default function Home() {
   return (
@@ -12,117 +15,160 @@ export default function Home() {
       <section className="relative overflow-hidden bg-score-grid bg-[length:38px_38px]">
         <div className="max-w-6xl mx-auto px-6 pt-20 pb-24 grid lg:grid-cols-[1.1fr_0.9fr] gap-14 items-center">
           <div>
-            <p className="eyebrow mb-5">RIVARA HR Academy</p>
+            <p className="eyebrow mb-5">RIVARA HR ACADEMY</p>
             <h1 className="font-display text-4xl sm:text-5xl leading-[1.08] text-bone mb-6">
-              Dejá de perder horas filtrando CVs.
-              <br />
-              Empezá a decidir con <span className="text-magenta">IA de verdad</span>.
+              Dejá de perder horas filtrando CVs y empezá a tomar mejores
+              decisiones <span className="text-magenta">con IA</span>.
             </h1>
             <p className="text-bone/70 text-lg max-w-xl mb-8">
-              Te ayudo a armar tu propio asistente de selección, tu bot de
-              WhatsApp y tu ATS — con casos reales, de colega a colega.
+              Cursos, herramientas y recursos para recruiters que quieren
+              aplicar inteligencia artificial en selección de personal. Sin
+              tecnicismos, con resultados desde el día 1.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link
-                href="/cursos"
+                href="#cursos-en-vivo"
                 className="bg-magenta text-white font-semibold px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors"
               >
-                Ver cursos
+                Ver cursos disponibles →
               </Link>
             </div>
-            <div className="mt-10 flex items-center gap-3 text-sm text-bone/50">
-              <span className="w-8 h-8 rounded-full overflow-hidden border border-magenta/40 relative shrink-0">
-                <Image
-                  src="/images/melisa-avatar.jpg"
-                  alt="Lic. Melisa Rivara"
-                  fill
-                  sizes="32px"
-                  className="object-cover"
-                />
-              </span>
+          </div>
+
+          <div className="relative max-w-sm mx-auto w-full">
+            <div className="relative rounded-2xl overflow-hidden border border-magenta/25 shadow-2xl shadow-black/40">
+              <Image
+                src="/images/melisa-portrait.jpg"
+                alt="Lic. Melisa Rivara"
+                width={700}
+                height={840}
+                className="w-full h-auto object-cover"
+                priority
+              />
+            </div>
+            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-max card rounded-full px-5 py-2.5 shadow-xl shadow-black/30 flex items-center gap-2 text-sm text-bone whitespace-nowrap">
+              <span className="w-2 h-2 rounded-full bg-magenta" />
               Lic. Melisa Rivara — Especialista en Selección de Personal
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Signature element: candidate score card */}
-          <div className="card rounded-2xl p-6 shadow-2xl shadow-black/40 rotate-1 max-w-sm mx-auto w-full">
-            <div className="flex items-center justify-between mb-4">
-              <span className="eyebrow">Análisis de candidato</span>
-              <span className="text-xs text-bone/40 font-mono">IA</span>
+      {/* CURSOS EN VIVO */}
+      <section id="cursos-en-vivo" className="max-w-6xl mx-auto px-6 py-24">
+        <p className="eyebrow mb-3">📚 Cursos en vivo</p>
+        <h2 className="font-display text-2xl sm:text-3xl text-bone mb-10">
+          Aprendé en vivo, con casos reales
+        </h2>
+
+        <div className="card rounded-2xl p-8 sm:p-10 grid md:grid-cols-[1.3fr_1fr] gap-8 items-center">
+          <div>
+            <span className="eyebrow">En vivo</span>
+            <h3 className="font-display text-2xl sm:text-3xl text-bone mt-3 mb-4">
+              IA para Selección de Personal
+            </h3>
+            <p className="text-bone/70 text-lg mb-6">
+              De cero a tu Asistente de Selección y tu propio ATS en 2 clases
+              en vivo.
+            </p>
+            <div className="flex flex-col gap-2 text-sm text-bone/60 mb-2">
+              <span>📅 Martes 11 y Jueves 13 de agosto · 17 a 18:30 hs (ARG)</span>
             </div>
-            <div className="flex items-end gap-2 mb-1">
-              <span className="font-display text-5xl text-magenta">82</span>
-              <span className="text-bone/40 text-sm mb-1">/ 100 fit</span>
+          </div>
+
+          <div className="card-alt rounded-xl p-6 text-center">
+            <div className="font-display text-3xl text-bone mb-1">
+              Desde {formatARS(45000)} ARS
             </div>
-            <div className="hairline mb-4" />
-            <ul className="space-y-2 text-sm text-bone/70">
-              <li className="flex justify-between">
-                <span>Fit técnico</span>
-                <span className="text-bone">8 / 10</span>
-              </li>
-              <li className="flex justify-between">
-                <span>Fit cultural</span>
-                <span className="text-bone">7 / 10</span>
-              </li>
-              <li className="flex justify-between">
-                <span>Banderas rojas</span>
-                <span className="text-bone">Ninguna</span>
-              </li>
-            </ul>
-            <div className="mt-4 text-xs px-3 py-2 rounded-lg bg-magenta/10 text-magenta border border-magenta/30">
-              Recomendación: Avanzar con reservas
+            <div className="text-sm text-magenta mb-6">
+              Precio con descuento hasta el 9/8
             </div>
+            <Link
+              href="/cursos/de-cero-a-tu-asistente"
+              className="inline-block w-full bg-magenta text-white font-semibold px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors"
+            >
+              Ver más e inscribirme →
+            </Link>
           </div>
         </div>
       </section>
 
-      <AudienceSection />
-      <AboutSection />
-
-      {/* CURSOS */}
-      <section className="max-w-6xl mx-auto px-6 py-20">
-        <div className="flex items-end justify-between mb-8">
-          <h2 className="font-display text-2xl sm:text-3xl text-bone">Cursos</h2>
-          <Link href="/cursos" className="text-sm text-magenta hover:underline">
-            Ver todos →
-          </Link>
-        </div>
-        <div className="grid md:grid-cols-2 gap-6">
-          {courses.map((c) => (
-            <Link
-              key={c.slug}
-              href={`/cursos/${c.slug}`}
-              className="card rounded-xl p-6 hover:border-magenta/60 transition-colors"
-            >
-              <span className="eyebrow">{c.format}</span>
-              <h3 className="font-display text-xl text-bone mt-2 mb-2">{c.title}</h3>
-              <p className="text-bone/60 text-sm">{c.tagline}</p>
-            </Link>
+      {/* RECURSOS */}
+      <section id="recursos" className="max-w-6xl mx-auto px-6 py-24">
+        {/* GRATIS */}
+        <p className="eyebrow mb-3">🎁 Recursos gratuitos</p>
+        <h2 className="font-display text-2xl sm:text-3xl text-bone mb-10">
+          Empezá sin costo
+        </h2>
+        <div className="grid md:grid-cols-2 gap-6 mb-20">
+          {freeResources.map((r) => (
+            <div key={r.slug} className="card-alt rounded-xl p-6 flex flex-col">
+              <span className="eyebrow">{r.kind}</span>
+              <h3 className="font-display text-lg text-bone mt-2 mb-2">
+                {r.title}
+              </h3>
+              <p className="text-bone/60 text-sm mb-6">{r.description}</p>
+              <div className="mt-auto">
+                {r.fileUrl ? (
+                  <a
+                    href={r.fileUrl}
+                    download
+                    className="text-sm bg-sage text-white font-semibold px-4 py-2 rounded-full hover:opacity-90 transition-colors inline-block"
+                  >
+                    Descargar gratis
+                  </a>
+                ) : (
+                  <span className="text-sm text-bone/40 italic">
+                    Disponible muy pronto
+                  </span>
+                )}
+              </div>
+            </div>
           ))}
         </div>
-      </section>
 
-      {/* RECURSOS GRATIS */}
-      <section className="max-w-6xl mx-auto px-6 py-20">
-        <h2 className="font-display text-2xl sm:text-3xl text-bone mb-8">
-          Recursos gratuitos
+        {/* PAGOS */}
+        <p className="eyebrow mb-3">📖 Ebooks y recursos descargables</p>
+        <h2 className="font-display text-2xl sm:text-3xl text-bone mb-10">
+          Comprá, descargá y aplicá desde hoy
         </h2>
-        <div className="grid md:grid-cols-2 gap-6">
-          {freeResources.map((r) => (
-            <div key={r.slug} className="card-alt rounded-xl p-6">
+        <div className="grid md:grid-cols-3 gap-6">
+          {paidResources.map((r) => (
+            <div
+              key={r.slug}
+              className={
+                r.isCombo
+                  ? "rounded-xl p-6 flex flex-col border border-magenta bg-gradient-to-br from-panelAlt to-panel"
+                  : "card rounded-xl p-6 flex flex-col"
+              }
+            >
               <span className="eyebrow">{r.kind}</span>
-              <h3 className="font-display text-lg text-bone mt-2 mb-2">{r.title}</h3>
-              <p className="text-bone/60 text-sm mb-4">{r.description}</p>
-              <Link
-                href="/recursos"
-                className="text-sm text-magenta hover:underline"
-              >
-                Descargar →
-              </Link>
+              <h3 className="font-display text-lg text-bone mt-2 mb-2">
+                {r.title}
+              </h3>
+              <p className="text-bone/60 text-sm mb-5">{r.description}</p>
+              <div className="mt-auto">
+                <div className="flex items-baseline gap-2 mb-1">
+                  <span className="font-display text-2xl text-bone">
+                    {formatARS(r.priceARS)}
+                  </span>
+                  <span className="text-bone/40 text-xs">ARS</span>
+                </div>
+                {r.savingsARS && (
+                  <div className="text-magenta text-xs mb-3">
+                    Ahorrás {formatARS(r.savingsARS)}
+                  </div>
+                )}
+                <div className={r.savingsARS ? "" : "mt-3"}>
+                  <ResourceCheckoutButton resource={r} />
+                </div>
+              </div>
             </div>
           ))}
         </div>
       </section>
+
+      <AboutSection />
     </div>
   );
 }
