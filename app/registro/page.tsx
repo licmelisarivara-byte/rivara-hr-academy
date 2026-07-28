@@ -91,7 +91,7 @@ export default function RegistroPage() {
         <button
           type="submit"
           disabled={!supabaseConfigured || loading}
-          className="w-full bg-magenta text-white font-semibold px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors disabled:opacity-50"
+          className="btn-cta w-full bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors disabled:opacity-50"
         >
           {loading ? "Creando cuenta..." : "Crear cuenta"}
         </button>

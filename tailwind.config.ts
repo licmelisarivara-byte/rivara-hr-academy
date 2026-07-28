@@ -16,7 +16,7 @@ const config: Config = {
         sage: "#2ECC71",
       },
       fontFamily: {
-        display: ["Georgia", "ui-serif", "serif"],
+        display: ["Montserrat", "ui-sans-serif", "system-ui", "sans-serif"],
         sans: ["Montserrat", "ui-sans-serif", "system-ui", "sans-serif"],
         mono: ["'Courier New'", "ui-monospace", "monospace"],
       },

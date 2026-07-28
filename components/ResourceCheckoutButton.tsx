@@ -37,7 +37,7 @@ export default function ResourceCheckoutButton({ resource }: { resource: PaidRes
       <button
         onClick={handleClick}
         disabled={loading}
-        className="w-full text-sm bg-magenta text-white font-semibold px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors disabled:opacity-60"
+        className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors disabled:opacity-60"
       >
         {loading ? "Redirigiendo..." : resource.isCombo ? "Comprar combo →" : "Comprar ahora →"}
       </button>

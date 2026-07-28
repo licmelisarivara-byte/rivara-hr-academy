@@ -17,7 +17,7 @@ export default function ContactoPage() {
         href="https://wa.me/5491123912820"
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-block bg-magenta text-white font-semibold px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors"
+        className="btn-cta inline-block bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors"
       >
         Escribir por WhatsApp →
       </a>

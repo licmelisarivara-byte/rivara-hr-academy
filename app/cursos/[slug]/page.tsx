@@ -17,7 +17,7 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
       <p className="text-bone/70 text-lg mb-8">{course.description}</p>
 
       {course.schedule && (
-        <div className="card rounded-xl p-4 mb-8 text-sm text-bone/70">
+        <div className="detail-text card rounded-xl p-4 mb-8">
           📅 {course.schedule}
         </div>
       )}
@@ -55,7 +55,7 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
                 <div>
                   <div className="font-semibold text-bone">{opt.method}</div>
                   {opt.note && (
-                    <div className="text-xs text-bone/50 mt-0.5">{opt.note}</div>
+                    <div className="detail-text mt-0.5">{opt.note}</div>
                   )}
                 </div>
                 <div className="font-display text-xl text-bone">{opt.price}</div>

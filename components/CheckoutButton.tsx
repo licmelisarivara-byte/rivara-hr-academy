@@ -13,7 +13,7 @@ export default function CheckoutButton({ course }: { course: Course }) {
         href={course.externalCheckout}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-block bg-magenta text-white font-semibold px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors"
+        className="btn-cta inline-block bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors"
       >
         Comprar en Hotmart
       </a>
@@ -50,7 +50,7 @@ export default function CheckoutButton({ course }: { course: Course }) {
       <button
         onClick={handleClick}
         disabled={loading}
-        className="bg-magenta text-white font-semibold px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors disabled:opacity-60"
+        className="btn-cta bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors disabled:opacity-60"
       >
         {loading ? "Redirigiendo..." : "Inscribirme"}
       </button>
