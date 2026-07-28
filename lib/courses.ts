@@ -1,3 +1,7 @@
+export type PaymentOption = { method: string; price: string; note?: string };
+export type BankDetails = { holder: string; cbu: string; alias: string; cuil: string };
+export type FAQ = { q: string; a: string };
+
 export type Course = {
   slug: string;
   title: string;
@@ -5,9 +9,13 @@ export type Course = {
   tagline: string;
   description: string;
   modules: { title: string; items: string[] }[];
+  outcomes?: string[];
   price: string; // texto mostrado en pantalla
-  priceARS: number; // monto real que se cobra por Mercado Pago
+  priceARS?: number; // monto real que se cobra por Mercado Pago
   priceNote?: string;
+  paymentOptions?: PaymentOption[];
+  bankDetails?: BankDetails;
+  faqs?: FAQ[];
   schedule?: string;
   externalCheckout?: string; // e.g. link to Hotmart if it's sold there
   freePreviewVideoId?: string; // YouTube ID, unlisted is fine
@@ -18,34 +26,86 @@ export type Course = {
 export const courses: Course[] = [
   {
     slug: "de-cero-a-tu-asistente",
-    title: "De cero a tu Asistente de Selección y tu propio ATS",
+    title: "Creá tu propio Bot de Selección + ATS con IA",
     format: "En vivo",
     tagline:
-      "Armá tu asistente de selección con IA y tu propio ATS, en 2 clases en vivo por Google Meet.",
+      "En 2 clases en vivo armás tu asistente de selección con IA y publicás tu propio ATS, sin perfil técnico.",
     description:
-      "Curso en vivo de dos clases donde armamos, paso a paso, un asistente de selección con Claude Projects, un bot conectado a WhatsApp con Botpress, y un ATS a medida en Lovable con Supabase. Pensado para selectoras y selectores que quieren dejar de filtrar CVs a mano.",
+      "Curso en vivo de dos clases donde armamos, paso a paso, un asistente de selección con Claude, un bot conectado con Botpress, y un ATS propio con IA publicado en Lovable. Pensado para recruiters y profesionales de RRHH sin perfil técnico que quieren dejar de filtrar CVs a mano.",
     modules: [
       {
-        title: "Clase 1 — Tu asistente de selección con IA",
+        title: "Módulo 1 (11 de agosto) — Tu asistente de selección con IA",
         items: [
-          "Asistente de selección en Claude Projects: análisis de CV, scoring y preguntas STAR",
-          "Bot de WhatsApp con Botpress conectado a tu proceso",
-          "Caso práctico en vivo con un CV y un puesto reales",
+          "Introducción a Claude y sus ventajas frente a otras IAs",
+          "Manejo de tokens y límites de uso",
+          "Armado paso a paso de tu asistente de selección",
+          "Prompt maestro de análisis de CV",
+          "Introducción a Botpress",
         ],
       },
       {
-        title: "Clase 2 — Tu propio ATS",
+        title: "Módulo 2 (18 de agosto) — Tu propio ATS con IA",
         items: [
-          "Diseño de tu ATS a medida en Lovable",
-          "Base de datos con Supabase: pipeline, candidatos, estados",
-          "Cómo seguir iterando tu asistente después del curso",
+          "Precios de las plataformas (Botpress y Lovable)",
+          "Diseño de tu ATS en Claude",
+          "Deploy del ATS en Lovable",
+          "Pipeline de candidatos tipo Kanban",
+          "Publicación del ATS recibiendo postulantes reales",
         ],
       },
     ],
+    outcomes: [
+      "Tu asistente de selección con IA, configurado con tu propio contexto",
+      "Análisis de CVs en segundos, con scoring y recomendación automática",
+      "Tu propio ATS publicado, con pipeline Kanban y formulario de postulación",
+      "Prompts maestros para entrevistas y preguntas STAR",
+      "Criterios de privacidad y mitigación de sesgos",
+      "Grabación incluida de las dos clases",
+      "Certificado de asistencia",
+    ],
     price: "$45.000 ARS",
-    priceARS: 45000,
-    priceNote: "🔥 Antes $60.000 · Ahorrás $15.000 · Oferta hasta el 9/8",
-    schedule: "Martes 11 y Jueves 13 de agosto · 17 a 18:30 hs (ARG)",
+    priceARS: 60000,
+    priceNote:
+      "🔥 $45.000 ARS por transferencia o USD 30 por Payoneer, antes del 9/8 · Por Mercado Pago: $60.000 ARS (sin descuento)",
+    paymentOptions: [
+      {
+        method: "Transferencia bancaria",
+        price: "$45.000 ARS",
+        note: "Antes del 9/8 (después $60.000)",
+      },
+      {
+        method: "Payoneer",
+        price: "USD 30",
+        note: "Antes del 9/8 (después USD 40)",
+      },
+      {
+        method: "Mercado Pago",
+        price: "$60.000 ARS",
+        note: "Pago online inmediato, sin descuento",
+      },
+    ],
+    bankDetails: {
+      holder: "RIVARA MELISA",
+      cbu: "0170111740000003078211",
+      alias: "MELISA.RIVARA",
+      cuil: "27-37993190-7",
+    },
+    faqs: [
+      {
+        q: "¿Necesito conocimientos técnicos?",
+        a: "No. El curso está diseñado para recruiters y profesionales de RRHH sin perfil técnico.",
+      },
+      {
+        q: "¿Las herramientas que usamos son pagas?",
+        a: "No para empezar. Claude y Lovable tienen plan gratuito.",
+      },
+      {
+        q: "¿Qué pasa si no puedo ir en vivo a alguna clase?",
+        a: "Las dos clases quedan grabadas, así que podés verlas después. Igual se recomienda asistir en vivo para practicar en el momento.",
+      },
+    ],
+    schedule:
+      "Martes 11 y martes 18 de agosto · 17 a 18:30 hs (ARG) · por Google Meet · incluye grabación y certificado de asistencia",
   },
   {
     slug: "claude-para-seleccion",

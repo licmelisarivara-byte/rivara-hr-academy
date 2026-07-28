@@ -20,12 +20,54 @@ export default function Footer() {
           <div className="eyebrow mb-3">Contacto</div>
           <p className="text-bone/60">hola@rivaraconsultora.com.ar</p>
           <p className="text-bone/60">rivaraconsultora.com.ar</p>
+          <a
+            href="https://wa.me/5491123912820"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-magenta hover:underline inline-block mt-1"
+          >
+            WhatsApp
+          </a>
         </div>
         <div>
           <div className="eyebrow mb-3">Lic. Melisa Rivara</div>
-          <p className="text-bone/60">
+          <p className="text-bone/60 mb-3">
             Especialista en Selección de Personal · RIVARA Consultora
           </p>
+          <div className="flex flex-wrap gap-3 text-bone/60">
+            <a
+              href="https://www.instagram.com/lic.melisarivara/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-magenta transition-colors"
+            >
+              Instagram
+            </a>
+            <a
+              href="https://www.facebook.com/Recursoshumanosydigitalizacion"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-magenta transition-colors"
+            >
+              Facebook
+            </a>
+            <a
+              href="http://www.youtube.com/@recursoshumanosydigitalizacion"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-magenta transition-colors"
+            >
+              YouTube
+            </a>
+            <a
+              href="https://www.linkedin.com/company/rivara-consultora"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-magenta transition-colors"
+            >
+              LinkedIn
+            </a>
+          </div>
         </div>
       </div>
       <div className="hairline" />

@@ -57,8 +57,12 @@ export default function CheckoutButton({ course }: { course: Course }) {
       {error && (
         <p className="text-xs text-bone/50 mt-3 max-w-xs">
           {error}{" "}
-          {/* TODO: reemplazar por el link real wa.me/549[numero] de Melisa */}
-          <a href="/contacto" className="text-magenta hover:underline">
+          <a
+            href="https://wa.me/5491123912820"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-magenta hover:underline"
+          >
             Escribir por WhatsApp
           </a>
         </p>

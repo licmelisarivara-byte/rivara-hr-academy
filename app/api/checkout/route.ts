@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "course_not_found" }, { status: 404 });
     }
     title = course.title;
-    unitPrice = course.priceARS;
+    unitPrice = course.priceARS ?? 0;
     failureUrl = `${siteUrl}/cursos/${course.slug}?compra=fallida`;
   }
 

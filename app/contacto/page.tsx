@@ -4,8 +4,7 @@ export default function ContactoPage() {
       <p className="eyebrow mb-4">Contacto</p>
       <h1 className="font-display text-3xl text-bone mb-6">Escribime</h1>
       <p className="text-bone/60 mb-8">
-        {/* TODO: reemplazar por el link real de WhatsApp de Melisa (wa.me/549...) */}
-        Para coordinar el pago o resolver dudas, escribime a{" "}
+        Para coordinar el pago o resolver dudas, escribime por WhatsApp o a{" "}
         <a
           href="mailto:hola@rivaraconsultora.com.ar"
           className="text-magenta hover:underline"
@@ -14,6 +13,14 @@ export default function ContactoPage() {
         </a>
         .
       </p>
+      <a
+        href="https://wa.me/5491123912820"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-block bg-magenta text-white font-semibold px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors"
+      >
+        Escribir por WhatsApp →
+      </a>
     </div>
   );
 }

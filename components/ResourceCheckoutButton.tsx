@@ -44,7 +44,12 @@ export default function ResourceCheckoutButton({ resource }: { resource: PaidRes
       {error && (
         <p className="text-xs text-bone/50 mt-2">
           {error}{" "}
-          <a href="/contacto" className="text-magenta hover:underline">
+          <a
+            href="https://wa.me/5491123912820"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-magenta hover:underline"
+          >
             Escribir por WhatsApp
           </a>
         </p>

@@ -73,14 +73,14 @@ export default function Home() {
           <div>
             <span className="eyebrow">En vivo</span>
             <h3 className="font-display text-2xl sm:text-3xl text-bone mt-3 mb-4">
-              IA para Selección de Personal
+              Creá tu propio Bot de Selección + ATS con IA
             </h3>
             <p className="text-bone/70 text-lg mb-6">
-              De cero a tu Asistente de Selección y tu propio ATS en 2 clases
-              en vivo.
+              En 2 clases en vivo armás tu asistente de selección con IA y
+              publicás tu propio ATS, sin perfil técnico.
             </p>
             <div className="flex flex-col gap-2 text-sm text-bone/60 mb-2">
-              <span>📅 Martes 11 y Jueves 13 de agosto · 17 a 18:30 hs (ARG)</span>
+              <span>📅 Martes 11 y martes 18 de agosto · 17 a 18:30 hs (ARG)</span>
             </div>
           </div>
 
@@ -96,14 +96,17 @@ export default function Home() {
                 {formatARS(45000)} ARS
               </span>
             </div>
-            <div className="text-sm text-magenta mb-6">
-              Oferta hasta el 9/8
+            <div className="text-sm text-magenta mb-1">
+              Por transferencia o Payoneer, hasta el 9/8
+            </div>
+            <div className="text-xs text-bone/40 mb-6">
+              Por Mercado Pago: {formatARS(60000)} ARS
             </div>
             <Link
               href="/cursos/de-cero-a-tu-asistente"
               className="inline-block w-full bg-magenta text-white font-semibold px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors"
             >
-              Inscribirme ahora →
+              Ver formas de pago →
             </Link>
           </div>
         </div>
