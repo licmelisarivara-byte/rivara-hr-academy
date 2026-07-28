@@ -12,15 +12,20 @@ export default function Home() {
   return (
     <div>
       {/* HERO */}
-      <section className="relative overflow-hidden bg-score-grid bg-[length:38px_38px]">
-        <div className="max-w-6xl mx-auto px-6 pt-20 pb-24 grid lg:grid-cols-[1.1fr_0.9fr] gap-14 items-center">
+      <section
+        className="relative overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, #0d0d14 0%, #1a0028 100%)",
+        }}
+      >
+        <div className="max-w-6xl mx-auto px-6 pt-20 pb-28 grid lg:grid-cols-[1.1fr_0.9fr] gap-14 items-center">
           <div>
-            <p className="eyebrow mb-5">RIVARA HR ACADEMY</p>
-            <h1 className="font-display text-4xl sm:text-5xl leading-[1.08] text-bone mb-6">
+            <p className="eyebrow mb-5 text-magenta">RIVARA HR ACADEMY</p>
+            <h1 className="font-display text-4xl sm:text-5xl leading-[1.08] text-white mb-6">
               Dejá de perder horas filtrando CVs y empezá a tomar mejores
               decisiones <span className="text-magenta">con IA</span>.
             </h1>
-            <p className="text-bone/70 text-lg max-w-xl mb-8">
+            <p className="text-white/70 text-lg max-w-xl mb-8">
               Cursos, herramientas y recursos para recruiters que quieren
               aplicar inteligencia artificial en selección de personal. Sin
               tecnicismos, con resultados desde el día 1.
@@ -28,15 +33,18 @@ export default function Home() {
             <div className="flex flex-wrap gap-4">
               <Link
                 href="#cursos-en-vivo"
-                className="bg-magenta text-white font-semibold px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors"
+                className="bg-magenta text-white font-semibold px-8 py-4 text-[1.1rem] rounded-full hover:bg-magentaSoft transition-colors shadow-lg shadow-magenta/30"
               >
-                Ver cursos disponibles →
+                Quiero mi lugar →
               </Link>
             </div>
           </div>
 
-          <div className="relative max-w-sm mx-auto w-full">
-            <div className="relative rounded-2xl overflow-hidden border border-magenta/25 shadow-2xl shadow-black/40">
+          <div className="relative max-w-md mx-auto w-full">
+            <div
+              className="relative rounded-[20px] overflow-hidden border border-magenta/30"
+              style={{ boxShadow: "0 20px 40px rgba(232,0,111,0.25)" }}
+            >
               <Image
                 src="/images/melisa-portrait.jpg"
                 alt="Lic. Melisa Rivara"
@@ -46,7 +54,7 @@ export default function Home() {
                 priority
               />
             </div>
-            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-max card rounded-full px-5 py-2.5 shadow-xl shadow-black/30 flex items-center gap-2 text-sm text-bone whitespace-nowrap">
+            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-max rounded-full px-5 py-2.5 bg-black/60 backdrop-blur border border-magenta/40 shadow-xl shadow-black/30 flex items-center gap-2 text-sm text-white whitespace-nowrap">
               <span className="w-2 h-2 rounded-full bg-magenta" />
               Lic. Melisa Rivara — Especialista en Selección de Personal
             </div>
@@ -77,17 +85,25 @@ export default function Home() {
           </div>
 
           <div className="card-alt rounded-xl p-6 text-center">
-            <div className="font-display text-3xl text-bone mb-1">
-              Desde {formatARS(45000)} ARS
+            <span className="inline-block text-xs font-semibold bg-magenta text-white px-3 py-1 rounded-full mb-3">
+              🔥 Ahorrá {formatARS(15000)}
+            </span>
+            <div className="mb-1">
+              <span className="text-bone/40 line-through text-lg mr-2">
+                {formatARS(60000)}
+              </span>
+              <span className="font-display text-3xl text-bone">
+                {formatARS(45000)} ARS
+              </span>
             </div>
             <div className="text-sm text-magenta mb-6">
-              Precio con descuento hasta el 9/8
+              Oferta hasta el 9/8
             </div>
             <Link
               href="/cursos/de-cero-a-tu-asistente"
               className="inline-block w-full bg-magenta text-white font-semibold px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors"
             >
-              Ver más e inscribirme →
+              Inscribirme ahora →
             </Link>
           </div>
         </div>
@@ -115,7 +131,7 @@ export default function Home() {
                     download
                     className="text-sm bg-sage text-white font-semibold px-4 py-2 rounded-full hover:opacity-90 transition-colors inline-block"
                   >
-                    Descargar gratis
+                    ⬇️ Descargar gratis →
                   </a>
                 ) : (
                   <span className="text-sm text-bone/40 italic">

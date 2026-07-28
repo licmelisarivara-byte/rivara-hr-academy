@@ -41,8 +41,8 @@ export const courses: Course[] = [
         ],
       },
     ],
-    price: "Desde $45.000 ARS",
-    priceNote: "Precio con descuento hasta el 9/8",
+    price: "$45.000 ARS",
+    priceNote: "🔥 Antes $60.000 · Ahorrás $15.000 · Oferta hasta el 9/8",
     schedule: "Martes 11 y Jueves 13 de agosto · 17 a 18:30 hs (ARG)",
   },
   {
