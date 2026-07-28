@@ -5,7 +5,8 @@ export type Course = {
   tagline: string;
   description: string;
   modules: { title: string; items: string[] }[];
-  price: string; // TODO real: reemplazar con precio final
+  price: string; // texto mostrado en pantalla
+  priceARS: number; // monto real que se cobra por Mercado Pago
   priceNote?: string;
   schedule?: string;
   externalCheckout?: string; // e.g. link to Hotmart if it's sold there
@@ -42,6 +43,7 @@ export const courses: Course[] = [
       },
     ],
     price: "$45.000 ARS",
+    priceARS: 45000,
     priceNote: "🔥 Antes $60.000 · Ahorrás $15.000 · Oferta hasta el 9/8",
     schedule: "Martes 11 y Jueves 13 de agosto · 17 a 18:30 hs (ARG)",
   },

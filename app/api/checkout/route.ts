@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "course_not_found" }, { status: 404 });
     }
     title = course.title;
-    unitPrice = 0; // TODO: precio real en ARS del curso, todavía no confirmado
+    unitPrice = course.priceARS;
     failureUrl = `${siteUrl}/cursos/${course.slug}?compra=fallida`;
   }
 
