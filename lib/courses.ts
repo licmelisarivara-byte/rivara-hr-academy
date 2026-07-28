@@ -9,6 +9,7 @@ export type Course = {
   tagline: string;
   description: string;
   modules: { title: string; items: string[] }[];
+  image?: string; // portada en /public/images
   outcomes?: string[];
   price: string; // texto mostrado en pantalla
   priceARS?: number; // monto real que se cobra por Mercado Pago
@@ -29,6 +30,7 @@ export const courses: Course[] = [
     slug: "de-cero-a-tu-asistente",
     title: "Creá tu propio Bot de Selección + ATS con IA",
     format: "En vivo",
+    image: "/images/covers/curso-bot-seleccion.svg",
     tagline:
       "En 2 clases en vivo armás tu asistente de selección con IA y publicás tu propio ATS, sin perfil técnico.",
     description:
@@ -113,6 +115,7 @@ export const courses: Course[] = [
     slug: "claude-para-seleccion",
     title: "Claude para Selección",
     format: "Grabado",
+    image: "/images/covers/curso-claude-seleccion.svg",
     tagline:
       "6 módulos grabados para incorporar Claude a tu día a día de selección, a tu ritmo.",
     description:

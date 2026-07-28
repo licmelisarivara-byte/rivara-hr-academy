@@ -167,12 +167,10 @@ export default function Home() {
             >
               <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden mb-4 bg-parchment border border-black/5">
                 {r.image ? (
-                  <Image
+                  <img
                     src={r.image}
                     alt={r.title}
-                    fill
-                    sizes="(min-width: 768px) 33vw, 100vw"
-                    className="object-cover"
+                    className="w-full h-full object-cover"
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center text-bone/30 text-sm">

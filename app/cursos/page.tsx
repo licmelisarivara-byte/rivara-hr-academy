@@ -9,19 +9,34 @@ export default function CursosPage() {
 
       <div className="grid md:grid-cols-2 gap-6">
         {courses.map((c) => (
-          <Link
+          <div
             key={c.slug}
-            href={`/cursos/${c.slug}`}
-            className="card rounded-xl p-7 hover:border-magenta/60 transition-colors flex flex-col"
+            className="card rounded-xl overflow-hidden flex flex-col hover:border-magenta/60 transition-colors"
           >
-            <span className="eyebrow">{c.format}</span>
-            <h2 className="font-display text-xl text-bone mt-2 mb-2">{c.title}</h2>
-            <p className="text-bone/60 text-sm mb-6">{c.tagline}</p>
-            <div className="mt-auto flex items-center justify-between text-sm">
-              <span className="text-bone/50">{c.price}</span>
-              <span className="text-magenta">Ver detalle →</span>
+            <div className="relative w-full aspect-[4/3] bg-parchment">
+              {c.image ? (
+                <img src={c.image} alt={c.title} className="w-full h-full object-cover" />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center text-bone/30 text-sm">
+                  Foto próximamente
+                </div>
+              )}
             </div>
-          </Link>
+            <div className="p-7 flex flex-col flex-1">
+              <span className="eyebrow">{c.format}</span>
+              <h2 className="font-display text-xl text-bone mt-2 mb-2">{c.title}</h2>
+              <p className="text-bone/60 text-sm mb-6">{c.tagline}</p>
+              <div className="mt-auto flex items-center justify-between gap-4">
+                <span className="detail-text">{c.price}</span>
+                <Link
+                  href={`/cursos/${c.slug}`}
+                  className="btn-cta bg-magenta text-white px-5 py-2.5 rounded-full hover:bg-magentaSoft transition-colors"
+                >
+                  Ver más →
+                </Link>
+              </div>
+            </div>
+          </div>
         ))}
       </div>
     </div>

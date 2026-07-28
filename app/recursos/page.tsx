@@ -54,6 +54,15 @@ export default function RecursosPage() {
                   : "card rounded-xl p-6 flex flex-col"
               }
             >
+              <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden mb-4 bg-parchment border border-black/5">
+                {r.image ? (
+                  <img src={r.image} alt={r.title} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-bone/30 text-sm">
+                    Foto próximamente
+                  </div>
+                )}
+              </div>
               <span className="eyebrow">{r.kind}</span>
               <h3 className="font-display text-lg text-bone mt-2 mb-2">{r.title}</h3>
               <p className="text-bone/60 text-sm mb-5">{r.description}</p>
@@ -109,13 +118,17 @@ export default function RecursosPage() {
               <p className="text-bone/60 text-sm mb-6">{r.description}</p>
               <div className="mt-auto">
                 {!r.fileUrl ? (
-                  <span className="text-sm text-bone/40 italic">
-                    Disponible muy pronto
-                  </span>
+                  <button
+                    type="button"
+                    disabled
+                    className="btn-cta bg-bone/20 text-bone/50 px-4 py-2 rounded-full cursor-not-allowed"
+                  >
+                    Próximamente
+                  </button>
                 ) : supabaseConfigured && !loggedIn ? (
                   <Link
                     href="/registro"
-                    className="text-sm bg-sage text-white font-semibold px-4 py-2 rounded-full hover:opacity-90 transition-colors inline-block"
+                    className="btn-cta bg-sage text-white px-4 py-2 rounded-full hover:opacity-90 transition-colors inline-block"
                   >
                     Registrarme para descargar
                   </Link>
@@ -123,9 +136,9 @@ export default function RecursosPage() {
                   <a
                     href={r.fileUrl}
                     download
-                    className="text-sm bg-sage text-white font-semibold px-4 py-2 rounded-full hover:opacity-90 transition-colors inline-block"
+                    className="btn-cta bg-sage text-white px-4 py-2 rounded-full hover:opacity-90 transition-colors inline-block"
                   >
-                    Descargar gratis
+                    Descargar gratis →
                   </a>
                 )}
               </div>

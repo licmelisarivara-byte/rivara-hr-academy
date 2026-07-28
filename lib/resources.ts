@@ -61,6 +61,7 @@ export const paidResources: PaidResource[] = [
     priceARS: 15000,
     priceUSD: 12,
     fileUrl: "/downloads/kit-12-prompts-seleccion.pdf",
+    image: "/images/covers/kit-12-prompts.svg",
   },
   {
     slug: "basta-de-filtrar-a-mano",
@@ -71,6 +72,7 @@ export const paidResources: PaidResource[] = [
     priceARS: 22000,
     priceUSD: 18,
     fileUrl: "/downloads/guia-automatizacion-pymes.pdf",
+    image: "/images/covers/guia-pymes.svg",
   },
   {
     slug: "combo-kit-y-guia",
@@ -81,6 +83,7 @@ export const paidResources: PaidResource[] = [
     priceUSD: 25,
     savingsARS: 7000,
     isCombo: true,
+    image: "/images/covers/combo-kit-guia.svg",
   },
 ];
 
