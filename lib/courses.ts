@@ -22,6 +22,7 @@ export type Course = {
   schedule?: string;
   externalCheckout?: string; // e.g. link to Hotmart if it's sold there
   mpPaymentLink?: string; // link de pago fijo de Mercado Pago (mientras la API de Checkout Pro esté bloqueada)
+  comingSoon?: boolean; // todavía no se vende; muestra "Próximamente" en vez de un botón de compra
   freePreviewVideoId?: string; // YouTube ID, unlisted is fine
 };
 
@@ -125,8 +126,8 @@ export const courses: Course[] = [
       { title: "Módulo 5", items: ["Informes ejecutivos y comunicación con el cliente"] },
       { title: "Módulo 6", items: ["Armar tu propio Proyecto de Claude para no repetir el prompt cada vez"] },
     ],
-    price: "USD 47 (early access) / USD 67 (regular)",
-    externalCheckout: "https://hotmart.com", // TODO: reemplazar por el link real de Hotmart cuando esté publicado
+    price: "Próximamente",
+    comingSoon: true,
   },
 ];
 

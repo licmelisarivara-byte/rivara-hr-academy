@@ -7,6 +7,18 @@ export default function CheckoutButton({ course }: { course: Course }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  if (course.comingSoon) {
+    return (
+      <button
+        type="button"
+        disabled
+        className="btn-cta bg-bone/20 text-bone/50 px-6 py-3 rounded-full cursor-not-allowed"
+      >
+        Próximamente
+      </button>
+    );
+  }
+
   if (course.mpPaymentLink) {
     return (
       <a
