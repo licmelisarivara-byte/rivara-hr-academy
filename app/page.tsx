@@ -119,7 +119,7 @@ export default function Home() {
         <h2 className="font-display text-2xl sm:text-3xl text-bone mb-10">
           Empezá sin costo
         </h2>
-        <div className="grid md:grid-cols-2 gap-6 mb-24">
+        <div className="grid md:grid-cols-3 gap-6 mb-24">
           {freeResources.map((r) => (
             <div key={r.slug} className="card-alt rounded-xl p-6 flex flex-col">
               <span className="eyebrow">{r.kind}</span>

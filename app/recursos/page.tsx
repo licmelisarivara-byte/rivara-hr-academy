@@ -101,7 +101,7 @@ export default function RecursosPage() {
           </div>
         )}
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
           {freeResources.map((r) => (
             <div key={r.slug} className="card-alt rounded-xl p-6 flex flex-col">
               <span className="eyebrow">{r.kind}</span>

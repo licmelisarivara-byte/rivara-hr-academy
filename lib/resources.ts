@@ -22,7 +22,15 @@ export const freeResources: FreeResource[] = [
     kind: "PDF",
     description:
       "El prompt que arma scoring técnico y cultural (0 a 100), banderas rojas y preguntas de entrevista sugeridas a partir de un CV y un puesto. Regalo de RIVARA HR Academy.",
-    // TODO: subir el PDF (public/downloads/prompt-maestro-analisis-cvs.pdf o Drive) y completar fileUrl.
+    fileUrl: "/downloads/prompt-maestro-analisis-cv.pdf",
+  },
+  {
+    slug: "busqueda-booleana-linkedin",
+    title: "Búsqueda Booleana en LinkedIn",
+    kind: "PDF",
+    description:
+      "5 prompts listos para armar búsquedas booleanas en LinkedIn: búsqueda general, perfiles técnicos/IT, comerciales, RRHH, y una guía de operadores (AND, OR, NOT, X-Ray) con ejemplos.",
+    fileUrl: "/downloads/busqueda-booleana-linkedin.pdf",
   },
 ];
 
