@@ -51,6 +51,7 @@ export const paidResources: PaidResource[] = [
       "12 prompts listos para usar en atracción de talento, preselección, entrevistas y post-entrevista. Compatible con Claude, ChatGPT, Gemini, Copilot y NotebookLM.",
     priceARS: 15000,
     priceUSD: 12,
+    fileUrl: "/downloads/kit-12-prompts-seleccion.pdf",
   },
   {
     slug: "basta-de-filtrar-a-mano",
@@ -60,6 +61,7 @@ export const paidResources: PaidResource[] = [
       "Guía práctica de automatización de reclutamiento para PyMEs: qué automatizar, cómo elegir un ATS, plantillas listas para usar y un plan de implementación de 5 semanas.",
     priceARS: 22000,
     priceUSD: 18,
+    fileUrl: "/downloads/guia-automatizacion-pymes.pdf",
   },
   {
     slug: "combo-kit-y-guia",
