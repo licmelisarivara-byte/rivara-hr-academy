@@ -63,7 +63,7 @@ export default function Home() {
       </section>
 
       {/* CURSOS EN VIVO */}
-      <section id="cursos-en-vivo" className="max-w-6xl mx-auto px-6 py-24">
+      <section id="cursos-en-vivo" className="max-w-6xl mx-auto px-6 py-28">
         <p className="eyebrow mb-3">📚 Cursos en vivo</p>
         <h2 className="font-display text-2xl sm:text-3xl text-bone mb-10">
           Aprendé en vivo, con casos reales
@@ -113,13 +113,13 @@ export default function Home() {
       </section>
 
       {/* RECURSOS */}
-      <section id="recursos" className="max-w-6xl mx-auto px-6 py-24">
+      <section id="recursos" className="max-w-6xl mx-auto px-6 py-28">
         {/* GRATIS */}
         <p className="eyebrow mb-3">🎁 Recursos gratuitos</p>
         <h2 className="font-display text-2xl sm:text-3xl text-bone mb-10">
           Empezá sin costo
         </h2>
-        <div className="grid md:grid-cols-2 gap-6 mb-20">
+        <div className="grid md:grid-cols-2 gap-6 mb-24">
           {freeResources.map((r) => (
             <div key={r.slug} className="card-alt rounded-xl p-6 flex flex-col">
               <span className="eyebrow">{r.kind}</span>
@@ -132,14 +132,18 @@ export default function Home() {
                   <a
                     href={r.fileUrl}
                     download
-                    className="btn-cta text-sm bg-sage text-white px-4 py-2 rounded-full hover:opacity-90 transition-colors inline-block"
+                    className="btn-cta bg-sage text-white px-4 py-2 rounded-full hover:opacity-90 transition-colors inline-block"
                   >
-                    ⬇️ Descargar gratis →
+                    Descargar gratis →
                   </a>
                 ) : (
-                  <span className="text-sm text-bone/40 italic">
-                    Disponible muy pronto
-                  </span>
+                  <button
+                    type="button"
+                    disabled
+                    className="btn-cta bg-bone/20 text-bone/50 px-4 py-2 rounded-full cursor-not-allowed"
+                  >
+                    Próximamente
+                  </button>
                 )}
               </div>
             </div>
@@ -161,6 +165,21 @@ export default function Home() {
                   : "card rounded-xl p-6 flex flex-col"
               }
             >
+              <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden mb-4 bg-parchment border border-black/5">
+                {r.image ? (
+                  <Image
+                    src={r.image}
+                    alt={r.title}
+                    fill
+                    sizes="(min-width: 768px) 33vw, 100vw"
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-bone/30 text-sm">
+                    Foto próximamente
+                  </div>
+                )}
+              </div>
               <span className="eyebrow">{r.kind}</span>
               <h3 className="font-display text-lg text-bone mt-2 mb-2">
                 {r.title}

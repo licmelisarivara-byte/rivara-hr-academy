@@ -40,6 +40,7 @@ export type PaidResource = {
   savingsARS?: number;
   isCombo?: boolean;
   fileUrl?: string; // se completa cuando esté subido el PDF final de venta
+  image?: string; // foto de portada en /public/images, opcional
 };
 
 export const paidResources: PaidResource[] = [
