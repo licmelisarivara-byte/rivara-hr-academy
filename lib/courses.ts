@@ -1,3 +1,5 @@
+import { bankDetails } from "@/lib/bankDetails";
+
 export type PaymentOption = { method: string; price: string; note?: string };
 export type BankDetails = { holder: string; cbu: string; alias: string; cuil: string };
 export type FAQ = { q: string; a: string };
@@ -87,12 +89,7 @@ export const courses: Course[] = [
         note: "Pago online inmediato, sin descuento",
       },
     ],
-    bankDetails: {
-      holder: "RIVARA MELISA",
-      cbu: "0170111740000003078211",
-      alias: "MELISA.RIVARA",
-      cuil: "27-37993190-7",
-    },
+    bankDetails,
     faqs: [
       {
         q: "¿Necesito conocimientos técnicos?",

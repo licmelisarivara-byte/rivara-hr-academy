@@ -49,6 +49,7 @@ export type PaidResource = {
   isCombo?: boolean;
   fileUrl?: string; // se completa cuando esté subido el PDF final de venta
   image?: string; // foto de portada en /public/images, opcional
+  mpPaymentLink?: string; // link de pago fijo de Mercado Pago (mientras la API de Checkout Pro esté bloqueada)
 };
 
 export const paidResources: PaidResource[] = [

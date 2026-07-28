@@ -7,6 +7,19 @@ export default function ResourceCheckoutButton({ resource }: { resource: PaidRes
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  if (resource.mpPaymentLink) {
+    return (
+      <a
+        href={resource.mpPaymentLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors inline-block text-center"
+      >
+        {resource.isCombo ? "Comprar combo →" : "Comprar ahora →"}
+      </a>
+    );
+  }
+
   async function handleClick() {
     setLoading(true);
     setError(null);
