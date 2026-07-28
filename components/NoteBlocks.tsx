@@ -42,6 +42,31 @@ export default function NoteBlocks({ blocks }: { blocks: NoteBlock[] }) {
             );
           case "hr":
             return <div key={i} className="hairline my-8" />;
+          case "source":
+            return (
+              <p key={i} className="detail-text !text-magenta">
+                Fuente: {block.text}
+              </p>
+            );
+          case "links":
+            return (
+              <p key={i} className="text-sm">
+                🔗{" "}
+                {block.items.map((l, j) => (
+                  <span key={j}>
+                    <a
+                      href={l.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-magenta hover:underline"
+                    >
+                      {l.text}
+                    </a>
+                    {j < block.items.length - 1 ? " · " : ""}
+                  </span>
+                ))}
+              </p>
+            );
           case "cta":
             return (
               <p key={i} className="card-alt rounded-xl p-6 text-bone/70 leading-relaxed">
