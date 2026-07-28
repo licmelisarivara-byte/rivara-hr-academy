@@ -18,8 +18,19 @@ export default function Footer() {
         </div>
         <div>
           <div className="eyebrow mb-3">Contacto</div>
-          <p className="text-bone/60">hola@rivaraconsultora.com.ar</p>
-          <p className="text-bone/60">rivaraconsultora.com.ar</p>
+          <p className="text-bone/60">
+            <a href="mailto:hola@rivaraconsultora.com.ar" className="hover:text-magenta transition-colors">
+              hola@rivaraconsultora.com.ar
+            </a>
+          </p>
+          <a
+            href="https://www.rivaraconsultora.com.ar"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-bone/60 hover:text-magenta transition-colors inline-block"
+          >
+            rivaraconsultora.com.ar
+          </a>
           <a
             href="https://wa.me/5491123912820"
             target="_blank"
