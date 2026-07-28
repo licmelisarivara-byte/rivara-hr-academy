@@ -41,8 +41,12 @@ export default function RecursosPage() {
         <h2 className="font-display text-2xl text-bone mb-1">
           Comprá, descargá y aplicá desde hoy
         </h2>
-        <p className="text-bone/50 text-sm mb-8">
+        <p className="text-bone/50 text-sm mb-2">
           Material listo para usar.
+        </p>
+        <p className="detail-text mb-8">
+          Pago en USD (Payoneer) disponible solo para el combo. El Kit y la
+          Guía por separado se cobran en ARS.
         </p>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -75,7 +79,12 @@ export default function RecursosPage() {
                   </span>
                   <span className="text-bone/40 text-xs">ARS</span>
                 </div>
-                <div className="text-bone/50 text-xs mb-1">USD {r.priceUSD}</div>
+                <div className="text-bone/50 text-xs mb-1">
+                  USD {r.priceUSD}
+                  {!r.payoneerLink && (
+                    <span className="text-bone/40"> (solo referencia, se cobra en ARS)</span>
+                  )}
+                </div>
                 {r.savingsARS && (
                   <div className="text-magenta text-xs mb-3">
                     Ahorrás {formatARS(r.savingsARS)}
@@ -84,6 +93,16 @@ export default function RecursosPage() {
                 <div className={r.savingsARS ? "" : "mt-3"}>
                   <ResourceCheckoutButton resource={r} />
                 </div>
+                {r.payoneerLink && (
+                  <a
+                    href={r.payoneerLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="detail-text block text-center mt-2 hover:text-magenta"
+                  >
+                    Pagar en USD con Payoneer →
+                  </a>
+                )}
                 <a
                   href={`https://wa.me/5491123912820?text=${encodeURIComponent(
                     `Hola! Quiero pagar por transferencia: ${r.title}`
