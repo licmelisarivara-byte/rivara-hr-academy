@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notes } from "@/lib/notes";
+
+export const metadata: Metadata = {
+  title: "Notas de Selección",
+  description:
+    "Reflexiones y análisis sobre IA aplicada a selección de personal y RRHH, por Lic. Melisa Rivara.",
+};
 
 export default function NotasPage() {
   return (

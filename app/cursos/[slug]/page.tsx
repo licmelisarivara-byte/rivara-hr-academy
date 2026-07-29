@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { courses, getCourseBySlug } from "@/lib/courses";
 import CheckoutButton from "@/components/CheckoutButton";
@@ -6,12 +7,49 @@ export function generateStaticParams() {
   return courses.map((c) => ({ slug: c.slug }));
 }
 
+export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
+  const course = getCourseBySlug(params.slug);
+  if (!course) return {};
+  return {
+    title: course.title,
+    description: course.description,
+    openGraph: course.image ? { images: [{ url: course.image }] } : undefined,
+  };
+}
+
 export default function CourseDetailPage({ params }: { params: { slug: string } }) {
   const course = getCourseBySlug(params.slug);
   if (!course) return notFound();
 
+  const courseJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    name: course.title,
+    description: course.description,
+    provider: {
+      "@type": "Organization",
+      name: "RIVARA HR Academy",
+      sameAs: "https://hracademy.rivaraconsultora.com.ar",
+    },
+    ...(course.priceARS
+      ? {
+          offers: {
+            "@type": "Offer",
+            price: course.priceARS,
+            priceCurrency: "ARS",
+            availability: "https://schema.org/InStock",
+            url: `https://hracademy.rivaraconsultora.com.ar/cursos/${course.slug}`,
+          },
+        }
+      : {}),
+  };
+
   return (
     <div className="max-w-4xl mx-auto px-6 py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
+      />
       {course.image && (
         <div className="relative w-full max-w-md mx-auto aspect-[1080/1520] rounded-xl overflow-hidden mb-8">
           <img src={course.image} alt={course.title} className="w-full h-full object-cover" />

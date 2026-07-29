@@ -1,25 +1,22 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import type { Metadata } from "next";
 import { freeResources, paidResources } from "@/lib/resources";
 import { bankDetails } from "@/lib/bankDetails";
-import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
+import { supabaseConfigured } from "@/lib/supabaseClient";
 import ConfigNotice from "@/components/ConfigNotice";
 import ResourceCheckoutButton from "@/components/ResourceCheckoutButton";
+import FreeResourceDownloadButton from "@/components/FreeResourceDownloadButton";
+
+export const metadata: Metadata = {
+  title: "Recursos y Ebooks de IA para Selección de Personal",
+  description:
+    "Prompts y guías gratis y pagas para aplicar IA en selección de personal: kit de prompts, búsqueda booleana en LinkedIn, y guía de automatización de reclutamiento.",
+};
 
 function formatARS(n: number) {
   return `$${n.toLocaleString("es-AR")}`;
 }
 
 export default function RecursosPage() {
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  useEffect(() => {
-    if (!supabase) return;
-    supabase.auth.getSession().then(({ data }) => setLoggedIn(!!data.session));
-  }, []);
-
   return (
     <div className="max-w-5xl mx-auto px-6 py-16">
       <p className="eyebrow mb-4">Recursos</p>
@@ -161,30 +158,7 @@ export default function RecursosPage() {
               <h3 className="font-display text-lg text-bone mt-2 mb-2">{r.title}</h3>
               <p className="text-bone/60 text-sm mb-6">{r.description}</p>
               <div className="mt-auto">
-                {!r.fileUrl ? (
-                  <button
-                    type="button"
-                    disabled
-                    className="btn-cta bg-bone/20 text-bone/50 px-4 py-2 rounded-full cursor-not-allowed"
-                  >
-                    Próximamente
-                  </button>
-                ) : supabaseConfigured && !loggedIn ? (
-                  <Link
-                    href="/registro"
-                    className="btn-cta bg-sage text-white px-4 py-2 rounded-full hover:opacity-90 transition-colors inline-block"
-                  >
-                    Registrarme para descargar
-                  </Link>
-                ) : (
-                  <a
-                    href={r.fileUrl}
-                    download
-                    className="btn-cta bg-sage text-white px-4 py-2 rounded-full hover:opacity-90 transition-colors inline-block"
-                  >
-                    Descargar gratis →
-                  </a>
-                )}
+                <FreeResourceDownloadButton resource={r} />
               </div>
             </div>
           ))}

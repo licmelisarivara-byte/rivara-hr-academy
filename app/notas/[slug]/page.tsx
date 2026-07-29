@@ -1,9 +1,19 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { notes, getNoteBySlug } from "@/lib/notes";
 import NoteBlocks from "@/components/NoteBlocks";
 
 export function generateStaticParams() {
   return notes.map((n) => ({ slug: n.slug }));
+}
+
+export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
+  const note = getNoteBySlug(params.slug);
+  if (!note) return {};
+  return {
+    title: note.title,
+    description: note.excerpt,
+  };
 }
 
 export default function NoteDetailPage({ params }: { params: { slug: string } }) {

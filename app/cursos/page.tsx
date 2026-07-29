@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { courses } from "@/lib/courses";
+
+export const metadata: Metadata = {
+  title: "Cursos de IA para Selección de Personal",
+  description:
+    "Cursos en vivo y grabados para aplicar IA en selección de personal: armá tu asistente de selección, tu propio ATS, y sumá Claude a tu día a día de RRHH.",
+};
 
 export default function CursosPage() {
   return (

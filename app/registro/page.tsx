@@ -34,6 +34,7 @@ export default function RegistroPage() {
   if (done) {
     return (
       <div className="max-w-md mx-auto px-6 py-20 text-center">
+        <meta name="robots" content="noindex, nofollow" />
         <h1 className="font-display text-2xl text-bone mb-3">Revisá tu email</h1>
         <p className="text-bone/60">
           Te enviamos un link de confirmación para activar tu cuenta.
@@ -44,6 +45,7 @@ export default function RegistroPage() {
 
   return (
     <div className="max-w-md mx-auto px-6 py-20">
+      <meta name="robots" content="noindex, nofollow" />
       <p className="eyebrow mb-4">Alumnos</p>
       <h1 className="font-display text-3xl text-bone mb-8">Crear cuenta</h1>
 

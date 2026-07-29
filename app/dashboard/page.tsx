@@ -24,6 +24,7 @@ export default function DashboardPage() {
   if (!supabaseConfigured) {
     return (
       <div className="max-w-4xl mx-auto px-6 py-16">
+        <meta name="robots" content="noindex, nofollow" />
         <ConfigNotice what="el login y las compras de los alumnos" />
       </div>
     );
@@ -36,6 +37,7 @@ export default function DashboardPage() {
   if (!userEmail) {
     return (
       <div className="max-w-md mx-auto px-6 py-20 text-center">
+        <meta name="robots" content="noindex, nofollow" />
         <h1 className="font-display text-2xl text-bone mb-4">Necesitás ingresar</h1>
         <Link href="/login" className="text-magenta hover:underline">
           Ir a login →
@@ -46,6 +48,7 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-16">
+      <meta name="robots" content="noindex, nofollow" />
       <p className="eyebrow mb-4">Mi cuenta</p>
       <h1 className="font-display text-3xl text-bone mb-2">Hola de nuevo</h1>
       <p className="text-bone/50 mb-10">{userEmail}</p>

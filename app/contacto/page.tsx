@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Contacto",
+  description: "Escribile a Lic. Melisa Rivara por WhatsApp o email para coordinar cursos, recursos o pagos.",
+};
+
 export default function ContactoPage() {
   return (
     <div className="max-w-md mx-auto px-6 py-20 text-center">

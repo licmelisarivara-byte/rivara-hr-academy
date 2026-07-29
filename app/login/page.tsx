@@ -29,6 +29,7 @@ export default function LoginPage() {
 
   return (
     <div className="max-w-md mx-auto px-6 py-20">
+      <meta name="robots" content="noindex, nofollow" />
       <p className="eyebrow mb-4">Alumnos</p>
       <h1 className="font-display text-3xl text-bone mb-8">Ingresar</h1>
 
