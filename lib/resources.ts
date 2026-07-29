@@ -48,6 +48,7 @@ export type PaidResource = {
   savingsARS?: number;
   isCombo?: boolean;
   fileUrl?: string; // se completa cuando esté subido el PDF final de venta
+  fileUrls?: string[]; // para combos: un link por cada PDF incluido
   image?: string; // foto de portada en /public/images, opcional
   mpPaymentLink?: string; // link de pago fijo de Mercado Pago (mientras la API de Checkout Pro esté bloqueada)
   payoneerLink?: string; // link de pago en USD; Payoneer exige mínimo USD 20 por link
@@ -87,6 +88,10 @@ export const paidResources: PaidResource[] = [
     priceUSD: 25,
     savingsARS: 7000,
     isCombo: true,
+    fileUrls: [
+      "/downloads/kit-12-prompts-seleccion.pdf",
+      "/downloads/guia-automatizacion-pymes.pdf",
+    ],
     image: "/images/covers/combo-kit-guia.png",
     mpPaymentLink: "https://mpago.la/1C4L7zt",
     payoneerLink: "https://link.payoneer.com/Token?t=6EFF423EBE87409CAD8EAD6CC230EC8C&src=pl",

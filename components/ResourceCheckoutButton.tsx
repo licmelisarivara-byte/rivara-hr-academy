@@ -7,19 +7,11 @@ export default function ResourceCheckoutButton({ resource }: { resource: PaidRes
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  if (resource.mpPaymentLink) {
-    return (
-      <a
-        href={resource.mpPaymentLink}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors inline-block text-center"
-      >
-        {resource.isCombo ? "Comprar combo →" : "Comprar ahora →"}
-      </a>
-    );
-  }
-
+  // Primero intenta el flujo automático (crea la preferencia en /api/checkout
+  // y te manda a Mercado Pago; eso es lo único que dispara el webhook que
+  // registra la compra y envía el PDF solo). Si MP_ACCESS_TOKEN todavía no
+  // está configurado en el servidor, cae al link fijo de MP (si existe) o al
+  // mensaje de WhatsApp — igual que el flujo manual de antes.
   async function handleClick() {
     setLoading(true);
     setError(null);
@@ -33,13 +25,17 @@ export default function ResourceCheckoutButton({ resource }: { resource: PaidRes
       const data = await res.json();
       if (data.init_point) {
         window.location.href = data.init_point;
-      } else {
-        throw new Error("no-init-point");
+        return;
       }
+      throw new Error("no-init-point");
     } catch (e) {
-      setError(
-        "El cobro online todavía no está configurado. Escribinos y coordinamos el pago."
-      );
+      if (resource.mpPaymentLink) {
+        window.open(resource.mpPaymentLink, "_blank", "noopener,noreferrer");
+      } else {
+        setError(
+          "El cobro online todavía no está configurado. Escribinos y coordinamos el pago."
+        );
+      }
     } finally {
       setLoading(false);
     }

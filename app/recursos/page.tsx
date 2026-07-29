@@ -16,7 +16,13 @@ function formatARS(n: number) {
   return `$${n.toLocaleString("es-AR")}`;
 }
 
-export default function RecursosPage() {
+export default function RecursosPage({
+  searchParams,
+}: {
+  searchParams?: { compra?: string };
+}) {
+  const compra = searchParams?.compra;
+
   return (
     <div className="max-w-5xl mx-auto px-6 py-16">
       <p className="eyebrow mb-4">Recursos</p>
@@ -26,6 +32,20 @@ export default function RecursosPage() {
       <p className="text-bone/60 max-w-2xl mb-14">
         Prompts y guías que uso yo misma en procesos de selección reales.
       </p>
+
+      {compra === "exitosa" && (
+        <div className="card-alt rounded-xl p-4 mb-10 border border-sage/40 text-sm text-bone/80">
+          ¡Gracias por tu compra! Te enviamos el PDF por email apenas se
+          confirmó el pago (revisá también spam). Si en unos minutos no te
+          llegó, escribinos por WhatsApp.
+        </div>
+      )}
+      {compra === "fallida" && (
+        <div className="card-alt rounded-xl p-4 mb-10 border border-magenta/40 text-sm text-bone/80">
+          El pago no se pudo completar. Podés intentar de nuevo o escribirnos
+          por WhatsApp para coordinar el pago.
+        </div>
+      )}
 
       {/* EBOOKS Y RECURSOS PAGOS */}
       <section className="mb-16">
