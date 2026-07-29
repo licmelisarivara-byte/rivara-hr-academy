@@ -4,6 +4,7 @@ import { freeResources, paidResources } from "@/lib/resources";
 import { bankDetails } from "@/lib/bankDetails";
 import AboutSection from "@/components/AboutSection";
 import ResourceCheckoutButton from "@/components/ResourceCheckoutButton";
+import FreeResourceDownloadButton from "@/components/FreeResourceDownloadButton";
 
 function formatARS(n: number) {
   return `$${n.toLocaleString("es-AR")}`;
@@ -129,23 +130,7 @@ export default function Home() {
               </h3>
               <p className="text-bone/60 text-sm mb-6">{r.description}</p>
               <div className="mt-auto">
-                {r.fileUrl ? (
-                  <a
-                    href={r.fileUrl}
-                    download
-                    className="btn-cta bg-sage text-white px-4 py-2 rounded-full hover:opacity-90 transition-colors inline-block"
-                  >
-                    Descargar gratis →
-                  </a>
-                ) : (
-                  <button
-                    type="button"
-                    disabled
-                    className="btn-cta bg-bone/20 text-bone/50 px-4 py-2 rounded-full cursor-not-allowed"
-                  >
-                    Próximamente
-                  </button>
-                )}
+                <FreeResourceDownloadButton resource={r} />
               </div>
             </div>
           ))}
