@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { supabase } from "@/lib/supabaseClient";
 
 const links = [
   { href: "/cursos", label: "Cursos" },
@@ -12,6 +14,24 @@ const links = [
 
 export default function Nav() {
   const [open, setOpen] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!supabase) return;
+    supabase.auth.getSession().then(({ data }) => setLoggedIn(!!data.session));
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setLoggedIn(!!session);
+    });
+    return () => listener.subscription.unsubscribe();
+  }, []);
+
+  async function handleLogout() {
+    if (!supabase) return;
+    await supabase.auth.signOut();
+    setOpen(false);
+    router.push("/");
+  }
 
   return (
     <header className="border-b border-black/5 sticky top-0 z-40 bg-ink/90 backdrop-blur">
@@ -36,18 +56,38 @@ export default function Nav() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <Link
-            href="/login"
-            className="text-sm text-bone/80 hover:text-magenta transition-colors hidden sm:inline"
-          >
-            Ingresar
-          </Link>
-          <Link
-            href="/cursos"
-            className="btn-cta text-sm bg-magenta text-white px-4 py-2 rounded-full hover:bg-magentaSoft transition-colors hidden sm:inline-block"
-          >
-            Ver cursos
-          </Link>
+          {loggedIn ? (
+            <>
+              <Link
+                href="/dashboard"
+                className="text-sm text-bone/80 hover:text-magenta transition-colors hidden sm:inline"
+              >
+                Mi cuenta
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="btn-cta text-sm bg-magenta text-white px-4 py-2 rounded-full hover:bg-magentaSoft transition-colors hidden sm:inline-block"
+              >
+                Cerrar sesión
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="text-sm text-bone/80 hover:text-magenta transition-colors hidden sm:inline"
+              >
+                Ingresar
+              </Link>
+              <Link
+                href="/cursos"
+                className="btn-cta text-sm bg-magenta text-white px-4 py-2 rounded-full hover:bg-magentaSoft transition-colors hidden sm:inline-block"
+              >
+                Ver cursos
+              </Link>
+            </>
+          )}
 
           <button
             type="button"
@@ -87,20 +127,41 @@ export default function Nav() {
               {l.label}
             </Link>
           ))}
-          <Link
-            href="/login"
-            onClick={() => setOpen(false)}
-            className="hover:text-magenta transition-colors"
-          >
-            Ingresar
-          </Link>
-          <Link
-            href="/cursos"
-            onClick={() => setOpen(false)}
-            className="btn-cta bg-magenta text-white px-4 py-2.5 rounded-full text-center hover:bg-magentaSoft transition-colors"
-          >
-            Ver cursos
-          </Link>
+          {loggedIn ? (
+            <>
+              <Link
+                href="/dashboard"
+                onClick={() => setOpen(false)}
+                className="hover:text-magenta transition-colors"
+              >
+                Mi cuenta
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="btn-cta bg-magenta text-white px-4 py-2.5 rounded-full text-center hover:bg-magentaSoft transition-colors"
+              >
+                Cerrar sesión
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                onClick={() => setOpen(false)}
+                className="hover:text-magenta transition-colors"
+              >
+                Ingresar
+              </Link>
+              <Link
+                href="/cursos"
+                onClick={() => setOpen(false)}
+                className="btn-cta bg-magenta text-white px-4 py-2.5 rounded-full text-center hover:bg-magentaSoft transition-colors"
+              >
+                Ver cursos
+              </Link>
+            </>
+          )}
         </nav>
       )}
     </header>
