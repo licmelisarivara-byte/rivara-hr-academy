@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import ConfigNotice from "@/components/ConfigNotice";
 import { courses } from "@/lib/courses";
@@ -15,6 +16,16 @@ type MyPurchase = {
 };
 
 export default function DashboardPage() {
+  return (
+    <Suspense fallback={null}>
+      <DashboardContent />
+    </Suspense>
+  );
+}
+
+function DashboardContent() {
+  const searchParams = useSearchParams();
+  const compra = searchParams.get("compra");
   const [checking, setChecking] = useState(true);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [purchases, setPurchases] = useState<MyPurchase[]>([]);
@@ -81,6 +92,19 @@ export default function DashboardPage() {
       <p className="eyebrow mb-4">Mi cuenta</p>
       <h1 className="font-display text-3xl text-bone mb-2">Hola de nuevo</h1>
       <p className="text-bone/50 mb-10">{userEmail}</p>
+
+      {compra === "exitosa" && (
+        <div className="card-alt rounded-xl p-4 mb-10 border border-sage/40 text-sm text-bone/80">
+          ¡Gracias por tu compra! En cuanto se confirme el pago, lo vas a ver
+          acá abajo (puede tardar unos minutos).
+        </div>
+      )}
+      {compra === "fallida" && (
+        <div className="card-alt rounded-xl p-4 mb-10 border border-magenta/40 text-sm text-bone/80">
+          El pago no se pudo completar. Podés intentar de nuevo o escribirnos
+          por WhatsApp para coordinar el pago.
+        </div>
+      )}
 
       {resourcePurchases.length > 0 && (
         <div className="mb-12">

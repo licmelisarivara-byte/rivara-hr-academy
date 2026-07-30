@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { freeResources, paidResources } from "@/lib/resources";
-import { bankDetails } from "@/lib/bankDetails";
 import { supabaseConfigured } from "@/lib/supabaseClient";
 import ConfigNotice from "@/components/ConfigNotice";
-import ResourceCheckoutButton from "@/components/ResourceCheckoutButton";
+import ResourcePaymentActions from "@/components/ResourcePaymentActions";
 import FreeResourceDownloadButton from "@/components/FreeResourceDownloadButton";
 
 export const metadata: Metadata = {
@@ -33,13 +32,6 @@ export default function RecursosPage({
         Prompts y guías que uso yo misma en procesos de selección reales.
       </p>
 
-      {compra === "exitosa" && (
-        <div className="card-alt rounded-xl p-4 mb-10 border border-sage/40 text-sm text-bone/80">
-          ¡Gracias por tu compra! Te enviamos el PDF por email apenas se
-          confirmó el pago (revisá también spam). Si en unos minutos no te
-          llegó, escribinos por WhatsApp.
-        </div>
-      )}
       {compra === "fallida" && (
         <div className="card-alt rounded-xl p-4 mb-10 border border-magenta/40 text-sm text-bone/80">
           El pago no se pudo completar. Podés intentar de nuevo o escribirnos
@@ -108,45 +100,11 @@ export default function RecursosPage({
                   </div>
                 )}
                 <div className={r.savingsARS ? "" : "mt-3"}>
-                  <ResourceCheckoutButton resource={r} />
+                  <ResourcePaymentActions resource={r} />
                 </div>
-                {r.payoneerLink && (
-                  <a
-                    href={r.payoneerLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="detail-text block text-center mt-2 hover:text-magenta"
-                  >
-                    Pagar en USD con Payoneer →
-                  </a>
-                )}
-                <a
-                  href={`https://wa.me/5491123912820?text=${encodeURIComponent(
-                    `Hola! Quiero pagar por transferencia: ${r.title}`
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="detail-text block text-center mt-2 hover:text-magenta"
-                >
-                  o por transferencia →
-                </a>
               </div>
             </div>
           ))}
-        </div>
-
-        <div className="card-alt rounded-xl p-6 mt-8 text-sm text-bone/70">
-          <p className="font-semibold text-bone mb-2">
-            ¿Preferís transferencia bancaria?
-          </p>
-          <p>Titular: {bankDetails.holder}</p>
-          <p>CBU: {bankDetails.cbu}</p>
-          <p>Alias: {bankDetails.alias}</p>
-          <p>CUIL: {bankDetails.cuil}</p>
-          <p className="mt-2 text-xs text-bone/50">
-            Transferí y escribinos por WhatsApp contándonos qué recurso
-            querés — confirmamos el pago y te enviamos el PDF por ahí mismo.
-          </p>
         </div>
       </section>
 

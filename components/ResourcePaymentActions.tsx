@@ -4,17 +4,17 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
-import CheckoutButton from "@/components/CheckoutButton";
-import type { Course } from "@/lib/courses";
+import ResourceCheckoutButton from "@/components/ResourceCheckoutButton";
+import { bankDetails } from "@/lib/bankDetails";
+import type { PaidResource } from "@/lib/resources";
 
 type Method = "" | "transferencia" | "mercadopago" | "payoneer";
 
-// Los precios/formas de pago quedan visibles sin loguearse (ayudan a
-// decidir la compra), pero ninguna acción real —Mercado Pago, coordinar
-// transferencia, Payoneer— se puede tocar sin registrarse antes. Así, sea
-// cual sea el método que elija, siempre queda su mail (y ahora también
-// nombre y celular, que ya pidió el registro).
-export default function CoursePaymentActions({ course }: { course: Course }) {
+// Mismo esquema que CoursePaymentActions: precios visibles sin loguearse,
+// pero elegir y confirmar una forma de pago pide login antes. Transferencia
+// y Payoneer quedan registrados como "pending" y avisan por WhatsApp;
+// Mercado Pago usa el checkout automático existente.
+export default function ResourcePaymentActions({ resource }: { resource: PaidResource }) {
   const pathname = usePathname();
   const router = useRouter();
   const [checking, setChecking] = useState(supabaseConfigured);
@@ -41,37 +41,12 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
     });
   }, []);
 
-  if (course.comingSoon) {
-    return (
-      <button
-        type="button"
-        disabled
-        className="btn-cta bg-bone/20 text-bone/50 px-6 py-3 rounded-full cursor-not-allowed"
-      >
-        Próximamente
-      </button>
-    );
-  }
-
-  if (course.externalCheckout) {
-    return (
-      <a
-        href={course.externalCheckout}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="btn-cta inline-block bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors"
-      >
-        Comprar en Hotmart
-      </a>
-    );
-  }
-
   if (checking) {
     return (
       <button
         type="button"
         disabled
-        className="btn-cta bg-magenta/50 text-white px-6 py-3 rounded-full opacity-60"
+        className="btn-cta w-full bg-magenta/50 text-white px-4 py-2.5 rounded-full opacity-60"
       >
         Cargando...
       </button>
@@ -82,15 +57,11 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
     return (
       <Link
         href={`/registro?next=${encodeURIComponent(pathname)}`}
-        className="btn-cta inline-block bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors"
+        className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors inline-block text-center"
       >
         Registrarme para elegir cómo pagar →
       </Link>
     );
-  }
-
-  if (!course.paymentOptions?.length) {
-    return <CheckoutButton course={course} />;
   }
 
   async function logInterest(m: "transferencia" | "payoneer") {
@@ -99,8 +70,8 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          kind: "course",
-          slug: course.slug,
+          kind: "resource",
+          slug: resource.slug,
           method: m,
           buyerEmail: buyer?.email,
           buyerName: buyer?.name,
@@ -122,70 +93,59 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
   function confirmManual(m: "transferencia" | "payoneer") {
     const label = m === "transferencia" ? "Transferencia bancaria" : "Payoneer";
     const message = encodeURIComponent(
-      `Hola Melisa 👋\n\nQuiero inscribirme al curso "${course.title}" de RIVARA HR Academy.\n\n📌 Nombre: ${buyer?.name}\n📧 Email: ${buyer?.email}\n📱 Celular: ${buyer?.phone}\n💳 Forma de pago: ${label}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
+      `Hola Melisa 👋\n\nQuiero comprar: ${resource.title}\n\n📌 Nombre: ${buyer?.name}\n📧 Email: ${buyer?.email}\n📱 Celular: ${buyer?.phone}\n💳 Forma de pago: ${label}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
     );
     window.open(`https://wa.me/5491123912820?text=${message}`, "_blank");
     router.push("/dashboard");
   }
 
   return (
-    <div className="max-w-md">
-      <div className="mb-4">
-        <label className="text-sm text-bone/60 block mb-1">¿Cómo querés pagar?</label>
+    <div>
+      <div className="mb-3">
         <select
           value={method}
           onChange={(e) => handleMethodChange(e.target.value as Method)}
-          className="w-full rounded-lg bg-panel border border-black/10 px-4 py-2.5 text-bone focus:border-magenta outline-none"
+          className="w-full rounded-lg bg-panel border border-black/10 px-3 py-2 text-sm text-bone focus:border-magenta outline-none"
         >
-          <option value="">— Elegí una opción —</option>
-          {course.paymentOptions?.map((opt) => (
-            <option
-              key={opt.method}
-              value={
-                opt.method === "Transferencia bancaria"
-                  ? "transferencia"
-                  : opt.method === "Payoneer"
-                  ? "payoneer"
-                  : "mercadopago"
-              }
-            >
-              {opt.method} — {opt.price}
-              {opt.note ? ` (${opt.note})` : ""}
-            </option>
-          ))}
+          <option value="">¿Cómo querés pagar?</option>
+          <option value="mercadopago">Mercado Pago — ${resource.priceARS.toLocaleString("es-AR")} ARS</option>
+          <option value="transferencia">Transferencia bancaria — ${resource.priceARS.toLocaleString("es-AR")} ARS</option>
+          {resource.payoneerLink && (
+            <option value="payoneer">Payoneer — USD {resource.priceUSD}</option>
+          )}
         </select>
       </div>
 
-      {method === "mercadopago" && <CheckoutButton course={course} />}
+      {method === "mercadopago" && <ResourceCheckoutButton resource={resource} />}
 
-      {method === "transferencia" && course.bankDetails && (
-        <div className="card-alt rounded-lg p-4 mb-4 text-sm text-bone/70">
+      {method === "transferencia" && (
+        <div className="card-alt rounded-lg p-4 text-sm text-bone/70">
           <p className="font-semibold text-bone mb-2">Datos para transferencia</p>
-          <p>Titular: {course.bankDetails.holder}</p>
-          <p>CBU: {course.bankDetails.cbu}</p>
-          <p>Alias: {course.bankDetails.alias}</p>
-          <p>CUIL: {course.bankDetails.cuil}</p>
+          <p>Titular: {bankDetails.holder}</p>
+          <p>CBU: {bankDetails.cbu}</p>
+          <p>Alias: {bankDetails.alias}</p>
+          <p>CUIL: {bankDetails.cuil}</p>
           <p className="mt-3 text-xs text-bone/50">
             Una vez transferido, enviá el comprobante por WhatsApp o a{" "}
             <a href="mailto:hola@rivaraconsultora.com.ar" className="text-magenta hover:underline">
               hola@rivaraconsultora.com.ar
             </a>{" "}
-            para confirmar tu lugar.
+            para confirmar tu compra.
           </p>
           <button
             type="button"
             onClick={() => confirmManual("transferencia")}
             className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors mt-3"
           >
-            Confirmar inscripción →
+            Confirmar compra →
           </button>
         </div>
       )}
 
-      {method === "payoneer" && course.payoneerLink && (
-        <div className="card-alt rounded-lg p-4 mb-4 text-sm text-bone/70">
+      {method === "payoneer" && resource.payoneerLink && (
+        <div className="card-alt rounded-lg p-4 text-sm text-bone/70">
           <a
-            href={course.payoneerLink}
+            href={resource.payoneerLink}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-cta w-full inline-block text-center bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors"
@@ -197,14 +157,14 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
             <a href="mailto:hola@rivaraconsultora.com.ar" className="text-magenta hover:underline">
               hola@rivaraconsultora.com.ar
             </a>{" "}
-            para confirmar tu lugar.
+            para confirmar tu compra.
           </p>
           <button
             type="button"
             onClick={() => confirmManual("payoneer")}
             className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors mt-3"
           >
-            Confirmar inscripción →
+            Confirmar compra →
           </button>
         </div>
       )}

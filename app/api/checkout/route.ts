@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     }
     title = resource.title;
     unitPrice = resource.priceARS;
-    successUrl = `${siteUrl}/recursos?compra=exitosa`;
+    successUrl = `${siteUrl}/dashboard?compra=exitosa`;
     failureUrl = `${siteUrl}/recursos?compra=fallida`;
 
     // Registramos la compra como "pending" antes de mandar a Mercado Pago.

@@ -2,12 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import type { FreeResource } from "@/lib/resources";
 
 export default function FreeResourceDownloadButton({ resource }: { resource: FreeResource }) {
-  const pathname = usePathname();
   const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -30,7 +28,7 @@ export default function FreeResourceDownloadButton({ resource }: { resource: Fre
   if (supabaseConfigured && !loggedIn) {
     return (
       <Link
-        href={`/registro?next=${encodeURIComponent(pathname)}`}
+        href="/registro?next=%2Fdashboard"
         className="btn-cta bg-sage text-white px-4 py-2 rounded-full hover:opacity-90 transition-colors inline-block"
       >
         Registrarme para descargar
