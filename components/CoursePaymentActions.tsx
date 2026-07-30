@@ -117,9 +117,10 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
     }
   }
 
-  function confirmTransferencia() {
+  function confirmManual(m: "transferencia" | "payoneer") {
+    const label = m === "transferencia" ? "Transferencia bancaria" : "Payoneer";
     const message = encodeURIComponent(
-      `Hola Melisa 👋\n\nQuiero inscribirme al curso "${course.title}" de RIVARA HR Academy.\n\n📌 Nombre: ${buyer?.name}\n📧 Email: ${buyer?.email}\n📱 Celular: ${buyer?.phone}\n💳 Forma de pago: Transferencia bancaria\n\n📎 Voy a enviar el comprobante de transferencia.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
+      `Hola Melisa 👋\n\nQuiero inscribirme al curso "${course.title}" de RIVARA HR Academy.\n\n📌 Nombre: ${buyer?.name}\n📧 Email: ${buyer?.email}\n📱 Celular: ${buyer?.phone}\n💳 Forma de pago: ${label}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
     );
     window.open(`https://wa.me/5491123912820?text=${message}`, "_blank");
     setConfirmed(true);
@@ -176,7 +177,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
           ) : (
             <button
               type="button"
-              onClick={confirmTransferencia}
+              onClick={() => confirmManual("transferencia")}
               className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors mt-3"
             >
               Confirmar inscripción →
@@ -196,11 +197,25 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
             Pagar con Payoneer (USD) →
           </a>
           <p className="mt-3 text-xs text-bone/50">
-            ¿Problemas con el pago? Escribinos a{" "}
+            Una vez pagado, enviá el comprobante por WhatsApp o a{" "}
             <a href="mailto:hola@rivaraconsultora.com.ar" className="text-magenta hover:underline">
               hola@rivaraconsultora.com.ar
-            </a>
+            </a>{" "}
+            para confirmar tu lugar.
           </p>
+          {confirmed ? (
+            <p className="mt-3 text-sm text-sage">
+              ¡Listo! En cuanto confirmemos el pago, se activa el curso en tu cuenta.
+            </p>
+          ) : (
+            <button
+              type="button"
+              onClick={() => confirmManual("payoneer")}
+              className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors mt-3"
+            >
+              Confirmar inscripción →
+            </button>
+          )}
         </div>
       )}
     </div>

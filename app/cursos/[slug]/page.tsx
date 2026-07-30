@@ -107,22 +107,6 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
             ))}
           </div>
 
-          {course.bankDetails && (
-            <div className="card-alt rounded-lg p-4 mb-6 text-sm text-bone/70">
-              <p className="font-semibold text-bone mb-2">
-                Datos para transferencia
-              </p>
-              <p>Titular: {course.bankDetails.holder}</p>
-              <p>CBU: {course.bankDetails.cbu}</p>
-              <p>Alias: {course.bankDetails.alias}</p>
-              <p>CUIL: {course.bankDetails.cuil}</p>
-              <p className="mt-2 text-xs text-bone/50">
-                Por transferencia o Payoneer, coordiná por WhatsApp para
-                confirmar el pago y te enviamos el acceso.
-              </p>
-            </div>
-          )}
-
           <CoursePaymentActions course={course} />
         </div>
       ) : (
