@@ -139,7 +139,9 @@ export default function DashboardPage() {
           <div className="space-y-4">
             {myCourses.map((c) => (
               <div key={c.slug} className="card rounded-xl p-6">
-                <h3 className="font-semibold text-bone mb-3">{c.title}</h3>
+                <p className="eyebrow mb-1">¡Bienvenida al curso!</p>
+                <h3 className="font-semibold text-bone mb-2">{c.title}</h3>
+                {c.schedule && <p className="text-sm text-bone/60 mb-4">📅 {c.schedule}</p>}
 
                 {c.format === "En vivo" && (
                   <div className="mb-4">
@@ -160,7 +162,7 @@ export default function DashboardPage() {
                   </div>
                 )}
 
-                <div className="space-y-4">
+                <div className="space-y-4 mb-4">
                   {c.modules.map((m) => (
                     <div key={m.title}>
                       <p className="text-xs text-bone/50 mb-2">{m.title}</p>
@@ -180,6 +182,46 @@ export default function DashboardPage() {
                       )}
                     </div>
                   ))}
+                </div>
+
+                {c.materials && c.materials.length > 0 && (
+                  <div className="mb-4">
+                    <p className="text-xs text-bone/50 mb-2">Materiales</p>
+                    <div className="flex flex-wrap gap-2">
+                      {c.materials.map((mat) => (
+                        <a
+                          key={mat.url}
+                          href={mat.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn-cta bg-sage text-white px-3 py-1.5 rounded-full hover:opacity-90 transition-colors inline-block text-xs"
+                        >
+                          {mat.title} →
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex flex-wrap gap-4 text-sm">
+                  <a
+                    href="https://wa.me/5491123912820"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-magenta hover:underline"
+                  >
+                    Consultas por WhatsApp →
+                  </a>
+                  {c.whatsappGroupLink && (
+                    <a
+                      href={c.whatsappGroupLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-magenta hover:underline"
+                    >
+                      Sumarte al grupo de WhatsApp →
+                    </a>
+                  )}
                 </div>
               </div>
             ))}

@@ -22,9 +22,12 @@ export type Course = {
   schedule?: string;
   externalCheckout?: string; // e.g. link to Hotmart if it's sold there
   mpPaymentLink?: string; // link de pago fijo de Mercado Pago (mientras la API de Checkout Pro esté bloqueada)
+  payoneerLink?: string; // link de pago en USD para quien elige Payoneer
   comingSoon?: boolean; // todavía no se vende; muestra "Próximamente" en vez de un botón de compra
   freePreviewVideoId?: string; // YouTube ID, unlisted is fine
   meetLink?: string; // link de Google Meet del curso en vivo, se muestra solo a quien ya se inscribió
+  materials?: { title: string; url: string }[]; // PDFs y otros materiales del curso, visibles en el dashboard
+  whatsappGroupLink?: string; // link de invitación al grupo de WhatsApp del curso
 };
 
 // ⚠️ Contenido real tomado de lo que Melisa definió. Los precios en ARS son
@@ -109,6 +112,7 @@ export const courses: Course[] = [
     schedule:
       "Martes 11 y martes 18 de agosto · 17 a 18:30 hs (ARG) · por Google Meet · incluye grabación y certificado de asistencia",
     mpPaymentLink: "https://mpago.la/1urEhEV",
+    payoneerLink: "https://link.payoneer.com/Token?t=BE30B7CEC2134934981FCA4AC76D193D&src=pl",
   },
   {
     slug: "claude-para-seleccion",

@@ -18,6 +18,7 @@ export async function POST(req: NextRequest) {
   const email = body?.record?.email ?? "(sin email)";
   const createdAt = body?.record?.created_at ?? new Date().toISOString();
   const fullName = body?.record?.raw_user_meta_data?.full_name ?? "";
+  const phone = body?.record?.raw_user_meta_data?.phone ?? "";
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -34,6 +35,7 @@ export async function POST(req: NextRequest) {
         <ul>
           <li><strong>Email:</strong> ${email}</li>
           ${fullName ? `<li><strong>Nombre:</strong> ${fullName}</li>` : ""}
+          ${phone ? `<li><strong>Celular:</strong> ${phone}</li>` : ""}
           <li><strong>Fecha:</strong> ${createdAt}</li>
         </ul>
       `,

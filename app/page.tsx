@@ -108,7 +108,7 @@ export default function Home() {
               href="/cursos/de-cero-a-tu-asistente"
               className="btn-cta inline-block w-full bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors"
             >
-              Ver formas de pago →
+              Me quiero inscribir →
             </Link>
           </div>
         </div>
