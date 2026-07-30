@@ -1,11 +1,52 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import type { PaidResource } from "@/lib/resources";
 
 export default function ResourceCheckoutButton({ resource }: { resource: PaidResource }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [checkingSession, setCheckingSession] = useState(supabaseConfigured);
+  const [buyerEmail, setBuyerEmail] = useState<string | null>(null);
+
+  // Igual que la descarga de recursos gratis: pedimos login antes de comprar
+  // para quedarnos con el mail de quien arranca una compra, aunque no llegue
+  // a pagar (hoy esos casos se pierden por completo).
+  useEffect(() => {
+    if (!supabase) {
+      setCheckingSession(false);
+      return;
+    }
+    supabase.auth.getSession().then(({ data }) => {
+      setBuyerEmail(data.session?.user?.email ?? null);
+      setCheckingSession(false);
+    });
+  }, []);
+
+  if (checkingSession) {
+    return (
+      <button
+        type="button"
+        disabled
+        className="btn-cta w-full bg-magenta/50 text-white px-4 py-2.5 rounded-full opacity-60"
+      >
+        Cargando...
+      </button>
+    );
+  }
+
+  if (supabaseConfigured && !buyerEmail) {
+    return (
+      <Link
+        href="/registro"
+        className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors inline-block text-center"
+      >
+        Registrarme para comprar →
+      </Link>
+    );
+  }
 
   // Primero intenta el flujo automático (crea la preferencia en /api/checkout
   // y te manda a Mercado Pago; eso es lo único que dispara el webhook que
@@ -19,7 +60,7 @@ export default function ResourceCheckoutButton({ resource }: { resource: PaidRes
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind: "resource", slug: resource.slug }),
+        body: JSON.stringify({ kind: "resource", slug: resource.slug, buyerEmail }),
       });
       if (!res.ok) throw new Error("no-config");
       const data = await res.json();

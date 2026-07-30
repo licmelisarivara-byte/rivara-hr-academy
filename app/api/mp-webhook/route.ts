@@ -105,7 +105,10 @@ async function handleNotification(req: NextRequest) {
   }
 
   const status: string = payment.status; // approved | rejected | pending | in_process | cancelled
-  const buyerEmail: string | null = payment.payer?.email ?? null;
+  // El mail ya suele estar guardado desde que la persona arrancó la compra
+  // (login previo); si MP nos manda uno, lo preferimos por ser el que
+  // efectivamente pagó, pero nunca lo dejamos en blanco.
+  const buyerEmail: string | null = payment.payer?.email ?? purchase.buyer_email ?? null;
   const buyerName: string | null =
     [payment.payer?.first_name, payment.payer?.last_name].filter(Boolean).join(" ") || null;
 

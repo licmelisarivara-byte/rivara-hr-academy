@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { kind, slug } = await req.json();
+  const { kind, slug, buyerEmail } = await req.json();
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL || "https://hracademy.rivaraconsultora.com.ar";
 
@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
           amount: unitPrice,
           currency: "ARS",
           status: "pending",
+          buyer_email: buyerEmail || null,
         })
         .select("id")
         .single();
@@ -84,6 +85,9 @@ export async function POST(req: NextRequest) {
   };
   if (purchaseId) {
     preference.external_reference = purchaseId;
+  }
+  if (buyerEmail) {
+    preference.payer = { email: buyerEmail };
   }
 
   const res = await fetch("https://api.mercadopago.com/checkout/preferences", {
