@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import type { PaidResource } from "@/lib/resources";
 
 export default function ResourceCheckoutButton({ resource }: { resource: PaidResource }) {
+  const pathname = usePathname();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [checkingSession, setCheckingSession] = useState(supabaseConfigured);
@@ -40,7 +42,7 @@ export default function ResourceCheckoutButton({ resource }: { resource: PaidRes
   if (supabaseConfigured && !buyerEmail) {
     return (
       <Link
-        href="/registro"
+        href={`/registro?next=${encodeURIComponent(pathname)}`}
         className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors inline-block text-center"
       >
         Registrarme para comprar →

@@ -1,13 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import ConfigNotice from "@/components/ConfigNotice";
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next") || "/dashboard";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +34,7 @@ export default function LoginPage() {
       setError("Email o contraseña incorrectos.");
       return;
     }
-    router.push("/dashboard");
+    router.push(next);
   }
 
   return (
@@ -74,7 +84,10 @@ export default function LoginPage() {
 
       <p className="text-sm text-bone/50 mt-6">
         ¿No tenés cuenta todavía?{" "}
-        <Link href="/registro" className="text-magenta hover:underline">
+        <Link
+          href={`/registro?next=${encodeURIComponent(next)}`}
+          className="text-magenta hover:underline"
+        >
           Registrate
         </Link>
       </p>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import CheckoutButton from "@/components/CheckoutButton";
 import type { Course } from "@/lib/courses";
@@ -14,6 +15,7 @@ type Method = "" | "transferencia" | "mercadopago" | "payoneer";
 // cual sea el método que elija, siempre queda su mail (y ahora también
 // nombre y celular, que ya pidió el registro).
 export default function CoursePaymentActions({ course }: { course: Course }) {
+  const pathname = usePathname();
   const [checking, setChecking] = useState(supabaseConfigured);
   const [buyer, setBuyer] = useState<{ email: string; name: string; phone: string } | null>(
     null
@@ -79,7 +81,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
   if (supabaseConfigured && !buyer) {
     return (
       <Link
-        href="/registro"
+        href={`/registro?next=${encodeURIComponent(pathname)}`}
         className="btn-cta inline-block bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors"
       >
         Registrarme para elegir cómo pagar →

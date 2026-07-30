@@ -1,11 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import ConfigNotice from "@/components/ConfigNotice";
 
 export default function RegistroPage() {
+  return (
+    <Suspense fallback={null}>
+      <RegistroForm />
+    </Suspense>
+  );
+}
+
+function RegistroForm() {
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next") || "/dashboard";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -22,7 +33,10 @@ export default function RegistroPage() {
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: name, phone } },
+      options: {
+        data: { full_name: name, phone },
+        emailRedirectTo: `${window.location.origin}${next}`,
+      },
     });
     setLoading(false);
     if (error) {
@@ -114,7 +128,10 @@ export default function RegistroPage() {
 
       <p className="text-sm text-bone/50 mt-6">
         ¿Ya tenés cuenta?{" "}
-        <Link href="/login" className="text-magenta hover:underline">
+        <Link
+          href={`/login?next=${encodeURIComponent(next)}`}
+          className="text-magenta hover:underline"
+        >
           Ingresá
         </Link>
       </p>
