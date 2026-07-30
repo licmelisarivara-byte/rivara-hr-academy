@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabaseClient";
 const links = [
   { href: "/cursos", label: "Cursos" },
   { href: "/recursos", label: "Recursos gratis" },
+  { href: "/ebooks", label: "Ebooks" },
   { href: "/notas", label: "Notas" },
 ];
 
