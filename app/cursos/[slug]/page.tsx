@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { courses, getCourseBySlug } from "@/lib/courses";
-import CheckoutButton from "@/components/CheckoutButton";
+import CoursePaymentActions from "@/components/CoursePaymentActions";
 
 export function generateStaticParams() {
   return courses.map((c) => ({ slug: c.slug }));
@@ -123,17 +123,7 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
             </div>
           )}
 
-          <div className="flex flex-wrap items-center gap-4">
-            <CheckoutButton course={course} />
-            <a
-              href="https://wa.me/5491123912820"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-magenta hover:underline"
-            >
-              O coordinar por WhatsApp →
-            </a>
-          </div>
+          <CoursePaymentActions course={course} />
         </div>
       ) : (
         <div className="card rounded-xl p-6 mb-10 flex flex-wrap items-center justify-between gap-4">
@@ -143,7 +133,7 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
               <div className="text-sm text-magenta mt-1">{course.priceNote}</div>
             )}
           </div>
-          <CheckoutButton course={course} />
+          <CoursePaymentActions course={course} />
         </div>
       )}
 
