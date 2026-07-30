@@ -43,6 +43,7 @@ export async function POST(req: NextRequest) {
       const { data: purchase, error } = await supabaseAdmin
         .from("compras")
         .insert({
+          kind: "resource",
           resource_slug: resource.slug,
           title: resource.title,
           amount: unitPrice,
@@ -64,6 +65,28 @@ export async function POST(req: NextRequest) {
     title = course.title;
     unitPrice = course.priceARS ?? 0;
     failureUrl = `${siteUrl}/cursos/${course.slug}?compra=fallida`;
+
+    // Igual que los recursos: se registra "pending" y el webhook la marca
+    // aprobada. Los pagos manuales (transferencia/Payoneer) no pasan por
+    // acá, así que esos se siguen habilitando a mano en la base.
+    if (supabaseAdmin) {
+      const { data: purchase, error } = await supabaseAdmin
+        .from("compras")
+        .insert({
+          kind: "course",
+          resource_slug: course.slug,
+          title: course.title,
+          amount: unitPrice,
+          currency: "ARS",
+          status: "pending",
+          buyer_email: buyerEmail || null,
+        })
+        .select("id")
+        .single();
+      if (!error && purchase) {
+        purchaseId = purchase.id;
+      }
+    }
   }
 
   const preference: Record<string, unknown> = {

@@ -5,9 +5,14 @@ import Link from "next/link";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import ConfigNotice from "@/components/ConfigNotice";
 import { courses } from "@/lib/courses";
-import { getPaidResourceBySlug } from "@/lib/resources";
+import { getPaidResourceBySlug, freeResources } from "@/lib/resources";
 
-type MyPurchase = { resource_slug: string; title: string; paid_at: string | null };
+type MyPurchase = {
+  kind: "resource" | "course";
+  resource_slug: string;
+  title: string;
+  paid_at: string | null;
+};
 
 export default function DashboardPage() {
   const [checking, setChecking] = useState(true);
@@ -64,6 +69,12 @@ export default function DashboardPage() {
     );
   }
 
+  const resourcePurchases = purchases.filter((p) => p.kind === "resource");
+  const purchasedCourseSlugs = new Set(
+    purchases.filter((p) => p.kind === "course").map((p) => p.resource_slug)
+  );
+  const myCourses = courses.filter((c) => purchasedCourseSlugs.has(c.slug));
+
   return (
     <div className="max-w-4xl mx-auto px-6 py-16">
       <meta name="robots" content="noindex, nofollow" />
@@ -71,11 +82,11 @@ export default function DashboardPage() {
       <h1 className="font-display text-3xl text-bone mb-2">Hola de nuevo</h1>
       <p className="text-bone/50 mb-10">{userEmail}</p>
 
-      {purchases.length > 0 && (
+      {resourcePurchases.length > 0 && (
         <div className="mb-12">
           <h2 className="font-display text-xl text-bone mb-4">Tus compras</h2>
           <div className="space-y-4">
-            {purchases.map((p) => {
+            {resourcePurchases.map((p) => {
               const resource = getPaidResourceBySlug(p.resource_slug);
               const links = resource?.fileUrls?.length
                 ? resource.fileUrls
@@ -110,33 +121,66 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/*
-        TODO (backend): esta sección hoy lista todos los cursos.
-        Falta la tabla `inscripciones` en Supabase (user_id, course_slug,
-        fecha_pago) para filtrar solo los cursos que el alumno compró.
-      */}
-      <h2 className="font-display text-xl text-bone mb-4">Tus clases</h2>
-      <div className="space-y-4">
-        {courses.map((c) => (
-          <div key={c.slug} className="card rounded-xl p-6">
-            <h3 className="font-semibold text-bone mb-2">{c.title}</h3>
-            {c.freePreviewVideoId ? (
-              <div className="aspect-video rounded-lg overflow-hidden mb-3">
-                <iframe
-                  className="w-full h-full"
-                  src={`https://www.youtube.com/embed/${c.freePreviewVideoId}`}
-                  title={c.title}
-                  allowFullScreen
-                />
+      <div className="mb-12">
+        <h2 className="font-display text-xl text-bone mb-4">Tus clases</h2>
+        {myCourses.length === 0 ? (
+          <p className="text-sm text-bone/50">
+            Todavía no tenés ningún curso inscripto.{" "}
+            <Link href="/cursos" className="text-magenta hover:underline">
+              Ver cursos disponibles →
+            </Link>
+            <br />
+            <span className="text-xs">
+              (Si pagaste por transferencia o Payoneer, puede tardar un poco en
+              aparecer mientras confirmamos el pago.)
+            </span>
+          </p>
+        ) : (
+          <div className="space-y-4">
+            {myCourses.map((c) => (
+              <div key={c.slug} className="card rounded-xl p-6">
+                <h3 className="font-semibold text-bone mb-2">{c.title}</h3>
+                {c.freePreviewVideoId ? (
+                  <div className="aspect-video rounded-lg overflow-hidden mb-3">
+                    <iframe
+                      className="w-full h-full"
+                      src={`https://www.youtube.com/embed/${c.freePreviewVideoId}`}
+                      title={c.title}
+                      allowFullScreen
+                    />
+                  </div>
+                ) : (
+                  <p className="text-sm text-bone/50">
+                    Video no cargado todavía — se sube como no listado en
+                    YouTube/Vimeo y se pega el ID acá.
+                  </p>
+                )}
               </div>
-            ) : (
-              <p className="text-sm text-bone/50">
-                Video no cargado todavía — se sube como no listado en
-                YouTube/Vimeo y se pega el ID acá.
-              </p>
-            )}
+            ))}
           </div>
-        ))}
+        )}
+      </div>
+
+      <div>
+        <h2 className="font-display text-xl text-bone mb-4">Recursos gratis</h2>
+        <div className="grid sm:grid-cols-2 gap-4">
+          {freeResources.map((r) => (
+            <div key={r.slug} className="card rounded-xl p-5 flex flex-col">
+              <h3 className="font-semibold text-bone text-sm mb-3">{r.title}</h3>
+              {r.fileUrl ? (
+                <a
+                  href={r.fileUrl}
+                  download
+                  className="btn-cta bg-sage text-white px-4 py-2 rounded-full hover:opacity-90 transition-colors inline-block text-center text-sm mt-auto"
+                >
+                  Descargar →
+                </a>
+              ) : (
+                <p className="text-xs text-bone/40 mt-auto">Próximamente</p>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
 
   const { data: purchases } = await supabaseAdmin
     .from("compras")
-    .select("resource_slug, title, paid_at")
+    .select("kind, resource_slug, title, paid_at")
     .eq("buyer_email", email)
     .eq("status", "approved")
     .order("paid_at", { ascending: false });

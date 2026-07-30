@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { getPaidResourceBySlug } from "@/lib/resources";
+import { getCourseBySlug } from "@/lib/courses";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 // Mercado Pago llama a esta URL (configurada como `notification_url` al
@@ -125,7 +126,11 @@ async function handleNotification(req: NextRequest) {
     .eq("id", purchaseId);
 
   if (status === "approved" && !purchase.delivered_at && buyerEmail) {
-    await deliverResource(purchase.resource_slug, buyerEmail);
+    if (purchase.kind === "course") {
+      await deliverCourseAccess(purchase.resource_slug, buyerEmail);
+    } else {
+      await deliverResource(purchase.resource_slug, buyerEmail);
+    }
     await supabaseAdmin
       .from("compras")
       .update({ delivered_at: new Date().toISOString() })
@@ -133,6 +138,35 @@ async function handleNotification(req: NextRequest) {
   }
 
   return NextResponse.json({ ok: true });
+}
+
+async function deliverCourseAccess(courseSlug: string, buyerEmail: string) {
+  const apiKey = process.env.RESEND_API_KEY;
+  const course = getCourseBySlug(courseSlug);
+  if (!apiKey || !course) return;
+
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://hracademy.rivaraconsultora.com.ar";
+
+  await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "RIVARA HR Academy <onboarding@resend.dev>",
+      to: [buyerEmail],
+      bcc: ["licmelisarivara@gmail.com"],
+      subject: `¡Estás dentro! ${course.title}`,
+      html: `
+        <p>¡Gracias por tu inscripción a <strong>${course.title}</strong>!</p>
+        <p>Ya te aparece en tu cuenta de RIVARA HR Academy: <a href="${siteUrl}/dashboard">${siteUrl}/dashboard</a></p>
+        ${course.schedule ? `<p>${course.schedule}</p>` : ""}
+        <p>Cualquier duda, escribinos por WhatsApp: https://wa.me/5491123912820</p>
+      `,
+    }),
+  });
 }
 
 async function deliverResource(resourceSlug: string, buyerEmail: string) {
