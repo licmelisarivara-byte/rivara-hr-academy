@@ -139,22 +139,48 @@ export default function DashboardPage() {
           <div className="space-y-4">
             {myCourses.map((c) => (
               <div key={c.slug} className="card rounded-xl p-6">
-                <h3 className="font-semibold text-bone mb-2">{c.title}</h3>
-                {c.freePreviewVideoId ? (
-                  <div className="aspect-video rounded-lg overflow-hidden mb-3">
-                    <iframe
-                      className="w-full h-full"
-                      src={`https://www.youtube.com/embed/${c.freePreviewVideoId}`}
-                      title={c.title}
-                      allowFullScreen
-                    />
+                <h3 className="font-semibold text-bone mb-3">{c.title}</h3>
+
+                {c.format === "En vivo" && (
+                  <div className="mb-4">
+                    {c.meetLink ? (
+                      <a
+                        href={c.meetLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-cta bg-magenta text-white px-4 py-2 rounded-full hover:bg-magentaSoft transition-colors inline-block text-sm"
+                      >
+                        Unirte a la clase por Google Meet →
+                      </a>
+                    ) : (
+                      <p className="text-sm text-bone/50">
+                        Te vamos a compartir acá el link de Google Meet antes de la clase.
+                      </p>
+                    )}
                   </div>
-                ) : (
-                  <p className="text-sm text-bone/50">
-                    Video no cargado todavía — se sube como no listado en
-                    YouTube/Vimeo y se pega el ID acá.
-                  </p>
                 )}
+
+                <div className="space-y-4">
+                  {c.modules.map((m) => (
+                    <div key={m.title}>
+                      <p className="text-xs text-bone/50 mb-2">{m.title}</p>
+                      {m.recordingVideoId ? (
+                        <div className="aspect-video rounded-lg overflow-hidden">
+                          <iframe
+                            className="w-full h-full"
+                            src={`https://www.youtube.com/embed/${m.recordingVideoId}`}
+                            title={m.title}
+                            allowFullScreen
+                          />
+                        </div>
+                      ) : (
+                        <p className="text-xs text-bone/40">
+                          Grabación disponible después de esta clase.
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>

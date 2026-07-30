@@ -10,7 +10,7 @@ export type Course = {
   format: "En vivo" | "Grabado";
   tagline: string;
   description: string;
-  modules: { title: string; items: string[] }[];
+  modules: { title: string; items: string[]; recordingVideoId?: string }[]; // recordingVideoId: YouTube ID no listado de la grabación de esa clase, se completa después de dictarla
   image?: string; // portada en /public/images
   outcomes?: string[];
   price: string; // texto mostrado en pantalla
@@ -24,6 +24,7 @@ export type Course = {
   mpPaymentLink?: string; // link de pago fijo de Mercado Pago (mientras la API de Checkout Pro esté bloqueada)
   comingSoon?: boolean; // todavía no se vende; muestra "Próximamente" en vez de un botón de compra
   freePreviewVideoId?: string; // YouTube ID, unlisted is fine
+  meetLink?: string; // link de Google Meet del curso en vivo, se muestra solo a quien ya se inscribió
 };
 
 // ⚠️ Contenido real tomado de lo que Melisa definió. Los precios en ARS son
