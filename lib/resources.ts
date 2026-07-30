@@ -61,7 +61,10 @@ export const paidResources: PaidResource[] = [
     kind: "PDF",
     description:
       "12 prompts listos para usar en atracción de talento, preselección, entrevistas y post-entrevista. Compatible con Claude, ChatGPT, Gemini, Copilot y NotebookLM.",
-    priceARS: 15000,
+    // TEMPORAL: precio bajado a $50 solo para probar el cobro de punta a
+    // punta. Volver a 15000 apenas se confirme que la compra de prueba
+    // funcionó (avisar si esto sigue acá el día del lanzamiento).
+    priceARS: 50,
     priceUSD: 12,
     fileUrl: "/downloads/kit-12-prompts-seleccion.pdf",
     image: "/images/covers/kit-12-prompts.png",
