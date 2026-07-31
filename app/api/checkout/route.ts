@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     title = resource.title;
     unitPrice = resource.priceARS;
     successUrl = `${siteUrl}/dashboard?compra=exitosa`;
-    failureUrl = `${siteUrl}/recursos?compra=fallida`;
+    failureUrl = `${siteUrl}/ebooks?compra=fallida`;
 
     // Registramos la compra como "pending" antes de mandar a Mercado Pago.
     // El webhook (/api/mp-webhook) la busca por este id (external_reference)
