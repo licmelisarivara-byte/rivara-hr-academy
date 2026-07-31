@@ -58,17 +58,9 @@ export default function MasterclassPage() {
             Una masterclass en vivo y gratuita para aprender a usar IA en el
             análisis de currículums de forma práctica.
           </p>
-          <div className="detail-text card rounded-xl p-4 mb-3">
+          <div className="detail-text card rounded-xl p-4 mb-8">
             📅 Martes 4 de agosto · 17:30 hs (ARG) · en vivo por YouTube
           </div>
-          <a
-            href={CALENDAR_LINK}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-magenta hover:underline inline-block mb-8"
-          >
-            + Agendar en Google Calendar →
-          </a>
 
           <MasterclassForm
             eventSlug={EVENT_SLUG}
