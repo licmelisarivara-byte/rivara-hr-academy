@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { getEventBySlug } from "@/lib/events";
 
 // Registro liviano para eventos gratuitos (masterclasses, webinars): sin
 // contraseña ni confirmación de mail, para no perder inscriptos por
@@ -27,7 +28,12 @@ export async function POST(req: NextRequest) {
   }
 
   const apiKey = process.env.RESEND_API_KEY;
+  const event = getEventBySlug(eventSlug);
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://hracademy.rivaraconsultora.com.ar";
+
   if (apiKey) {
+    // Aviso a Melisa.
     await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -51,6 +57,31 @@ export async function POST(req: NextRequest) {
     }).catch(() => {
       // No bloqueamos la confirmación si el mail falla.
     });
+
+    // Confirmación a quien se registró, con el link del evento.
+    if (event) {
+      await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: "RIVARA HR Academy <onboarding@resend.dev>",
+          to: [email],
+          subject: `¡Ya estás registrada! ${event.title}`,
+          html: `
+            <p>Hola ${name},</p>
+            <p>¡Gracias por registrarte a <strong>${event.title}</strong>! Guardá este link para conectarte el día del evento:</p>
+            <p><a href="${event.youtubeLink}">${event.youtubeLink}</a></p>
+            <p>Mientras tanto, podés ir viendo los recursos gratuitos y los próximos cursos acá: <a href="${siteUrl}">${siteUrl}</a></p>
+            <p>Cualquier duda, escribinos por WhatsApp: https://wa.me/5491123912820</p>
+          `,
+        }),
+      }).catch(() => {
+        // No bloqueamos la confirmación si el mail falla.
+      });
+    }
   }
 
   return NextResponse.json({ ok: true });
