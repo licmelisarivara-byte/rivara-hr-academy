@@ -222,8 +222,8 @@ export default function Home() {
       <AboutSection />
 
       {/* SOS EMPRESA */}
-      <section className="max-w-6xl mx-auto px-6 pb-24">
-        <div className="card-alt rounded-2xl p-8 sm:p-10 flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
+      <section className="max-w-6xl mx-auto px-6 pb-24 grid gap-6 sm:grid-cols-2">
+        <div className="card-alt rounded-2xl p-8 flex flex-col justify-between gap-6 text-center sm:text-left">
           <div>
             <h2 className="font-display text-xl sm:text-2xl text-bone mb-2">
               ¿Sos empresa?
@@ -236,9 +236,28 @@ export default function Home() {
             href="https://rivaraconsultora.com.ar/"
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-cta inline-block bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors whitespace-nowrap"
+            className="btn-cta inline-block bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors whitespace-nowrap self-center sm:self-start"
           >
             Conocé nuestros servicios →
+          </a>
+        </div>
+
+        <div className="card-alt rounded-2xl p-8 flex flex-col justify-between gap-6 text-center sm:text-left">
+          <div>
+            <h2 className="font-display text-xl sm:text-2xl text-bone mb-2">
+              ¿Necesitás un sistema de RRHH?
+            </h2>
+            <p className="text-bone/60">
+              Conocé RIVARA HR Suite: selección inteligente con IA, diagnóstico de clima laboral, capacitaciones para tu equipo y recibo de sueldo PRO, todo en un solo lugar.
+            </p>
+          </div>
+          <a
+            href="https://hrsuite.rivaraconsultora.com.ar/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-cta inline-block bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors whitespace-nowrap self-center sm:self-start"
+          >
+            Conocé HR Suite →
           </a>
         </div>
       </section>
