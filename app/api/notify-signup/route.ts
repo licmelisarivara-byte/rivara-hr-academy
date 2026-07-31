@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "RIVARA HR Academy <onboarding@resend.dev>",
+      from: "RIVARA HR Academy <hola@mailhr.rivaraconsultora.com.ar>",
       to: ["licmelisarivara@gmail.com"],
       subject: `Nueva alumna registrada: ${email}`,
       html: `

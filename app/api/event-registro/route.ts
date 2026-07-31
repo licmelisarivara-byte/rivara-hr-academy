@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "RIVARA HR Academy <onboarding@resend.dev>",
+        from: "RIVARA HR Academy <hola@mailhr.rivaraconsultora.com.ar>",
         to: ["licmelisarivara@gmail.com"],
         subject: `Nuevo registro a ${eventSlug}: ${email}`,
         html: `
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "RIVARA HR Academy <onboarding@resend.dev>",
+          from: "RIVARA HR Academy <hola@mailhr.rivaraconsultora.com.ar>",
           to: [email],
           subject: `¡Ya estás registrada! ${event.title}`,
           html: `

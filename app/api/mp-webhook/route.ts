@@ -155,7 +155,7 @@ async function deliverCourseAccess(courseSlug: string, buyerEmail: string) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "RIVARA HR Academy <onboarding@resend.dev>",
+      from: "RIVARA HR Academy <hola@mailhr.rivaraconsultora.com.ar>",
       to: [buyerEmail],
       bcc: ["licmelisarivara@gmail.com"],
       subject: `¡Estás dentro! ${course.title}`,
@@ -189,7 +189,7 @@ async function deliverResource(resourceSlug: string, buyerEmail: string) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "RIVARA HR Academy <onboarding@resend.dev>",
+      from: "RIVARA HR Academy <hola@mailhr.rivaraconsultora.com.ar>",
       to: [buyerEmail],
       bcc: ["licmelisarivara@gmail.com"],
       subject: `Tu compra: ${resource.title}`,
