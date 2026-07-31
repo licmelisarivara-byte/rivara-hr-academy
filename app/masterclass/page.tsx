@@ -5,6 +5,17 @@ const EVENT_SLUG = "analiza-cvs-con-ia";
 const YOUTUBE_LINK = "https://youtube.com/live/6_qluLNXQ7M?feature=share";
 const OG_IMAGE = "/images/masterclass/youtube-banner.png";
 
+// Martes 4/8/2026, 17:30 a 18:30 hs (ARG, UTC-3) → 20:30-21:30 UTC.
+const CALENDAR_LINK =
+  "https://www.google.com/calendar/render?" +
+  new URLSearchParams({
+    action: "TEMPLATE",
+    text: "Masterclass gratuita: Analizá CVs con IA",
+    dates: "20260804T203000Z/20260804T213000Z",
+    details: `Masterclass en vivo y gratuita de RIVARA HR Academy. Conectate acá: ${YOUTUBE_LINK}`,
+    location: "YouTube (en vivo)",
+  }).toString();
+
 export const metadata: Metadata = {
   title: "Masterclass gratuita: Analizá CVs con IA",
   description:
@@ -47,11 +58,23 @@ export default function MasterclassPage() {
             Una masterclass en vivo y gratuita para aprender a usar IA en el
             análisis de currículums de forma práctica.
           </p>
-          <div className="detail-text card rounded-xl p-4 mb-10">
+          <div className="detail-text card rounded-xl p-4 mb-3">
             📅 Martes 4 de agosto · 17:30 hs (ARG) · en vivo por YouTube
           </div>
+          <a
+            href={CALENDAR_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-magenta hover:underline inline-block mb-8"
+          >
+            + Agendar en Google Calendar →
+          </a>
 
-          <MasterclassForm eventSlug={EVENT_SLUG} youtubeLink={YOUTUBE_LINK} />
+          <MasterclassForm
+            eventSlug={EVENT_SLUG}
+            youtubeLink={YOUTUBE_LINK}
+            calendarLink={CALENDAR_LINK}
+          />
         </div>
       </div>
     </div>

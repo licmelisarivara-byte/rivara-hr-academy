@@ -63,6 +63,36 @@ export default function Home() {
         </div>
       </section>
 
+      {/* MASTERCLASS GRATUITA */}
+      <section className="max-w-6xl mx-auto px-6 pt-20">
+        <Link
+          href="/masterclass"
+          className="card rounded-2xl p-6 sm:p-8 grid sm:grid-cols-[auto_1fr] gap-6 items-center hover:border-magenta/40 transition-colors"
+        >
+          <Image
+            src="/images/masterclass/invite-flyer.jpg"
+            alt="Masterclass gratuita: Analizá un CV con IA en segundos"
+            width={140}
+            height={175}
+            className="w-24 sm:w-36 h-auto rounded-lg object-cover mx-auto sm:mx-0"
+          />
+          <div>
+            <span className="inline-block text-xs font-semibold bg-magenta text-white px-2.5 py-1 rounded-full mb-3">
+              EN VIVO · GRATIS
+            </span>
+            <h2 className="font-display text-xl sm:text-2xl text-bone mb-2">
+              Analizá un CV con IA en segundos
+            </h2>
+            <p className="text-bone/60 text-sm mb-1">
+              Masterclass gratuita en vivo · Martes 4 de agosto · 17:30 hs (ARG)
+            </p>
+            <span className="text-magenta text-sm font-semibold">
+              Registrarme gratis →
+            </span>
+          </div>
+        </Link>
+      </section>
+
       {/* CURSOS EN VIVO */}
       <section id="cursos-en-vivo" className="max-w-6xl mx-auto px-6 py-28">
         <p className="eyebrow mb-3">📚 Cursos en vivo</p>

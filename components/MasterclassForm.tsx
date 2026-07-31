@@ -5,9 +5,11 @@ import { useState } from "react";
 export default function MasterclassForm({
   eventSlug,
   youtubeLink,
+  calendarLink,
 }: {
   eventSlug: string;
   youtubeLink: string;
+  calendarLink: string;
 }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -44,14 +46,24 @@ export default function MasterclassForm({
         <p className="text-bone/70 mb-6">
           Guardá este link para conectarte el día del evento. Te esperamos ahí.
         </p>
-        <a
-          href={youtubeLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-cta inline-block bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors"
-        >
-          Ver en YouTube →
-        </a>
+        <div className="flex flex-wrap justify-center gap-3">
+          <a
+            href={youtubeLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-cta inline-block bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors"
+          >
+            Ver en YouTube →
+          </a>
+          <a
+            href={calendarLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-cta inline-block bg-sage text-white px-6 py-3 rounded-full hover:opacity-90 transition-colors"
+          >
+            + Agendar en Google Calendar
+          </a>
+        </div>
       </div>
     );
   }
