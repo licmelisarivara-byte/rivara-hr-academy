@@ -54,7 +54,7 @@ const organizationJsonLd = {
   sameAs: [
     "https://www.instagram.com/lic.melisarivara/",
     "https://www.facebook.com/Recursoshumanosydigitalizacion",
-    "https://www.linkedin.com/company/rivara-consultora",
+    "https://www.linkedin.com/company/rivara-hr-academy/",
     "http://www.youtube.com/@recursoshumanosydigitalizacion",
   ],
 };

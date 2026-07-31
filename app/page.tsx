@@ -220,6 +220,28 @@ export default function Home() {
       </section>
 
       <AboutSection />
+
+      {/* SOS EMPRESA */}
+      <section className="max-w-6xl mx-auto px-6 pb-24">
+        <div className="card-alt rounded-2xl p-8 sm:p-10 flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
+          <div>
+            <h2 className="font-display text-xl sm:text-2xl text-bone mb-2">
+              ¿Sos empresa?
+            </h2>
+            <p className="text-bone/60">
+              Conocé nuestros servicios de RRHH y selección de personal en RIVARA Consultora.
+            </p>
+          </div>
+          <a
+            href="https://rivaraconsultora.com.ar/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-cta inline-block bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors whitespace-nowrap"
+          >
+            Conocé nuestros servicios →
+          </a>
+        </div>
+      </section>
     </div>
   );
 }

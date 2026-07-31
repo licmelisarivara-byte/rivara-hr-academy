@@ -71,7 +71,7 @@ export default function Footer() {
               YouTube
             </a>
             <a
-              href="https://www.linkedin.com/company/rivara-consultora"
+              href="https://www.linkedin.com/company/rivara-hr-academy/"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-magenta transition-colors"
