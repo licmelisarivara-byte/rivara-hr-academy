@@ -61,6 +61,7 @@ const organizationJsonLd = {
 
 const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+const googleAdsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
 
 export default function RootLayout({
   children,
@@ -82,10 +83,10 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased">
-        {gaMeasurementId && (
+        {(gaMeasurementId || googleAdsId) && (
           <>
             <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`}
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId || googleAdsId}`}
               strategy="afterInteractive"
             />
             <Script id="google-analytics" strategy="afterInteractive">
@@ -93,7 +94,8 @@ export default function RootLayout({
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
-                gtag('config', '${gaMeasurementId}');
+                ${gaMeasurementId ? `gtag('config', '${gaMeasurementId}');` : ""}
+                ${googleAdsId ? `gtag('config', '${googleAdsId}');` : ""}
               `}
             </Script>
           </>
