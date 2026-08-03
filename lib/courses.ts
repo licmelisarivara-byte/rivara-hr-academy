@@ -113,6 +113,7 @@ export const courses: Course[] = [
       "Martes 11 y martes 18 de agosto · 17 a 18:30 hs (ARG) · por Google Meet · incluye grabación y certificado de asistencia",
     mpPaymentLink: "https://mpago.la/1urEhEV",
     payoneerLink: "https://link.payoneer.com/Token?t=BE30B7CEC2134934981FCA4AC76D193D&src=pl",
+    meetLink: "https://calendar.app.google/47iGeEf6fmis7zUD8",
   },
   {
     slug: "claude-para-seleccion",
