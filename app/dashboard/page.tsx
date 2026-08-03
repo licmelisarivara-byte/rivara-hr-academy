@@ -31,6 +31,16 @@ function DashboardContent() {
   const [purchases, setPurchases] = useState<MyPurchase[]>([]);
 
   useEffect(() => {
+    if (compra !== "exitosa") return;
+    // Evita contar la conversión dos veces si la persona refresca esta página.
+    if (sessionStorage.getItem("compra_exitosa_tracked")) return;
+    sessionStorage.setItem("compra_exitosa_tracked", "1");
+    (window as any).gtag?.("event", "purchase", {
+      event_category: "checkout",
+    });
+  }, [compra]);
+
+  useEffect(() => {
     if (!supabase) {
       setChecking(false);
       return;

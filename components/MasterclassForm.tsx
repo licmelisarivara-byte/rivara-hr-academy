@@ -30,6 +30,10 @@ export default function MasterclassForm({
       });
       if (!res.ok) throw new Error("failed");
       setDone(true);
+      (window as any).gtag?.("event", "generate_lead", {
+        event_category: "masterclass",
+        event_label: eventSlug,
+      });
     } catch {
       setError("Algo falló al registrarte. Probá de nuevo o escribinos por WhatsApp.");
     } finally {
