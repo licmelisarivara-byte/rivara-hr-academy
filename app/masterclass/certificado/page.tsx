@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CERTIFICADO_EVENTO, CERTIFICADO_OPCIONES } from "@/lib/certificado";
 
 type Estado =
@@ -18,7 +18,14 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export default function CertificadoMasterclassPage() {
-  const [opciones] = useState(() => shuffle(CERTIFICADO_OPCIONES));
+  // El orden se mezcla solo en el cliente (useEffect), no en el render
+  // inicial: si se mezclara en el useState() de entrada, el server y el
+  // cliente calculan un orden random distinto cada uno y React tira un
+  // hydration mismatch.
+  const [opciones, setOpciones] = useState(CERTIFICADO_OPCIONES);
+  useEffect(() => {
+    setOpciones(shuffle(CERTIFICADO_OPCIONES));
+  }, []);
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [respuesta, setRespuesta] = useState("");
