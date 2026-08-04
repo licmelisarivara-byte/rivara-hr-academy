@@ -209,7 +209,14 @@ export async function GET(
                   src={firmaDataUri}
                   width={316}
                   height={419}
-                  style={{ position: "absolute", left: -37, top: -199 }}
+                  style={{
+                    position: "absolute",
+                    left: -37,
+                    top: -199,
+                    // Birome azul -> blanco, para que combine con el resto
+                    // del texto del certificado.
+                    filter: "brightness(0) invert(1)",
+                  }}
                 />
               </div>
               <div style={{ width: "100%", height: 1, background: "rgba(247,244,238,0.3)", display: "flex" }} />
