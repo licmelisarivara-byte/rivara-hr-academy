@@ -48,7 +48,7 @@ export async function GET(
 
   const [logoDataUri, firmaDataUri, regular, semibold, bold, extrabold] = await Promise.all([
     fetchAsDataUri(req, "/images/logo-isotipo.png", "image/png"),
-    fetchAsDataUri(req, "/images/firma-melisa.jpg", "image/jpeg"),
+    fetchAsDataUri(req, "/images/firma-melisa.png", "image/png"),
     loadGoogleFont("Montserrat", 400, fontText),
     loadGoogleFont("Montserrat", 600, fontText),
     loadGoogleFont("Montserrat", 700, fontText),
@@ -187,20 +187,18 @@ export async function GET(
             }}
           >
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 320 }}>
-              {/* Foto de la firma real, recortada con overflow hidden ya que
-                  este renderer (satori) no soporta object-fit/object-position
-                  de forma confiable. Los offsets están calculados a mano para
-                  la foto en public/images/firma-melisa.jpg (1204x1600) —
-                  si se reemplaza esa foto por otra con distinto encuadre,
-                  hay que reajustar left/top/width/height de abajo. */}
+              {/* Foto de la firma real (fondo ya removido, PNG transparente),
+                  recortada con overflow hidden ya que este renderer (satori)
+                  no soporta object-fit/object-position de forma confiable.
+                  Los offsets están calculados a mano para
+                  public/images/firma-melisa.png (433x576) — si se reemplaza
+                  esa foto por otra con distinto encuadre, hay que reajustar
+                  left/top/width/height de abajo. */}
               <div
                 style={{
                   width: 220,
                   height: 110,
                   overflow: "hidden",
-                  borderRadius: 10,
-                  background: "#F7F4EE",
-                  border: "1px solid rgba(247,244,238,0.25)",
                   position: "relative",
                   display: "flex",
                   marginBottom: 10,
