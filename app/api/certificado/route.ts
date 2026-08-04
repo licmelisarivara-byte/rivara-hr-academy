@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin, supabaseAdminConfigured } from "@/lib/supabaseAdmin";
 import { esRespuestaCorrecta, CERTIFICADO_GRABACION_URL } from "@/lib/certificado";
+import { syncCertificadoDescargadoEnNotion } from "@/lib/notion";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -43,6 +44,8 @@ export async function POST(req: NextRequest) {
           : " Podés mirar la grabación (el link se comparte por mail) y volver a intentar."),
     });
   }
+
+  await syncCertificadoDescargadoEnNotion(nombre, email);
 
   return NextResponse.json({ correcta: true, id: data.id });
 }
