@@ -15,13 +15,13 @@ export const CERTIFICADO_EVENTO = {
 };
 
 export const CERTIFICADO_RESPUESTA_CORRECTA =
-  process.env.CERTIFICADO_RESPUESTA_CORRECTA ?? "42/100";
+  process.env.CERTIFICADO_RESPUESTA_CORRECTA ?? "48/100";
 
 // Opciones que se muestran como tildable en el formulario (en vez de un
 // campo de texto libre, para no dar pistas con el placeholder). La correcta
 // tiene que ser exactamente el string de CERTIFICADO_RESPUESTA_CORRECTA.
 // Si el score real cambia, actualizar ambas constantes juntas.
-export const CERTIFICADO_OPCIONES = ["28/100", "42/100", "76/100", "95/100"];
+export const CERTIFICADO_OPCIONES = ["28/100", "48/100", "76/100", "95/100"];
 
 export const CERTIFICADO_GRABACION_URL =
   process.env.CERTIFICADO_GRABACION_URL ?? evento?.youtubeLink ?? "";
