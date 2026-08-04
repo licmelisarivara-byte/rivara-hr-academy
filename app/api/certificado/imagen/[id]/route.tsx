@@ -1,0 +1,244 @@
+import { ImageResponse } from "next/og";
+import { NextRequest } from "next/server";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+import { supabaseAdmin, supabaseAdminConfigured } from "@/lib/supabaseAdmin";
+import { CERTIFICADO_EVENTO } from "@/lib/certificado";
+import { loadGoogleFont } from "@/lib/googleFont";
+
+export const runtime = "nodejs";
+
+const WIDTH = 1600;
+const HEIGHT = 1131;
+
+async function getLogoDataUri() {
+  const filePath = path.join(process.cwd(), "public", "images", "logo-isotipo.png");
+  const buf = await readFile(filePath);
+  return `data:image/png;base64,${buf.toString("base64")}`;
+}
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  if (!supabaseAdminConfigured || !supabaseAdmin) {
+    return new Response("not_configured", { status: 501 });
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from("certificado_solicitudes")
+    .select("nombre, respuesta_correcta")
+    .eq("id", params.id)
+    .single();
+
+  if (error || !data || !data.respuesta_correcta) {
+    return new Response("not_found", { status: 404 });
+  }
+
+  const nombre = String(data.nombre).slice(0, 120);
+
+  const [logoDataUri, regular, semibold, bold, extrabold] = await Promise.all([
+    getLogoDataUri(),
+    loadGoogleFont("Montserrat", 400),
+    loadGoogleFont("Montserrat", 600),
+    loadGoogleFont("Montserrat", 700),
+    loadGoogleFont("Montserrat", 800),
+  ]);
+
+  const image = new ImageResponse(
+    (
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          background:
+            "radial-gradient(circle at 15% 10%, rgba(232,0,111,0.16) 0%, rgba(13,13,20,0) 45%), radial-gradient(circle at 85% 90%, rgba(224,7,126,0.14) 0%, rgba(13,13,20,0) 45%), #0D0D14",
+          position: "relative",
+          fontFamily: "Montserrat",
+        }}
+      >
+        {/* Barras decorativas superior/inferior */}
+        <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: 10, background: "#E8006F", display: "flex" }} />
+        <div style={{ position: "absolute", bottom: 0, left: 0, width: "100%", height: 10, background: "#E8006F", display: "flex" }} />
+
+        {/* Marco */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            width: WIDTH - 96,
+            height: HEIGHT - 96,
+            border: "1.5px solid rgba(232,0,111,0.45)",
+            borderRadius: 28,
+            padding: "56px 64px",
+            position: "relative",
+          }}
+        >
+          {/* Logo + wordmark */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={logoDataUri} width={72} height={72} style={{ borderRadius: 16 }} />
+            <div
+              style={{
+                marginTop: 12,
+                fontSize: 22,
+                fontWeight: 800,
+                color: "#FFFFFF",
+                letterSpacing: 2,
+              }}
+            >
+              RIVARA
+            </div>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: "#E8006F",
+                letterSpacing: 4,
+                marginTop: 2,
+              }}
+            >
+              HR ACADEMY
+            </div>
+          </div>
+
+          <div
+            style={{
+              marginTop: 40,
+              fontSize: 15,
+              fontWeight: 700,
+              color: "#E8006F",
+              letterSpacing: 4,
+            }}
+          >
+            CERTIFICADO DE PARTICIPACIÓN
+          </div>
+
+          <div
+            style={{
+              marginTop: 18,
+              fontSize: 38,
+              fontWeight: 800,
+              color: "#FFFFFF",
+              textAlign: "center",
+              maxWidth: 1150,
+            }}
+          >
+            {CERTIFICADO_EVENTO.titulo}
+          </div>
+
+          <div style={{ marginTop: 56, fontSize: 20, color: "rgba(247,244,238,0.55)" }}>
+            Otorgado a
+          </div>
+
+          <div
+            style={{
+              marginTop: 8,
+              fontSize: 58,
+              fontWeight: 800,
+              color: "#E8006F",
+              textAlign: "center",
+              maxWidth: 1200,
+            }}
+          >
+            {nombre}
+          </div>
+
+          <div style={{ marginTop: 20, width: 460, height: 2, background: "#C0185A", display: "flex" }} />
+
+          <div
+            style={{
+              marginTop: 36,
+              fontSize: 19,
+              lineHeight: 1.6,
+              color: "rgba(247,244,238,0.82)",
+              textAlign: "center",
+              maxWidth: 1180,
+            }}
+          >
+            {`Por su participación activa en la masterclass en vivo "${CERTIFICADO_EVENTO.titulo.split("— ")[1] ?? CERTIFICADO_EVENTO.titulo}", dictada el ${CERTIFICADO_EVENTO.fecha} por RIVARA HR Academy.`}
+          </div>
+
+          {/* Firma + fecha */}
+          <div
+            style={{
+              marginTop: "auto",
+              width: "100%",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-end",
+              paddingTop: 40,
+            }}
+          >
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 320 }}>
+              {/* TODO: reemplazar este bloque de texto por <img src={firmaDataUri} /> */}
+              {/* cuando public/images/firma-melisa.png esté disponible. */}
+              <div
+                style={{
+                  fontSize: 34,
+                  fontStyle: "italic",
+                  color: "#F7F4EE",
+                  transform: "rotate(-4deg)",
+                  marginBottom: 6,
+                }}
+              >
+                Melisa Rivara
+              </div>
+              <div style={{ width: "100%", height: 1, background: "rgba(247,244,238,0.3)", display: "flex" }} />
+              <div style={{ marginTop: 10, fontSize: 16, fontWeight: 700, color: "#FFFFFF" }}>
+                Lic. Melisa Rivara
+              </div>
+              <div style={{ fontSize: 13, color: "rgba(247,244,238,0.55)" }}>
+                Fundadora · RIVARA HR Academy
+              </div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 260 }}>
+              <div style={{ width: "100%", height: 1, background: "rgba(247,244,238,0.3)", display: "flex" }} />
+              <div style={{ marginTop: 10, fontSize: 16, fontWeight: 700, color: "#FFFFFF" }}>
+                {CERTIFICADO_EVENTO.fechaCorta}
+              </div>
+              <div style={{ fontSize: 13, color: "rgba(247,244,238,0.55)" }}>
+                Fecha de la masterclass
+              </div>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 28, fontSize: 13, color: "rgba(247,244,238,0.35)" }}>
+            hracademy.rivaraconsultora.com.ar
+          </div>
+        </div>
+      </div>
+    ),
+    {
+      width: WIDTH,
+      height: HEIGHT,
+      fonts: [
+        { name: "Montserrat", data: regular, weight: 400, style: "normal" },
+        { name: "Montserrat", data: semibold, weight: 600, style: "normal" },
+        { name: "Montserrat", data: bold, weight: 700, style: "normal" },
+        { name: "Montserrat", data: extrabold, weight: 800, style: "normal" },
+      ],
+    }
+  );
+
+  const buf = await image.arrayBuffer();
+  const safeNombre = nombre
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-zA-Z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .toLowerCase();
+
+  return new Response(buf, {
+    headers: {
+      "Content-Type": "image/png",
+      "Content-Disposition": `attachment; filename="certificado-${safeNombre || "rivara-hr-academy"}.png"`,
+      "Cache-Control": "no-store",
+    },
+  });
+}
