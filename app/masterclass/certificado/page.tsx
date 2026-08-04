@@ -1,14 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { CERTIFICADO_EVENTO } from "@/lib/certificado";
+import { CERTIFICADO_EVENTO, CERTIFICADO_OPCIONES } from "@/lib/certificado";
 
 type Estado =
   | { paso: "form" }
   | { paso: "error"; mensaje: string }
   | { paso: "ok"; id: string; nombre: string };
 
+function shuffle<T>(arr: T[]): T[] {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
 export default function CertificadoMasterclassPage() {
+  const [opciones] = useState(() => shuffle(CERTIFICADO_OPCIONES));
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [respuesta, setRespuesta] = useState("");
@@ -102,16 +112,25 @@ export default function CertificadoMasterclassPage() {
             />
           </div>
           <div>
-            <label className="text-sm text-bone/60 block mb-1">
+            <label className="text-sm text-bone/60 block mb-2">
               ¿Qué score le dio Claude al candidato de ejemplo en la demo?
             </label>
-            <input
-              required
-              value={respuesta}
-              onChange={(e) => setRespuesta(e.target.value)}
-              placeholder="Ej: 42"
-              className="w-full rounded-lg bg-panel border border-black/10 px-4 py-2.5 text-bone focus:border-magenta outline-none"
-            />
+            <div className="grid grid-cols-2 gap-2">
+              {opciones.map((op) => (
+                <button
+                  key={op}
+                  type="button"
+                  onClick={() => setRespuesta(op)}
+                  className={`rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${
+                    respuesta === op
+                      ? "border-magenta bg-magenta text-white"
+                      : "border-black/10 bg-panel text-bone hover:border-magenta/50"
+                  }`}
+                >
+                  {op}
+                </button>
+              ))}
+            </div>
           </div>
 
           {estado.paso === "error" && (
@@ -120,7 +139,7 @@ export default function CertificadoMasterclassPage() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !respuesta}
             className="btn-cta w-full bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors disabled:opacity-50"
           >
             {loading ? "Verificando..." : "Verificar y generar certificado"}

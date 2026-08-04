@@ -15,7 +15,13 @@ export const CERTIFICADO_EVENTO = {
 };
 
 export const CERTIFICADO_RESPUESTA_CORRECTA =
-  process.env.CERTIFICADO_RESPUESTA_CORRECTA ?? "42";
+  process.env.CERTIFICADO_RESPUESTA_CORRECTA ?? "42/100";
+
+// Opciones que se muestran como tildable en el formulario (en vez de un
+// campo de texto libre, para no dar pistas con el placeholder). La correcta
+// tiene que ser exactamente el string de CERTIFICADO_RESPUESTA_CORRECTA.
+// Si el score real cambia, actualizar ambas constantes juntas.
+export const CERTIFICADO_OPCIONES = ["28/100", "42/100", "76/100", "95/100"];
 
 export const CERTIFICADO_GRABACION_URL =
   process.env.CERTIFICADO_GRABACION_URL ?? evento?.youtubeLink ?? "";
@@ -28,8 +34,5 @@ export function normalizarRespuesta(raw: string): string {
 }
 
 export function esRespuestaCorrecta(raw: string): boolean {
-  const normalizada = normalizarRespuesta(raw);
-  const correcta = normalizarRespuesta(CERTIFICADO_RESPUESTA_CORRECTA);
-  // Acepta el número solo ("42") o con el formato que mostró la demo ("42/100").
-  return normalizada === correcta || normalizada === `${correcta}/100`;
+  return normalizarRespuesta(raw) === normalizarRespuesta(CERTIFICADO_RESPUESTA_CORRECTA);
 }
