@@ -21,7 +21,6 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  try {
   if (!supabaseAdminConfigured || !supabaseAdmin) {
     return new Response("not_configured", { status: 501 });
   }
@@ -56,8 +55,9 @@ export async function GET(
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background:
-            "radial-gradient(circle at 15% 10%, rgba(232,0,111,0.16) 0%, rgba(13,13,20,0) 45%), radial-gradient(circle at 85% 90%, rgba(224,7,126,0.14) 0%, rgba(13,13,20,0) 45%), #0D0D14",
+          backgroundColor: "#0D0D14",
+          backgroundImage:
+            "radial-gradient(circle at 15% 10%, rgba(232,0,111,0.16) 0%, rgba(13,13,20,0) 45%), radial-gradient(circle at 85% 90%, rgba(224,7,126,0.14) 0%, rgba(13,13,20,0) 45%)",
           position: "relative",
           fontFamily: "Montserrat",
         }}
@@ -242,8 +242,4 @@ export async function GET(
       "Cache-Control": "no-store",
     },
   });
-  } catch (err: any) {
-    // DEBUG temporal — se saca en cuanto identifiquemos el error real.
-    return new Response(String(err?.stack || err), { status: 500 });
-  }
 }
