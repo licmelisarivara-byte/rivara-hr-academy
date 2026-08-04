@@ -89,6 +89,20 @@ export default function CertificadoMasterclassPage() {
           >
             Descargar mi certificado
           </a>
+
+          <div className="hairline my-6" />
+
+          <p className="text-bone/70 mb-3">
+            Compartí tu certificado en LinkedIn y etiquetanos — nos encanta verlos 💛
+          </p>
+          <a
+            href="https://www.linkedin.com/company/rivara-hr-academy/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-cta bg-sage text-white px-6 py-3 rounded-full hover:opacity-90 transition-colors inline-block"
+          >
+            Seguinos en LinkedIn →
+          </a>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="card rounded-xl p-6 sm:p-8 space-y-4">
