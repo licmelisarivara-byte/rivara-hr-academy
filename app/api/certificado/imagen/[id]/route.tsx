@@ -143,7 +143,11 @@ export async function GET(
             {CERTIFICADO_EVENTO.titulo}
           </div>
 
-          <div style={{ marginTop: 56, fontSize: 20, color: "rgba(247,244,238,0.55)" }}>
+          <div style={{ marginTop: 10, fontSize: 15, color: "rgba(247,244,238,0.5)" }}>
+            Duración: 60 minutos en vivo
+          </div>
+
+          <div style={{ marginTop: 40, fontSize: 20, color: "rgba(247,244,238,0.55)" }}>
             Otorgado a
           </div>
 
