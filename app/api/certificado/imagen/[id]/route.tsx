@@ -11,10 +11,10 @@ const HEIGHT = 1131;
 
 // No se puede leer public/ con fs en una función serverless de Vercel (se
 // sube aparte, como asset estático) — se pide por HTTP al mismo deploy.
-async function getLogoDataUri(req: NextRequest) {
-  const res = await fetch(new URL("/images/logo-isotipo.png", req.url));
+async function fetchAsDataUri(req: NextRequest, publicPath: string, mime: string) {
+  const res = await fetch(new URL(publicPath, req.url));
   const buf = await res.arrayBuffer();
-  return `data:image/png;base64,${Buffer.from(buf).toString("base64")}`;
+  return `data:${mime};base64,${Buffer.from(buf).toString("base64")}`;
 }
 
 export async function GET(
@@ -46,8 +46,9 @@ export async function GET(
     CERTIFICADO_EVENTO.titulo +
     CERTIFICADO_EVENTO.fecha;
 
-  const [logoDataUri, regular, semibold, bold, extrabold] = await Promise.all([
-    getLogoDataUri(req),
+  const [logoDataUri, firmaDataUri, regular, semibold, bold, extrabold] = await Promise.all([
+    fetchAsDataUri(req, "/images/logo-isotipo.png", "image/png"),
+    fetchAsDataUri(req, "/images/firma-melisa.jpg", "image/jpeg"),
     loadGoogleFont("Montserrat", 400, fontText),
     loadGoogleFont("Montserrat", 600, fontText),
     loadGoogleFont("Montserrat", 700, fontText),
@@ -186,18 +187,32 @@ export async function GET(
             }}
           >
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 320 }}>
-              {/* TODO: reemplazar este bloque de texto por <img src={firmaDataUri} /> */}
-              {/* cuando public/images/firma-melisa.png esté disponible. */}
+              {/* Foto de la firma real, recortada con overflow hidden ya que
+                  este renderer (satori) no soporta object-fit/object-position
+                  de forma confiable. Los offsets están calculados a mano para
+                  la foto en public/images/firma-melisa.jpg (1204x1600) —
+                  si se reemplaza esa foto por otra con distinto encuadre,
+                  hay que reajustar left/top/width/height de abajo. */}
               <div
                 style={{
-                  fontSize: 34,
-                  fontStyle: "italic",
-                  color: "#F7F4EE",
-                  transform: "rotate(-4deg)",
-                  marginBottom: 6,
+                  width: 220,
+                  height: 110,
+                  overflow: "hidden",
+                  borderRadius: 10,
+                  background: "#F7F4EE",
+                  border: "1px solid rgba(247,244,238,0.25)",
+                  position: "relative",
+                  display: "flex",
+                  marginBottom: 10,
                 }}
               >
-                Melisa Rivara
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={firmaDataUri}
+                  width={316}
+                  height={419}
+                  style={{ position: "absolute", left: -37, top: -199 }}
+                />
               </div>
               <div style={{ width: "100%", height: 1, background: "rgba(247,244,238,0.3)", display: "flex" }} />
               <div style={{ marginTop: 10, fontSize: 16, fontWeight: 700, color: "#FFFFFF" }}>
