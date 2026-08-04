@@ -37,12 +37,21 @@ export async function GET(
 
   const nombre = String(data.nombre).slice(0, 120);
 
+  // Alfabeto completo en español + el nombre y el título reales, para que
+  // Google Fonts devuelva un único subset con todos los glifos que se van
+  // a usar (ver comentario en lib/googleFont.ts).
+  const fontText =
+    "ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyz0123456789ÁÉÍÓÚáéíóúÜü.,:—-'\"/() " +
+    nombre +
+    CERTIFICADO_EVENTO.titulo +
+    CERTIFICADO_EVENTO.fecha;
+
   const [logoDataUri, regular, semibold, bold, extrabold] = await Promise.all([
     getLogoDataUri(req),
-    loadGoogleFont("Montserrat", 400),
-    loadGoogleFont("Montserrat", 600),
-    loadGoogleFont("Montserrat", 700),
-    loadGoogleFont("Montserrat", 800),
+    loadGoogleFont("Montserrat", 400, fontText),
+    loadGoogleFont("Montserrat", 600, fontText),
+    loadGoogleFont("Montserrat", 700, fontText),
+    loadGoogleFont("Montserrat", 800, fontText),
   ]);
 
   const image = new ImageResponse(
