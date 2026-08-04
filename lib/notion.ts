@@ -5,7 +5,7 @@
 // base — ver NOTION_API_KEY en .env.example.
 const NOTION_VERSION = "2022-06-28";
 const DATABASE_ID =
-  process.env.NOTION_MASTERCLASS_DB_ID ?? "9d2561cd-95d9-434c-a838-9f488bcb478c";
+  process.env.NOTION_MASTERCLASS_DB_ID ?? "c02e0933-57e3-42ae-8d3b-1a114cc16f5c";
 
 function notionHeaders() {
   return {
