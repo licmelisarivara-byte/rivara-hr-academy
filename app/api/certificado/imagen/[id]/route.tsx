@@ -21,6 +21,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  try {
   if (!supabaseAdminConfigured || !supabaseAdmin) {
     return new Response("not_configured", { status: 501 });
   }
@@ -241,4 +242,8 @@ export async function GET(
       "Cache-Control": "no-store",
     },
   });
+  } catch (err: any) {
+    // DEBUG temporal — se saca en cuanto identifiquemos el error real.
+    return new Response(String(err?.stack || err), { status: 500 });
+  }
 }
