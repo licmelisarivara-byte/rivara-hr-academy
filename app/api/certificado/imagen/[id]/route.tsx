@@ -1,7 +1,5 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
-import { readFile } from "node:fs/promises";
-import path from "node:path";
 import { supabaseAdmin, supabaseAdminConfigured } from "@/lib/supabaseAdmin";
 import { CERTIFICADO_EVENTO } from "@/lib/certificado";
 import { loadGoogleFont } from "@/lib/googleFont";
@@ -11,10 +9,12 @@ export const runtime = "nodejs";
 const WIDTH = 1600;
 const HEIGHT = 1131;
 
-async function getLogoDataUri() {
-  const filePath = path.join(process.cwd(), "public", "images", "logo-isotipo.png");
-  const buf = await readFile(filePath);
-  return `data:image/png;base64,${buf.toString("base64")}`;
+// No se puede leer public/ con fs en una función serverless de Vercel (se
+// sube aparte, como asset estático) — se pide por HTTP al mismo deploy.
+async function getLogoDataUri(req: NextRequest) {
+  const res = await fetch(new URL("/images/logo-isotipo.png", req.url));
+  const buf = await res.arrayBuffer();
+  return `data:image/png;base64,${Buffer.from(buf).toString("base64")}`;
 }
 
 export async function GET(
@@ -38,7 +38,7 @@ export async function GET(
   const nombre = String(data.nombre).slice(0, 120);
 
   const [logoDataUri, regular, semibold, bold, extrabold] = await Promise.all([
-    getLogoDataUri(),
+    getLogoDataUri(req),
     loadGoogleFont("Montserrat", 400),
     loadGoogleFont("Montserrat", 600),
     loadGoogleFont("Montserrat", 700),
