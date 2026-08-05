@@ -68,7 +68,7 @@ export default function CertificadoMasterclassPage() {
   return (
     <div className="max-w-2xl mx-auto px-6 py-20">
       <meta name="robots" content="noindex, nofollow" />
-      <p className="eyebrow mb-4">Masterclass en vivo</p>
+      <p className="eyebrow mb-4">Masterclass grabada</p>
       <h1 className="font-display text-3xl text-bone mb-3">
         Pedí tu certificado de participación
       </h1>
