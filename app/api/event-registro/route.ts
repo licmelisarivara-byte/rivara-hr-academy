@@ -72,8 +72,10 @@ export async function POST(req: NextRequest) {
           subject: `¡Ya estás registrada! ${event.title}`,
           html: `
             <p>Hola ${name},</p>
-            <p>¡Gracias por registrarte a <strong>${event.title}</strong>! Guardá este link para conectarte el día del evento:</p>
+            <p>¡Gracias por registrarte a <strong>${event.title}</strong>! Ya podés ver la grabación cuando quieras:</p>
             <p><a href="${event.youtubeLink}">${event.youtubeLink}</a></p>
+            <p>Y si querés tu certificado de participación, pedilo acá (te va a pedir una pregunta rápida sobre la masterclass):</p>
+            <p><a href="${siteUrl}/masterclass/certificado">${siteUrl}/masterclass/certificado</a></p>
             <p>Mientras tanto, podés ir viendo los recursos gratuitos y los próximos cursos acá: <a href="${siteUrl}">${siteUrl}</a></p>
             <p>Cualquier duda, escribinos por WhatsApp: https://wa.me/5491123912820</p>
           `,

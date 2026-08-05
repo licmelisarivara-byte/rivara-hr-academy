@@ -65,6 +65,12 @@ export default function MasterclassForm({
           </p>
           <div className="flex flex-col gap-3">
             <a
+              href="/masterclass/certificado"
+              className="rounded-lg bg-panel border border-black/10 px-4 py-3 text-bone hover:border-magenta transition-colors"
+            >
+              🏆 Pedí tu certificado de participación
+            </a>
+            <a
               href="/cursos/de-cero-a-tu-asistente"
               className="rounded-lg bg-panel border border-black/10 px-4 py-3 text-bone hover:border-magenta transition-colors"
             >
@@ -132,7 +138,7 @@ export default function MasterclassForm({
         disabled={loading}
         className="btn-cta w-full bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors disabled:opacity-50"
       >
-        {loading ? "Registrando..." : "Reservar mi lugar →"}
+        {loading ? "Registrando..." : "Ver grabación →"}
       </button>
     </form>
   );
