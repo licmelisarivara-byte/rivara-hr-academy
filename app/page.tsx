@@ -78,16 +78,16 @@ export default function Home() {
           />
           <div>
             <span className="inline-block text-xs font-semibold bg-magenta text-white px-2.5 py-1 rounded-full mb-3">
-              EN VIVO · GRATIS
+              GRABACIÓN · GRATIS
             </span>
             <h2 className="font-display text-xl sm:text-2xl text-bone mb-2">
               Analizá un CV con IA en segundos
             </h2>
             <p className="text-bone/60 text-sm mb-1">
-              Masterclass gratuita en vivo · Martes 4 de agosto · 17:30 hs (ARG)
+              Masterclass gratuita · Grabación disponible
             </p>
             <span className="text-magenta text-sm font-semibold">
-              Registrarme gratis →
+              Ver la grabación gratis →
             </span>
           </div>
         </Link>

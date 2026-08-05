@@ -5,11 +5,9 @@ import { useState } from "react";
 export default function MasterclassForm({
   eventSlug,
   youtubeLink,
-  calendarLink,
 }: {
   eventSlug: string;
   youtubeLink: string;
-  calendarLink: string;
 }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -48,25 +46,48 @@ export default function MasterclassForm({
           ¡Ya estás registrada!
         </p>
         <p className="text-bone/70 mb-6">
-          Guardá este link para conectarte el día del evento. Te esperamos ahí.
+          Ya podés ver la grabación de la masterclass cuando quieras.
         </p>
-        <div className="flex flex-wrap justify-center gap-3">
+        <div className="flex flex-wrap justify-center gap-3 mb-8">
           <a
             href={youtubeLink}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-cta inline-block bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors"
           >
-            Ver en YouTube →
+            Ver la grabación →
           </a>
-          <a
-            href={calendarLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-cta inline-block bg-sage text-white px-6 py-3 rounded-full hover:opacity-90 transition-colors"
-          >
-            + Agendar en Google Calendar
-          </a>
+        </div>
+
+        <div className="border-t border-bone/10 pt-6 text-left">
+          <p className="text-bone/70 text-sm mb-4 text-center">
+            ¿Te gustó? Estos son los próximos pasos:
+          </p>
+          <div className="flex flex-col gap-3">
+            <a
+              href="/cursos/de-cero-a-tu-asistente"
+              className="rounded-lg bg-panel border border-black/10 px-4 py-3 text-bone hover:border-magenta transition-colors"
+            >
+              🎓 Sumate al curso completo — arranca el martes 11/8, con{" "}
+              <strong>25% off</strong> hasta el domingo 9/8
+            </a>
+            <a
+              href="http://www.youtube.com/@recursoshumanosydigitalizacion"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg bg-panel border border-black/10 px-4 py-3 text-bone hover:border-magenta transition-colors"
+            >
+              ▶️ Suscribite al canal de YouTube
+            </a>
+            <a
+              href="https://www.linkedin.com/company/rivara-hr-academy/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg bg-panel border border-black/10 px-4 py-3 text-bone hover:border-magenta transition-colors"
+            >
+              💼 Seguinos en LinkedIn
+            </a>
+          </div>
         </div>
       </div>
     );
