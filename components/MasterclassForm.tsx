@@ -66,12 +66,16 @@ export default function MasterclassForm({
           <div className="flex flex-col gap-3">
             <a
               href="/masterclass/certificado"
+              target="_blank"
+              rel="noopener noreferrer"
               className="rounded-lg bg-panel border border-black/10 px-4 py-3 text-bone hover:border-magenta transition-colors"
             >
               🏆 Pedí tu certificado de participación
             </a>
             <a
               href="/cursos/de-cero-a-tu-asistente"
+              target="_blank"
+              rel="noopener noreferrer"
               className="rounded-lg bg-panel border border-black/10 px-4 py-3 text-bone hover:border-magenta transition-colors"
             >
               🎓 Sumate al curso completo — arranca el martes 11/8, con{" "}
