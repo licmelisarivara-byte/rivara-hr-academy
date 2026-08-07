@@ -35,7 +35,7 @@ function RegistroForm() {
       password,
       options: {
         data: { full_name: name, phone },
-        emailRedirectTo: `${window.location.origin}${next}`,
+        emailRedirectTo: `${window.location.origin}/dashboard?verified=1&next=${encodeURIComponent(next)}`,
       },
     });
     setLoading(false);
@@ -50,9 +50,13 @@ function RegistroForm() {
     return (
       <div className="max-w-md mx-auto px-6 py-20 text-center">
         <meta name="robots" content="noindex, nofollow" />
-        <h1 className="font-display text-2xl text-bone mb-3">Revisá tu email</h1>
-        <p className="text-bone/60">
-          Te enviamos un link de confirmación para activar tu cuenta.
+        <h1 className="font-display text-2xl text-bone mb-3">📩 Revisá tu email</h1>
+        <p className="text-bone/60 mb-2">
+          Te enviamos un mail a <strong>{email}</strong> con un link para
+          verificar tu cuenta. Tocalo y vas a poder acceder enseguida.
+        </p>
+        <p className="text-bone/40 text-sm">
+          Si no lo ves en unos minutos, revisá la carpeta de spam.
         </p>
       </div>
     );
