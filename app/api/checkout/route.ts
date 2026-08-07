@@ -9,12 +9,6 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 // mensaje de contacto en vez de romperse.
 export async function POST(req: NextRequest) {
   const accessToken = process.env.MP_ACCESS_TOKEN;
-  if (!accessToken) {
-    return NextResponse.json(
-      { error: "mercado_pago_not_configured" },
-      { status: 501 }
-    );
-  }
 
   const { kind, slug, buyerEmail } = await req.json();
   const siteUrl =
@@ -26,6 +20,11 @@ export async function POST(req: NextRequest) {
   let failureUrl = `${siteUrl}?compra=fallida`;
   let purchaseId: string | null = null;
 
+  // Registramos la intención de compra como "pending" en cuanto alguien
+  // toca "Comprar/Inscribirme", ANTES de chequear si Mercado Pago está
+  // configurado. Así, aunque MP_ACCESS_TOKEN todavía no esté cargado y el
+  // botón caiga al link fijo de MP, ya queda un registro de quién quiso
+  // comprar qué (antes esos casos se perdían por completo).
   if (kind === "resource") {
     const resource = getPaidResourceBySlug(slug);
     if (!resource) {
@@ -36,9 +35,6 @@ export async function POST(req: NextRequest) {
     successUrl = `${siteUrl}/dashboard?compra=exitosa`;
     failureUrl = `${siteUrl}/ebooks?compra=fallida`;
 
-    // Registramos la compra como "pending" antes de mandar a Mercado Pago.
-    // El webhook (/api/mp-webhook) la busca por este id (external_reference)
-    // cuando MP confirma el pago, y ahí decide si entregar el PDF.
     if (supabaseAdmin) {
       const { data: purchase, error } = await supabaseAdmin
         .from("compras")
@@ -49,6 +45,7 @@ export async function POST(req: NextRequest) {
           amount: unitPrice,
           currency: "ARS",
           status: "pending",
+          payment_method: "mercadopago",
           buyer_email: buyerEmail || null,
         })
         .select("id")
@@ -66,9 +63,6 @@ export async function POST(req: NextRequest) {
     unitPrice = course.priceARS ?? 0;
     failureUrl = `${siteUrl}/cursos/${course.slug}?compra=fallida`;
 
-    // Igual que los recursos: se registra "pending" y el webhook la marca
-    // aprobada. Los pagos manuales (transferencia/Payoneer) no pasan por
-    // acá, así que esos se siguen habilitando a mano en la base.
     if (supabaseAdmin) {
       const { data: purchase, error } = await supabaseAdmin
         .from("compras")
@@ -79,6 +73,7 @@ export async function POST(req: NextRequest) {
           amount: unitPrice,
           currency: "ARS",
           status: "pending",
+          payment_method: "mercadopago",
           buyer_email: buyerEmail || null,
         })
         .select("id")
@@ -87,6 +82,17 @@ export async function POST(req: NextRequest) {
         purchaseId = purchase.id;
       }
     }
+  }
+
+  // El external_reference (purchaseId) es lo que el webhook usa para
+  // encontrar esta fila cuando MP confirma el pago, así que el registro
+  // arriba tiene que existir aunque después no podamos armar la
+  // preferencia real por falta de configuración.
+  if (!accessToken) {
+    return NextResponse.json(
+      { error: "mercado_pago_not_configured" },
+      { status: 501 }
+    );
   }
 
   const preference: Record<string, unknown> = {

@@ -7,7 +7,9 @@ import type { FreeResource } from "@/lib/resources";
 export default function FreeResourceDownloadButton({ resource }: { resource: FreeResource }) {
   const [sessionEmail, setSessionEmail] = useState<string | null>(null);
   const [askingEmail, setAskingEmail] = useState(false);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [unlocked, setUnlocked] = useState(false);
   const linkRef = useRef<HTMLAnchorElement>(null);
 
@@ -18,11 +20,16 @@ export default function FreeResourceDownloadButton({ resource }: { resource: Fre
     });
   }, []);
 
-  function logDownload(buyerEmail: string | null) {
+  function logDownload(buyerEmail: string | null, buyerName?: string, buyerPhone?: string) {
     fetch("/api/log-download", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ resourceSlug: resource.slug, buyerEmail }),
+      body: JSON.stringify({
+        resourceSlug: resource.slug,
+        buyerEmail,
+        buyerName: buyerName || null,
+        buyerPhone: buyerPhone || null,
+      }),
     }).catch(() => {
       // No bloqueamos la descarga si el log falla.
     });
@@ -32,9 +39,9 @@ export default function FreeResourceDownloadButton({ resource }: { resource: Fre
     });
   }
 
-  function handleEmailSubmit(e: React.FormEvent) {
+  function handleFormSubmit(e: React.FormEvent) {
     e.preventDefault();
-    logDownload(email);
+    logDownload(email, name, phone);
     setUnlocked(true);
     // El link real recién se monta en este render; hace falta esperar al
     // próximo tick para poder simular el click y disparar la descarga.
@@ -69,14 +76,29 @@ export default function FreeResourceDownloadButton({ resource }: { resource: Fre
 
   if (askingEmail) {
     return (
-      <form onSubmit={handleEmailSubmit} className="flex flex-col gap-2">
+      <form onSubmit={handleFormSubmit} className="flex flex-col gap-2">
+        <input
+          type="text"
+          required
+          autoFocus
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Nombre y apellido"
+          className="w-full rounded-lg bg-panel border border-black/10 px-3 py-2 text-sm text-bone focus:border-magenta outline-none"
+        />
         <input
           type="email"
           required
-          autoFocus
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Tu email"
+          className="w-full rounded-lg bg-panel border border-black/10 px-3 py-2 text-sm text-bone focus:border-magenta outline-none"
+        />
+        <input
+          type="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="WhatsApp (opcional)"
           className="w-full rounded-lg bg-panel border border-black/10 px-3 py-2 text-sm text-bone focus:border-magenta outline-none"
         />
         <button

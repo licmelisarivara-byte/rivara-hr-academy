@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "not_configured" }, { status: 501 });
   }
 
-  const { resourceSlug, buyerEmail } = await req.json();
+  const { resourceSlug, buyerEmail, buyerName, buyerPhone } = await req.json();
   if (!resourceSlug) {
     return NextResponse.json({ error: "missing_resource_slug" }, { status: 400 });
   }
@@ -17,6 +17,8 @@ export async function POST(req: NextRequest) {
   await supabaseAdmin.from("descargas_gratuitas").insert({
     resource_slug: resourceSlug,
     buyer_email: buyerEmail || null,
+    buyer_name: buyerName || null,
+    buyer_phone: buyerPhone || null,
   });
 
   return NextResponse.json({ ok: true });
