@@ -5,8 +5,12 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import CheckoutButton from "@/components/CheckoutButton";
-import { getCoupon } from "@/lib/coupons";
-import type { Course } from "@/lib/courses";
+import { getCoupon, applyDiscount } from "@/lib/coupons";
+import {
+  getTransferenciaAmountARS,
+  getPayoneerAmountUSD,
+  type Course,
+} from "@/lib/courses";
 
 type Method = "" | "transferencia" | "mercadopago" | "payoneer";
 
@@ -93,8 +97,13 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
   }
 
   if (!course.paymentOptions?.length) {
-    return <CheckoutButton course={course} couponCode={appliedCoupon?.code} />;
+    return <CheckoutButton course={course} />;
   }
+
+  // El cupón DESCARGA5 solo aplica pagando por transferencia — Mercado
+  // Pago y Payoneer usan links fijos que no reflejan el descuento.
+  const transferenciaARS = applyDiscount(getTransferenciaAmountARS(course), appliedCoupon);
+  const payoneerUSD = getPayoneerAmountUSD(course);
 
   async function logInterest(m: "transferencia" | "payoneer") {
     try {
@@ -108,7 +117,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
           buyerEmail: buyer?.email,
           buyerName: buyer?.name,
           buyerPhone: buyer?.phone,
-          couponCode: appliedCoupon?.code,
+          couponCode: m === "transferencia" ? appliedCoupon?.code : undefined,
         }),
       });
     } catch {
@@ -125,7 +134,10 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
 
   function confirmManual(m: "transferencia" | "payoneer") {
     const label = m === "transferencia" ? "Transferencia bancaria" : "Payoneer";
-    const couponLine = appliedCoupon ? `\n🎟️ Cupón: ${appliedCoupon.code} (${appliedCoupon.percentOff}% off)` : "";
+    const couponLine =
+      m === "transferencia" && appliedCoupon
+        ? `\n🎟️ Cupón: ${appliedCoupon.code} (${appliedCoupon.percentOff}% off)`
+        : "";
     const message = encodeURIComponent(
       `Hola Melisa 👋\n\nQuiero inscribirme al curso "${course.title}" de RIVARA HR Academy.\n\n📌 Nombre: ${buyer?.name}\n📧 Email: ${buyer?.email}\n📱 Celular: ${buyer?.phone}\n💳 Forma de pago: ${label}${couponLine}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
     );
@@ -147,7 +159,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
         {couponInput && (
           <p className={`text-xs mt-1 ${appliedCoupon ? "text-sage" : "text-magenta"}`}>
             {appliedCoupon
-              ? `✅ Cupón aplicado: ${appliedCoupon.percentOff}% off`
+              ? `✅ Cupón aplicado: ${appliedCoupon.percentOff}% off pagando por transferencia`
               : "Ese cupón no es válido."}
           </p>
         )}
@@ -161,21 +173,15 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
           className="w-full rounded-lg bg-panel border border-black/10 px-4 py-2.5 text-bone focus:border-magenta outline-none"
         >
           <option value="">— Elegí una opción —</option>
-          {course.paymentOptions?.map((opt) => (
-            <option
-              key={opt.method}
-              value={
-                opt.method === "Transferencia bancaria"
-                  ? "transferencia"
-                  : opt.method === "Payoneer"
-                  ? "payoneer"
-                  : "mercadopago"
-              }
-            >
-              {opt.method} — {opt.price}
-              {opt.note ? ` (${opt.note})` : ""}
-            </option>
-          ))}
+          <option value="transferencia">
+            Transferencia bancaria — ${transferenciaARS.toLocaleString("es-AR")} ARS
+          </option>
+          {course.payoneerLink && (
+            <option value="payoneer">Payoneer — USD {payoneerUSD}</option>
+          )}
+          <option value="mercadopago">
+            Mercado Pago — ${(course.priceARS ?? 0).toLocaleString("es-AR")} ARS (sin descuento)
+          </option>
         </select>
       </div>
 

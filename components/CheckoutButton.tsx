@@ -5,13 +5,8 @@ import Link from "next/link";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import type { Course } from "@/lib/courses";
 
-export default function CheckoutButton({
-  course,
-  couponCode,
-}: {
-  course: Course;
-  couponCode?: string;
-}) {
+// Mercado Pago no acepta cupones: siempre cobra el precio sin descuento.
+export default function CheckoutButton({ course }: { course: Course }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [checkingSession, setCheckingSession] = useState(supabaseConfigured);
@@ -88,7 +83,7 @@ export default function CheckoutButton({
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind: "course", slug: course.slug, buyerEmail, couponCode }),
+        body: JSON.stringify({ kind: "course", slug: course.slug, buyerEmail }),
       });
       if (!res.ok) throw new Error("no-config");
       const data = await res.json();

@@ -14,8 +14,13 @@ export type Course = {
   image?: string; // portada en /public/images
   outcomes?: string[];
   price: string; // texto mostrado en pantalla
-  priceARS?: number; // monto real que se cobra por Mercado Pago
+  priceARS?: number; // monto real que se cobra por Mercado Pago (nunca tiene descuento)
   priceNote?: string;
+  earlyBirdUntil?: string; // ISO datetime; hasta acá rige el precio early bird de transferencia/Payoneer
+  priceARSEarlyBird?: number; // monto real de transferencia antes de earlyBirdUntil
+  priceARSRegular?: number; // monto real de transferencia después de earlyBirdUntil
+  priceUSDEarlyBird?: number; // monto real de Payoneer antes de earlyBirdUntil
+  priceUSDRegular?: number; // monto real de Payoneer después de earlyBirdUntil
   paymentOptions?: PaymentOption[];
   bankDetails?: BankDetails;
   faqs?: FAQ[];
@@ -77,6 +82,11 @@ export const courses: Course[] = [
     priceARS: 60000,
     priceNote:
       "🔥 $45.000 ARS por transferencia o USD 30 por Payoneer, antes del 9/8 · Por Mercado Pago: $60.000 ARS (sin descuento)",
+    earlyBirdUntil: "2026-08-09T23:59:59-03:00",
+    priceARSEarlyBird: 45000,
+    priceARSRegular: 60000,
+    priceUSDEarlyBird: 30,
+    priceUSDRegular: 40,
     paymentOptions: [
       {
         method: "Transferencia bancaria",
@@ -139,4 +149,23 @@ export const courses: Course[] = [
 
 export function getCourseBySlug(slug: string) {
   return courses.find((c) => c.slug === slug);
+}
+
+function isEarlyBird(course: Course): boolean {
+  if (!course.earlyBirdUntil) return false;
+  return Date.now() < new Date(course.earlyBirdUntil).getTime();
+}
+
+// Monto real por transferencia bancaria, según si el early bird sigue
+// vigente hoy o no. Mercado Pago nunca usa esto: siempre cobra
+// `course.priceARS`, sin descuento.
+export function getTransferenciaAmountARS(course: Course): number {
+  const early = isEarlyBird(course);
+  return (early ? course.priceARSEarlyBird : course.priceARSRegular) ?? course.priceARS ?? 0;
+}
+
+// Monto real por Payoneer (USD), según si el early bird sigue vigente hoy.
+export function getPayoneerAmountUSD(course: Course): number {
+  const early = isEarlyBird(course);
+  return (early ? course.priceUSDEarlyBird : course.priceUSDRegular) ?? 0;
 }
