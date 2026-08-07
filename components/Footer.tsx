@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto px-6 py-12 grid gap-8 sm:grid-cols-3 text-sm">
         <div>
           <Image
-            src="/images/logo-horizontal.png"
+            src="/images/logo-horizontal-dark.png"
             alt="RIVARA HR Academy"
             width={640}
             height={162}

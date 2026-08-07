@@ -39,7 +39,7 @@ export default function Nav() {
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center" onClick={() => setOpen(false)}>
           <Image
-            src="/images/logo-horizontal.png"
+            src="/images/logo-horizontal-dark.png"
             alt="RIVARA HR Academy"
             width={640}
             height={162}

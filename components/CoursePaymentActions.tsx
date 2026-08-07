@@ -12,13 +12,13 @@ import {
 } from "@/lib/courses";
 
 type Method = "" | "transferencia" | "mercadopago" | "payoneer";
-type Buyer = { email: string; name: string; phone: string };
+type Buyer = { email: string; phone: string };
 
 // Orden pensado para no perder gente en el camino: primero elige CÓMO
-// quiere pagar (con los precios ya a la vista), recién ahí completa sus
-// datos, y al final crea la contraseña — no al revés. Así, sea cual sea el
-// método que elija, siempre queda su mail apenas completa el formulario de
-// contacto, aunque todavía no haya terminado de crear la cuenta.
+// quiere pagar (con los precios ya a la vista), recién ahí deja su mail —
+// nada de crear cuenta ni poner contraseña para poder pagar. La cuenta se
+// arma sola después, cuando el pago ya está confirmado: ahí le llega un
+// mail para que ponga su contraseña y entre directo (ver lib/deliverPurchase).
 export default function CoursePaymentActions({ course }: { course: Course }) {
   const router = useRouter();
   const [checking, setChecking] = useState(supabaseConfigured);
@@ -29,16 +29,10 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
   const appliedCoupon = getCoupon(couponInput);
 
   const [contactSubmitted, setContactSubmitted] = useState(false);
-  const [formName, setFormName] = useState("");
   const [formEmail, setFormEmail] = useState("");
   const [formPhone, setFormPhone] = useState("");
 
-  const [password, setPassword] = useState("");
-  const [creatingAccount, setCreatingAccount] = useState(false);
-  const [accountError, setAccountError] = useState<string | null>(null);
-  const [newBuyer, setNewBuyer] = useState<Buyer | null>(null);
-
-  const buyer = sessionBuyer ?? newBuyer;
+  const buyer = sessionBuyer ?? (contactSubmitted ? { email: formEmail, phone: formPhone } : null);
 
   useEffect(() => {
     if (!supabase) {
@@ -48,19 +42,15 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
     supabase.auth.getSession().then(({ data }) => {
       const user = data.session?.user;
       if (user?.email) {
-        setSessionBuyer({
-          email: user.email,
-          name: user.user_metadata?.full_name ?? "",
-          phone: user.user_metadata?.phone ?? "",
-        });
+        setSessionBuyer({ email: user.email, phone: user.user_metadata?.phone ?? "" });
       }
       setChecking(false);
     });
   }, []);
 
-  // Apenas conocemos al comprador (ya sea porque estaba logueado o porque
-  // recién completó el formulario de contacto) Y eligió un método manual,
-  // registramos la intención de compra — aunque después no confirme nada.
+  // Apenas conocemos el mail (ya sea porque estaba logueado o porque recién
+  // completó el formulario) Y eligió un método manual, registramos la
+  // intención de compra — aunque después no confirme nada.
   useEffect(() => {
     if (!buyer) return;
     if (method !== "transferencia" && method !== "payoneer") return;
@@ -72,7 +62,6 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
         slug: course.slug,
         method,
         buyerEmail: buyer.email,
-        buyerName: buyer.name,
         buyerPhone: buyer.phone,
         couponCode: method === "transferencia" ? appliedCoupon?.code : undefined,
       }),
@@ -124,30 +113,9 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
   const transferenciaARS = applyDiscount(getTransferenciaAmountARS(course), appliedCoupon);
   const payoneerUSD = getPayoneerAmountUSD(course);
 
-  async function handleContactSubmit(e: React.FormEvent) {
+  function handleContactSubmit(e: React.FormEvent) {
     e.preventDefault();
     setContactSubmitted(true);
-  }
-
-  async function handleCreateAccount(e: React.FormEvent) {
-    e.preventDefault();
-    if (!supabase) return;
-    setCreatingAccount(true);
-    setAccountError(null);
-    const { error } = await supabase.auth.signUp({
-      email: formEmail,
-      password,
-      options: {
-        data: { full_name: formName, phone: formPhone },
-        emailRedirectTo: `${window.location.origin}/dashboard?verified=1`,
-      },
-    });
-    setCreatingAccount(false);
-    if (error) {
-      setAccountError(error.message);
-      return;
-    }
-    setNewBuyer({ email: formEmail, name: formName, phone: formPhone });
   }
 
   function confirmManual(m: "transferencia" | "payoneer") {
@@ -156,11 +124,12 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
       m === "transferencia" && appliedCoupon
         ? `\n🎟️ Cupón: ${appliedCoupon.code} (${appliedCoupon.percentOff}% off)`
         : "";
+    const phoneLine = buyer?.phone ? `\n📱 Celular: ${buyer.phone}` : "";
     const message = encodeURIComponent(
-      `Hola Melisa 👋\n\nQuiero inscribirme al curso "${course.title}" de RIVARA HR Academy.\n\n📌 Nombre: ${buyer?.name}\n📧 Email: ${buyer?.email}\n📱 Celular: ${buyer?.phone}\n💳 Forma de pago: ${label}${couponLine}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
+      `Hola Melisa 👋\n\nQuiero inscribirme al curso "${course.title}" de RIVARA HR Academy.\n\n📧 Email: ${buyer?.email}${phoneLine}\n💳 Forma de pago: ${label}${couponLine}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
     );
     window.open(`https://wa.me/5491123912820?text=${message}`, "_blank");
-    router.push("/dashboard");
+    router.push("/");
   }
 
   return (
@@ -203,20 +172,16 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
         </select>
       </div>
 
-      {method && !buyer && !contactSubmitted && (
+      {method && !buyer && (
         <form onSubmit={handleContactSubmit} className="card-alt rounded-lg p-4 mb-4 space-y-3">
-          <p className="text-sm font-semibold text-bone">Tus datos</p>
-          <input
-            type="text"
-            required
-            value={formName}
-            onChange={(e) => setFormName(e.target.value)}
-            placeholder="Nombre y apellido"
-            className="w-full rounded-lg bg-panel border border-black/10 px-4 py-2.5 text-sm text-bone focus:border-magenta outline-none"
-          />
+          <p className="text-sm font-semibold text-bone">Tu mail</p>
+          <p className="text-xs text-bone/50">
+            Ahí te vamos a mandar la confirmación y, cuando el pago esté listo, el acceso al curso.
+          </p>
           <input
             type="email"
             required
+            autoFocus
             value={formEmail}
             onChange={(e) => setFormEmail(e.target.value)}
             placeholder="Email"
@@ -234,33 +199,6 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
             className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors"
           >
             Continuar →
-          </button>
-        </form>
-      )}
-
-      {method && !buyer && contactSubmitted && (
-        <form onSubmit={handleCreateAccount} className="card-alt rounded-lg p-4 mb-4 space-y-3">
-          <p className="text-sm font-semibold text-bone">Creá tu contraseña</p>
-          <p className="text-xs text-bone/50">
-            Así después vas a poder ver esta compra en tu cuenta de RIVARA HR Academy.
-          </p>
-          <input
-            type="password"
-            required
-            minLength={6}
-            autoFocus
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Contraseña"
-            className="w-full rounded-lg bg-panel border border-black/10 px-4 py-2.5 text-sm text-bone focus:border-magenta outline-none"
-          />
-          {accountError && <p className="text-xs text-magenta">{accountError}</p>}
-          <button
-            type="submit"
-            disabled={creatingAccount}
-            className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors disabled:opacity-60"
-          >
-            {creatingAccount ? "Creando cuenta..." : "Crear cuenta y continuar →"}
           </button>
         </form>
       )}

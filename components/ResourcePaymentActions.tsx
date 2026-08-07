@@ -8,10 +8,11 @@ import { bankDetails } from "@/lib/bankDetails";
 import type { PaidResource } from "@/lib/resources";
 
 type Method = "" | "transferencia" | "mercadopago" | "payoneer";
-type Buyer = { email: string; name: string; phone: string };
+type Buyer = { email: string; phone: string };
 
-// Mismo orden que CoursePaymentActions: primero elige cómo pagar, recién
-// ahí completa sus datos, y al final crea la contraseña.
+// Mismo orden que CoursePaymentActions: primero elige cómo pagar, después
+// deja su mail — la cuenta se arma sola después de que el pago se
+// confirme (ver lib/deliverPurchase), no hace falta contraseña para pagar.
 export default function ResourcePaymentActions({ resource }: { resource: PaidResource }) {
   const router = useRouter();
   const [checking, setChecking] = useState(supabaseConfigured);
@@ -20,16 +21,10 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
   const [method, setMethod] = useState<Method>("");
 
   const [contactSubmitted, setContactSubmitted] = useState(false);
-  const [formName, setFormName] = useState("");
   const [formEmail, setFormEmail] = useState("");
   const [formPhone, setFormPhone] = useState("");
 
-  const [password, setPassword] = useState("");
-  const [creatingAccount, setCreatingAccount] = useState(false);
-  const [accountError, setAccountError] = useState<string | null>(null);
-  const [newBuyer, setNewBuyer] = useState<Buyer | null>(null);
-
-  const buyer = sessionBuyer ?? newBuyer;
+  const buyer = sessionBuyer ?? (contactSubmitted ? { email: formEmail, phone: formPhone } : null);
 
   useEffect(() => {
     if (!supabase) {
@@ -39,11 +34,7 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
     supabase.auth.getSession().then(({ data }) => {
       const user = data.session?.user;
       if (user?.email) {
-        setSessionBuyer({
-          email: user.email,
-          name: user.user_metadata?.full_name ?? "",
-          phone: user.user_metadata?.phone ?? "",
-        });
+        setSessionBuyer({ email: user.email, phone: user.user_metadata?.phone ?? "" });
       }
       setChecking(false);
     });
@@ -60,7 +51,6 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
         slug: resource.slug,
         method,
         buyerEmail: buyer.email,
-        buyerName: buyer.name,
         buyerPhone: buyer.phone,
       }),
     }).catch(() => {
@@ -81,39 +71,19 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
     );
   }
 
-  async function handleContactSubmit(e: React.FormEvent) {
+  function handleContactSubmit(e: React.FormEvent) {
     e.preventDefault();
     setContactSubmitted(true);
   }
 
-  async function handleCreateAccount(e: React.FormEvent) {
-    e.preventDefault();
-    if (!supabase) return;
-    setCreatingAccount(true);
-    setAccountError(null);
-    const { error } = await supabase.auth.signUp({
-      email: formEmail,
-      password,
-      options: {
-        data: { full_name: formName, phone: formPhone },
-        emailRedirectTo: `${window.location.origin}/dashboard?verified=1`,
-      },
-    });
-    setCreatingAccount(false);
-    if (error) {
-      setAccountError(error.message);
-      return;
-    }
-    setNewBuyer({ email: formEmail, name: formName, phone: formPhone });
-  }
-
   function confirmManual(m: "transferencia" | "payoneer") {
     const label = m === "transferencia" ? "Transferencia bancaria" : "Payoneer";
+    const phoneLine = buyer?.phone ? `\n📱 Celular: ${buyer.phone}` : "";
     const message = encodeURIComponent(
-      `Hola Melisa 👋\n\nQuiero comprar: ${resource.title}\n\n📌 Nombre: ${buyer?.name}\n📧 Email: ${buyer?.email}\n📱 Celular: ${buyer?.phone}\n💳 Forma de pago: ${label}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
+      `Hola Melisa 👋\n\nQuiero comprar: ${resource.title}\n\n📧 Email: ${buyer?.email}${phoneLine}\n💳 Forma de pago: ${label}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
     );
     window.open(`https://wa.me/5491123912820?text=${message}`, "_blank");
-    router.push("/dashboard");
+    router.push("/");
   }
 
   return (
@@ -133,20 +103,16 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
         </select>
       </div>
 
-      {method && !buyer && !contactSubmitted && (
+      {method && !buyer && (
         <form onSubmit={handleContactSubmit} className="card-alt rounded-lg p-4 mb-3 space-y-3">
-          <p className="text-sm font-semibold text-bone">Tus datos</p>
-          <input
-            type="text"
-            required
-            value={formName}
-            onChange={(e) => setFormName(e.target.value)}
-            placeholder="Nombre y apellido"
-            className="w-full rounded-lg bg-panel border border-black/10 px-4 py-2.5 text-sm text-bone focus:border-magenta outline-none"
-          />
+          <p className="text-sm font-semibold text-bone">Tu mail</p>
+          <p className="text-xs text-bone/50">
+            Ahí te vamos a mandar la confirmación y, cuando el pago esté listo, la descarga.
+          </p>
           <input
             type="email"
             required
+            autoFocus
             value={formEmail}
             onChange={(e) => setFormEmail(e.target.value)}
             placeholder="Email"
@@ -164,33 +130,6 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
             className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors"
           >
             Continuar →
-          </button>
-        </form>
-      )}
-
-      {method && !buyer && contactSubmitted && (
-        <form onSubmit={handleCreateAccount} className="card-alt rounded-lg p-4 mb-3 space-y-3">
-          <p className="text-sm font-semibold text-bone">Creá tu contraseña</p>
-          <p className="text-xs text-bone/50">
-            Así después vas a poder ver esta compra en tu cuenta de RIVARA HR Academy.
-          </p>
-          <input
-            type="password"
-            required
-            minLength={6}
-            autoFocus
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Contraseña"
-            className="w-full rounded-lg bg-panel border border-black/10 px-4 py-2.5 text-sm text-bone focus:border-magenta outline-none"
-          />
-          {accountError && <p className="text-xs text-magenta">{accountError}</p>}
-          <button
-            type="submit"
-            disabled={creatingAccount}
-            className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors disabled:opacity-60"
-          >
-            {creatingAccount ? "Creando cuenta..." : "Crear cuenta y continuar →"}
           </button>
         </form>
       )}
