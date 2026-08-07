@@ -6,22 +6,33 @@ import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import type { Course } from "@/lib/courses";
 
 // Mercado Pago no acepta cupones: siempre cobra el precio sin descuento.
-export default function CheckoutButton({ course }: { course: Course }) {
+// Si el que llama ya sabe el mail del comprador (por ejemplo, porque lo
+// acaba de pedir en un formulario propio), lo puede pasar por prop y nos
+// salteamos el chequeo de sesión y el cartel de "Registrarme".
+export default function CheckoutButton({
+  course,
+  buyerEmail: buyerEmailProp,
+}: {
+  course: Course;
+  buyerEmail?: string;
+}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [checkingSession, setCheckingSession] = useState(supabaseConfigured);
-  const [buyerEmail, setBuyerEmail] = useState<string | null>(null);
+  const [checkingSession, setCheckingSession] = useState(supabaseConfigured && !buyerEmailProp);
+  const [sessionEmail, setSessionEmail] = useState<string | null>(null);
+  const buyerEmail = buyerEmailProp ?? sessionEmail;
 
   useEffect(() => {
+    if (buyerEmailProp) return;
     if (!supabase) {
       setCheckingSession(false);
       return;
     }
     supabase.auth.getSession().then(({ data }) => {
-      setBuyerEmail(data.session?.user?.email ?? null);
+      setSessionEmail(data.session?.user?.email ?? null);
       setCheckingSession(false);
     });
-  }, []);
+  }, [buyerEmailProp]);
 
   if (course.comingSoon) {
     return (

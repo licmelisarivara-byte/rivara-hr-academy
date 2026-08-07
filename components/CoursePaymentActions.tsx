@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import CheckoutButton from "@/components/CheckoutButton";
 import { getCoupon, applyDiscount } from "@/lib/coupons";
@@ -13,22 +12,33 @@ import {
 } from "@/lib/courses";
 
 type Method = "" | "transferencia" | "mercadopago" | "payoneer";
+type Buyer = { email: string; name: string; phone: string };
 
-// Los precios/formas de pago quedan visibles sin loguearse (ayudan a
-// decidir la compra), pero ninguna acción real —Mercado Pago, coordinar
-// transferencia, Payoneer— se puede tocar sin registrarse antes. Así, sea
-// cual sea el método que elija, siempre queda su mail (y ahora también
-// nombre y celular, que ya pidió el registro).
+// Orden pensado para no perder gente en el camino: primero elige CÓMO
+// quiere pagar (con los precios ya a la vista), recién ahí completa sus
+// datos, y al final crea la contraseña — no al revés. Así, sea cual sea el
+// método que elija, siempre queda su mail apenas completa el formulario de
+// contacto, aunque todavía no haya terminado de crear la cuenta.
 export default function CoursePaymentActions({ course }: { course: Course }) {
-  const pathname = usePathname();
   const router = useRouter();
   const [checking, setChecking] = useState(supabaseConfigured);
-  const [buyer, setBuyer] = useState<{ email: string; name: string; phone: string } | null>(
-    null
-  );
+  const [sessionBuyer, setSessionBuyer] = useState<Buyer | null>(null);
+
   const [method, setMethod] = useState<Method>("");
   const [couponInput, setCouponInput] = useState("");
   const appliedCoupon = getCoupon(couponInput);
+
+  const [contactSubmitted, setContactSubmitted] = useState(false);
+  const [formName, setFormName] = useState("");
+  const [formEmail, setFormEmail] = useState("");
+  const [formPhone, setFormPhone] = useState("");
+
+  const [password, setPassword] = useState("");
+  const [creatingAccount, setCreatingAccount] = useState(false);
+  const [accountError, setAccountError] = useState<string | null>(null);
+  const [newBuyer, setNewBuyer] = useState<Buyer | null>(null);
+
+  const buyer = sessionBuyer ?? newBuyer;
 
   useEffect(() => {
     if (!supabase) {
@@ -38,7 +48,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
     supabase.auth.getSession().then(({ data }) => {
       const user = data.session?.user;
       if (user?.email) {
-        setBuyer({
+        setSessionBuyer({
           email: user.email,
           name: user.user_metadata?.full_name ?? "",
           phone: user.user_metadata?.phone ?? "",
@@ -47,6 +57,30 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
       setChecking(false);
     });
   }, []);
+
+  // Apenas conocemos al comprador (ya sea porque estaba logueado o porque
+  // recién completó el formulario de contacto) Y eligió un método manual,
+  // registramos la intención de compra — aunque después no confirme nada.
+  useEffect(() => {
+    if (!buyer) return;
+    if (method !== "transferencia" && method !== "payoneer") return;
+    fetch("/api/manual-purchase", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        kind: "course",
+        slug: course.slug,
+        method,
+        buyerEmail: buyer.email,
+        buyerName: buyer.name,
+        buyerPhone: buyer.phone,
+        couponCode: method === "transferencia" ? appliedCoupon?.code : undefined,
+      }),
+    }).catch(() => {
+      // No bloqueamos la UI si esto falla; Melisa igual recibe el WhatsApp/mail.
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [buyer, method]);
 
   if (course.comingSoon) {
     return (
@@ -85,51 +119,35 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
     );
   }
 
-  if (supabaseConfigured && !buyer) {
-    return (
-      <Link
-        href={`/registro?next=${encodeURIComponent(pathname)}`}
-        className="btn-cta inline-block bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors"
-      >
-        Registrarme para elegir cómo pagar →
-      </Link>
-    );
-  }
-
-  if (!course.paymentOptions?.length) {
-    return <CheckoutButton course={course} />;
-  }
-
   // El cupón DESCARGA5 solo aplica pagando por transferencia — Mercado
   // Pago y Payoneer usan links fijos que no reflejan el descuento.
   const transferenciaARS = applyDiscount(getTransferenciaAmountARS(course), appliedCoupon);
   const payoneerUSD = getPayoneerAmountUSD(course);
 
-  async function logInterest(m: "transferencia" | "payoneer") {
-    try {
-      await fetch("/api/manual-purchase", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          kind: "course",
-          slug: course.slug,
-          method: m,
-          buyerEmail: buyer?.email,
-          buyerName: buyer?.name,
-          buyerPhone: buyer?.phone,
-          couponCode: m === "transferencia" ? appliedCoupon?.code : undefined,
-        }),
-      });
-    } catch {
-      // No bloqueamos la UI si esto falla; Melisa igual recibe el WhatsApp/mail.
-    }
+  async function handleContactSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setContactSubmitted(true);
   }
 
-  function handleMethodChange(value: Method) {
-    setMethod(value);
-    if (value === "transferencia" || value === "payoneer") {
-      logInterest(value);
+  async function handleCreateAccount(e: React.FormEvent) {
+    e.preventDefault();
+    if (!supabase) return;
+    setCreatingAccount(true);
+    setAccountError(null);
+    const { error } = await supabase.auth.signUp({
+      email: formEmail,
+      password,
+      options: {
+        data: { full_name: formName, phone: formPhone },
+        emailRedirectTo: `${window.location.origin}/dashboard?verified=1`,
+      },
+    });
+    setCreatingAccount(false);
+    if (error) {
+      setAccountError(error.message);
+      return;
     }
+    setNewBuyer({ email: formEmail, name: formName, phone: formPhone });
   }
 
   function confirmManual(m: "transferencia" | "payoneer") {
@@ -169,7 +187,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
         <label className="text-sm text-bone/60 block mb-1">¿Cómo querés pagar?</label>
         <select
           value={method}
-          onChange={(e) => handleMethodChange(e.target.value as Method)}
+          onChange={(e) => setMethod(e.target.value as Method)}
           className="w-full rounded-lg bg-panel border border-black/10 px-4 py-2.5 text-bone focus:border-magenta outline-none"
         >
           <option value="">— Elegí una opción —</option>
@@ -185,9 +203,71 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
         </select>
       </div>
 
-      {method === "mercadopago" && <CheckoutButton course={course} />}
+      {method && !buyer && !contactSubmitted && (
+        <form onSubmit={handleContactSubmit} className="card-alt rounded-lg p-4 mb-4 space-y-3">
+          <p className="text-sm font-semibold text-bone">Tus datos</p>
+          <input
+            type="text"
+            required
+            value={formName}
+            onChange={(e) => setFormName(e.target.value)}
+            placeholder="Nombre y apellido"
+            className="w-full rounded-lg bg-panel border border-black/10 px-4 py-2.5 text-sm text-bone focus:border-magenta outline-none"
+          />
+          <input
+            type="email"
+            required
+            value={formEmail}
+            onChange={(e) => setFormEmail(e.target.value)}
+            placeholder="Email"
+            className="w-full rounded-lg bg-panel border border-black/10 px-4 py-2.5 text-sm text-bone focus:border-magenta outline-none"
+          />
+          <input
+            type="tel"
+            value={formPhone}
+            onChange={(e) => setFormPhone(e.target.value)}
+            placeholder="WhatsApp (opcional)"
+            className="w-full rounded-lg bg-panel border border-black/10 px-4 py-2.5 text-sm text-bone focus:border-magenta outline-none"
+          />
+          <button
+            type="submit"
+            className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors"
+          >
+            Continuar →
+          </button>
+        </form>
+      )}
 
-      {method === "transferencia" && course.bankDetails && (
+      {method && !buyer && contactSubmitted && (
+        <form onSubmit={handleCreateAccount} className="card-alt rounded-lg p-4 mb-4 space-y-3">
+          <p className="text-sm font-semibold text-bone">Creá tu contraseña</p>
+          <p className="text-xs text-bone/50">
+            Así después vas a poder ver esta compra en tu cuenta de RIVARA HR Academy.
+          </p>
+          <input
+            type="password"
+            required
+            minLength={6}
+            autoFocus
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Contraseña"
+            className="w-full rounded-lg bg-panel border border-black/10 px-4 py-2.5 text-sm text-bone focus:border-magenta outline-none"
+          />
+          {accountError && <p className="text-xs text-magenta">{accountError}</p>}
+          <button
+            type="submit"
+            disabled={creatingAccount}
+            className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors disabled:opacity-60"
+          >
+            {creatingAccount ? "Creando cuenta..." : "Crear cuenta y continuar →"}
+          </button>
+        </form>
+      )}
+
+      {method === "mercadopago" && buyer && <CheckoutButton course={course} buyerEmail={buyer.email} />}
+
+      {method === "transferencia" && buyer && course.bankDetails && (
         <div className="card-alt rounded-lg p-4 mb-4 text-sm text-bone/70">
           <p className="font-semibold text-bone mb-2">Datos para transferencia</p>
           <p>Titular: {course.bankDetails.holder}</p>
@@ -211,7 +291,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
         </div>
       )}
 
-      {method === "payoneer" && course.payoneerLink && (
+      {method === "payoneer" && buyer && course.payoneerLink && (
         <div className="card-alt rounded-lg p-4 mb-4 text-sm text-bone/70">
           <a
             href={course.payoneerLink}

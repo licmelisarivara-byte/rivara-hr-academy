@@ -1,31 +1,36 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import type { PaidResource } from "@/lib/resources";
 
-export default function ResourceCheckoutButton({ resource }: { resource: PaidResource }) {
-  const pathname = usePathname();
+// Si el que llama ya sabe el mail del comprador (porque lo acaba de pedir
+// en su propio formulario), lo pasa por prop y nos salteamos el chequeo de
+// sesión y el cartel de "Registrarme".
+export default function ResourceCheckoutButton({
+  resource,
+  buyerEmail: buyerEmailProp,
+}: {
+  resource: PaidResource;
+  buyerEmail?: string;
+}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [checkingSession, setCheckingSession] = useState(supabaseConfigured);
-  const [buyerEmail, setBuyerEmail] = useState<string | null>(null);
+  const [checkingSession, setCheckingSession] = useState(supabaseConfigured && !buyerEmailProp);
+  const [sessionEmail, setSessionEmail] = useState<string | null>(null);
+  const buyerEmail = buyerEmailProp ?? sessionEmail;
 
-  // Igual que la descarga de recursos gratis: pedimos login antes de comprar
-  // para quedarnos con el mail de quien arranca una compra, aunque no llegue
-  // a pagar (hoy esos casos se pierden por completo).
   useEffect(() => {
+    if (buyerEmailProp) return;
     if (!supabase) {
       setCheckingSession(false);
       return;
     }
     supabase.auth.getSession().then(({ data }) => {
-      setBuyerEmail(data.session?.user?.email ?? null);
+      setSessionEmail(data.session?.user?.email ?? null);
       setCheckingSession(false);
     });
-  }, []);
+  }, [buyerEmailProp]);
 
   if (checkingSession) {
     return (
@@ -36,17 +41,6 @@ export default function ResourceCheckoutButton({ resource }: { resource: PaidRes
       >
         Cargando...
       </button>
-    );
-  }
-
-  if (supabaseConfigured && !buyerEmail) {
-    return (
-      <Link
-        href={`/registro?next=${encodeURIComponent(pathname)}`}
-        className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors inline-block text-center"
-      >
-        Registrarme para comprar →
-      </Link>
     );
   }
 

@@ -1,27 +1,35 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import ResourceCheckoutButton from "@/components/ResourceCheckoutButton";
 import { bankDetails } from "@/lib/bankDetails";
 import type { PaidResource } from "@/lib/resources";
 
 type Method = "" | "transferencia" | "mercadopago" | "payoneer";
+type Buyer = { email: string; name: string; phone: string };
 
-// Mismo esquema que CoursePaymentActions: precios visibles sin loguearse,
-// pero elegir y confirmar una forma de pago pide login antes. Transferencia
-// y Payoneer quedan registrados como "pending" y avisan por WhatsApp;
-// Mercado Pago usa el checkout automático existente.
+// Mismo orden que CoursePaymentActions: primero elige cómo pagar, recién
+// ahí completa sus datos, y al final crea la contraseña.
 export default function ResourcePaymentActions({ resource }: { resource: PaidResource }) {
-  const pathname = usePathname();
   const router = useRouter();
   const [checking, setChecking] = useState(supabaseConfigured);
-  const [buyer, setBuyer] = useState<{ email: string; name: string; phone: string } | null>(
-    null
-  );
+  const [sessionBuyer, setSessionBuyer] = useState<Buyer | null>(null);
+
   const [method, setMethod] = useState<Method>("");
+
+  const [contactSubmitted, setContactSubmitted] = useState(false);
+  const [formName, setFormName] = useState("");
+  const [formEmail, setFormEmail] = useState("");
+  const [formPhone, setFormPhone] = useState("");
+
+  const [password, setPassword] = useState("");
+  const [creatingAccount, setCreatingAccount] = useState(false);
+  const [accountError, setAccountError] = useState<string | null>(null);
+  const [newBuyer, setNewBuyer] = useState<Buyer | null>(null);
+
+  const buyer = sessionBuyer ?? newBuyer;
 
   useEffect(() => {
     if (!supabase) {
@@ -31,7 +39,7 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
     supabase.auth.getSession().then(({ data }) => {
       const user = data.session?.user;
       if (user?.email) {
-        setBuyer({
+        setSessionBuyer({
           email: user.email,
           name: user.user_metadata?.full_name ?? "",
           phone: user.user_metadata?.phone ?? "",
@@ -40,6 +48,26 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
       setChecking(false);
     });
   }, []);
+
+  useEffect(() => {
+    if (!buyer) return;
+    if (method !== "transferencia" && method !== "payoneer") return;
+    fetch("/api/manual-purchase", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        kind: "resource",
+        slug: resource.slug,
+        method,
+        buyerEmail: buyer.email,
+        buyerName: buyer.name,
+        buyerPhone: buyer.phone,
+      }),
+    }).catch(() => {
+      // No bloqueamos la UI si esto falla; Melisa igual recibe el WhatsApp/mail.
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [buyer, method]);
 
   if (checking) {
     return (
@@ -53,41 +81,30 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
     );
   }
 
-  if (supabaseConfigured && !buyer) {
-    return (
-      <Link
-        href={`/registro?next=${encodeURIComponent(pathname)}`}
-        className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors inline-block text-center"
-      >
-        Registrarme para elegir cómo pagar →
-      </Link>
-    );
+  async function handleContactSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setContactSubmitted(true);
   }
 
-  async function logInterest(m: "transferencia" | "payoneer") {
-    try {
-      await fetch("/api/manual-purchase", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          kind: "resource",
-          slug: resource.slug,
-          method: m,
-          buyerEmail: buyer?.email,
-          buyerName: buyer?.name,
-          buyerPhone: buyer?.phone,
-        }),
-      });
-    } catch {
-      // No bloqueamos la UI si esto falla; Melisa igual recibe el WhatsApp/mail.
+  async function handleCreateAccount(e: React.FormEvent) {
+    e.preventDefault();
+    if (!supabase) return;
+    setCreatingAccount(true);
+    setAccountError(null);
+    const { error } = await supabase.auth.signUp({
+      email: formEmail,
+      password,
+      options: {
+        data: { full_name: formName, phone: formPhone },
+        emailRedirectTo: `${window.location.origin}/dashboard?verified=1`,
+      },
+    });
+    setCreatingAccount(false);
+    if (error) {
+      setAccountError(error.message);
+      return;
     }
-  }
-
-  function handleMethodChange(value: Method) {
-    setMethod(value);
-    if (value === "transferencia" || value === "payoneer") {
-      logInterest(value);
-    }
+    setNewBuyer({ email: formEmail, name: formName, phone: formPhone });
   }
 
   function confirmManual(m: "transferencia" | "payoneer") {
@@ -104,7 +121,7 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
       <div className="mb-3">
         <select
           value={method}
-          onChange={(e) => handleMethodChange(e.target.value as Method)}
+          onChange={(e) => setMethod(e.target.value as Method)}
           className="w-full rounded-lg bg-panel border border-black/10 px-3 py-2 text-sm text-bone focus:border-magenta outline-none"
         >
           <option value="">¿Cómo querés pagar?</option>
@@ -116,9 +133,73 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
         </select>
       </div>
 
-      {method === "mercadopago" && <ResourceCheckoutButton resource={resource} />}
+      {method && !buyer && !contactSubmitted && (
+        <form onSubmit={handleContactSubmit} className="card-alt rounded-lg p-4 mb-3 space-y-3">
+          <p className="text-sm font-semibold text-bone">Tus datos</p>
+          <input
+            type="text"
+            required
+            value={formName}
+            onChange={(e) => setFormName(e.target.value)}
+            placeholder="Nombre y apellido"
+            className="w-full rounded-lg bg-panel border border-black/10 px-4 py-2.5 text-sm text-bone focus:border-magenta outline-none"
+          />
+          <input
+            type="email"
+            required
+            value={formEmail}
+            onChange={(e) => setFormEmail(e.target.value)}
+            placeholder="Email"
+            className="w-full rounded-lg bg-panel border border-black/10 px-4 py-2.5 text-sm text-bone focus:border-magenta outline-none"
+          />
+          <input
+            type="tel"
+            value={formPhone}
+            onChange={(e) => setFormPhone(e.target.value)}
+            placeholder="WhatsApp (opcional)"
+            className="w-full rounded-lg bg-panel border border-black/10 px-4 py-2.5 text-sm text-bone focus:border-magenta outline-none"
+          />
+          <button
+            type="submit"
+            className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors"
+          >
+            Continuar →
+          </button>
+        </form>
+      )}
 
-      {method === "transferencia" && (
+      {method && !buyer && contactSubmitted && (
+        <form onSubmit={handleCreateAccount} className="card-alt rounded-lg p-4 mb-3 space-y-3">
+          <p className="text-sm font-semibold text-bone">Creá tu contraseña</p>
+          <p className="text-xs text-bone/50">
+            Así después vas a poder ver esta compra en tu cuenta de RIVARA HR Academy.
+          </p>
+          <input
+            type="password"
+            required
+            minLength={6}
+            autoFocus
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Contraseña"
+            className="w-full rounded-lg bg-panel border border-black/10 px-4 py-2.5 text-sm text-bone focus:border-magenta outline-none"
+          />
+          {accountError && <p className="text-xs text-magenta">{accountError}</p>}
+          <button
+            type="submit"
+            disabled={creatingAccount}
+            className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors disabled:opacity-60"
+          >
+            {creatingAccount ? "Creando cuenta..." : "Crear cuenta y continuar →"}
+          </button>
+        </form>
+      )}
+
+      {method === "mercadopago" && buyer && (
+        <ResourceCheckoutButton resource={resource} buyerEmail={buyer.email} />
+      )}
+
+      {method === "transferencia" && buyer && (
         <div className="card-alt rounded-lg p-4 text-sm text-bone/70">
           <p className="font-semibold text-bone mb-2">Datos para transferencia</p>
           <p>Titular: {bankDetails.holder}</p>
@@ -142,7 +223,7 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
         </div>
       )}
 
-      {method === "payoneer" && resource.payoneerLink && (
+      {method === "payoneer" && buyer && resource.payoneerLink && (
         <div className="card-alt rounded-lg p-4 text-sm text-bone/70">
           <a
             href={resource.payoneerLink}
