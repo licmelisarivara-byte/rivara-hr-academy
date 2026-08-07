@@ -7,6 +7,7 @@ import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import ConfigNotice from "@/components/ConfigNotice";
 import { courses } from "@/lib/courses";
 import { getPaidResourceBySlug, freeResources } from "@/lib/resources";
+import FreeResourceDownloadButton from "@/components/FreeResourceDownloadButton";
 
 type MyPurchase = {
   kind: "resource" | "course";
@@ -269,17 +270,9 @@ function DashboardContent() {
           {freeResources.map((r) => (
             <div key={r.slug} className="card rounded-xl p-5 flex flex-col">
               <h3 className="font-semibold text-bone text-sm mb-3">{r.title}</h3>
-              {r.fileUrl ? (
-                <a
-                  href={r.fileUrl}
-                  download
-                  className="btn-cta bg-sage text-white px-4 py-2 rounded-full hover:opacity-90 transition-colors inline-block text-center text-sm mt-auto"
-                >
-                  Descargar →
-                </a>
-              ) : (
-                <p className="text-xs text-bone/40 mt-auto">Próximamente</p>
-              )}
+              <div className="mt-auto">
+                <FreeResourceDownloadButton resource={r} />
+              </div>
             </div>
           ))}
         </div>

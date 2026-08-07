@@ -1,27 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
+import { useEffect, useRef, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
 import type { FreeResource } from "@/lib/resources";
 
 export default function FreeResourceDownloadButton({ resource }: { resource: FreeResource }) {
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [email, setEmail] = useState<string | null>(null);
+  const [sessionEmail, setSessionEmail] = useState<string | null>(null);
+  const [askingEmail, setAskingEmail] = useState(false);
+  const [email, setEmail] = useState("");
+  const [unlocked, setUnlocked] = useState(false);
+  const linkRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     if (!supabase) return;
     supabase.auth.getSession().then(({ data }) => {
-      setLoggedIn(!!data.session);
-      setEmail(data.session?.user.email ?? null);
+      setSessionEmail(data.session?.user.email ?? null);
     });
   }, []);
 
-  function logDownload() {
+  function logDownload(buyerEmail: string | null) {
     fetch("/api/log-download", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ resourceSlug: resource.slug, buyerEmail: email }),
+      body: JSON.stringify({ resourceSlug: resource.slug, buyerEmail }),
     }).catch(() => {
       // No bloqueamos la descarga si el log falla.
     });
@@ -29,6 +30,15 @@ export default function FreeResourceDownloadButton({ resource }: { resource: Fre
       event_category: "recurso_gratis",
       event_label: resource.slug,
     });
+  }
+
+  function handleEmailSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    logDownload(email);
+    setUnlocked(true);
+    // El link real recién se monta en este render; hace falta esperar al
+    // próximo tick para poder simular el click y disparar la descarga.
+    setTimeout(() => linkRef.current?.click(), 0);
   }
 
   if (!resource.fileUrl) {
@@ -43,25 +53,49 @@ export default function FreeResourceDownloadButton({ resource }: { resource: Fre
     );
   }
 
-  if (supabaseConfigured && !loggedIn) {
+  if (sessionEmail || unlocked) {
     return (
-      <Link
-        href="/registro?next=%2Fdashboard"
+      <a
+        ref={linkRef}
+        href={resource.fileUrl}
+        download
+        onClick={() => !sessionEmail || logDownload(sessionEmail)}
         className="btn-cta bg-sage text-white px-4 py-2 rounded-full hover:opacity-90 transition-colors inline-block"
       >
-        Registrarme para descargar
-      </Link>
+        Descargar gratis →
+      </a>
+    );
+  }
+
+  if (askingEmail) {
+    return (
+      <form onSubmit={handleEmailSubmit} className="flex flex-col gap-2">
+        <input
+          type="email"
+          required
+          autoFocus
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Tu email"
+          className="w-full rounded-lg bg-panel border border-black/10 px-3 py-2 text-sm text-bone focus:border-magenta outline-none"
+        />
+        <button
+          type="submit"
+          className="btn-cta bg-sage text-white px-4 py-2 rounded-full hover:opacity-90 transition-colors text-sm"
+        >
+          Descargar →
+        </button>
+      </form>
     );
   }
 
   return (
-    <a
-      href={resource.fileUrl}
-      download
-      onClick={logDownload}
+    <button
+      type="button"
+      onClick={() => setAskingEmail(true)}
       className="btn-cta bg-sage text-white px-4 py-2 rounded-full hover:opacity-90 transition-colors inline-block"
     >
       Descargar gratis →
-    </a>
+    </button>
   );
 }

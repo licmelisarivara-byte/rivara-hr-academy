@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { freeResources } from "@/lib/resources";
-import { supabaseConfigured } from "@/lib/supabaseClient";
-import ConfigNotice from "@/components/ConfigNotice";
 import FreeResourceDownloadButton from "@/components/FreeResourceDownloadButton";
 
 export const metadata: Metadata = {
@@ -25,12 +23,6 @@ export default function RecursosPage() {
           Mirá los ebooks pagos →
         </Link>
       </p>
-
-      {!supabaseConfigured && (
-        <div className="mb-8">
-          <ConfigNotice what="la descarga con login" />
-        </div>
-      )}
 
       <div className="grid md:grid-cols-3 gap-6">
         {freeResources.map((r) => (
