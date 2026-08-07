@@ -101,3 +101,7 @@ export const paidResources: PaidResource[] = [
 export function getPaidResourceBySlug(slug: string) {
   return paidResources.find((r) => r.slug === slug);
 }
+
+export function getFreeResourceBySlug(slug: string) {
+  return freeResources.find((r) => r.slug === slug);
+}

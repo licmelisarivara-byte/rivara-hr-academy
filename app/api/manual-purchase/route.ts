@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCourseBySlug } from "@/lib/courses";
 import { getPaidResourceBySlug } from "@/lib/resources";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { getCoupon, applyDiscount } from "@/lib/coupons";
 
 // Registra la intención de compra (curso o recurso pago) por un método
 // MANUAL (transferencia o Payoneer): no hay preferencia de Mercado Pago ni
@@ -12,7 +13,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "not_configured" }, { status: 501 });
   }
 
-  const { kind, slug, buyerEmail, buyerName, buyerPhone, method } = await req.json();
+  const { kind, slug, buyerEmail, buyerName, buyerPhone, method, couponCode } = await req.json();
   if (method !== "transferencia" && method !== "payoneer") {
     return NextResponse.json({ error: "invalid_method" }, { status: 400 });
   }
@@ -24,7 +25,10 @@ export async function POST(req: NextRequest) {
   if (!item) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
-  const amount = kind === "course" ? item.priceARS ?? 0 : item.priceARS;
+  // El cupón solo aplica a cursos, y se valida acá — nunca confiamos en un
+  // monto ya descontado que venga del cliente.
+  const coupon = kind === "course" ? getCoupon(couponCode) : null;
+  const amount = applyDiscount(kind === "course" ? item.priceARS ?? 0 : item.priceARS, coupon);
 
   await supabaseAdmin.from("compras").insert({
     kind,
@@ -37,6 +41,7 @@ export async function POST(req: NextRequest) {
     buyer_email: buyerEmail || null,
     buyer_name: buyerName || null,
     buyer_phone: buyerPhone || null,
+    discount_code: coupon?.code ?? null,
   });
 
   return NextResponse.json({ ok: true });

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import CheckoutButton from "@/components/CheckoutButton";
+import { getCoupon } from "@/lib/coupons";
 import type { Course } from "@/lib/courses";
 
 type Method = "" | "transferencia" | "mercadopago" | "payoneer";
@@ -22,6 +23,8 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
     null
   );
   const [method, setMethod] = useState<Method>("");
+  const [couponInput, setCouponInput] = useState("");
+  const appliedCoupon = getCoupon(couponInput);
 
   useEffect(() => {
     if (!supabase) {
@@ -90,7 +93,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
   }
 
   if (!course.paymentOptions?.length) {
-    return <CheckoutButton course={course} />;
+    return <CheckoutButton course={course} couponCode={appliedCoupon?.code} />;
   }
 
   async function logInterest(m: "transferencia" | "payoneer") {
@@ -105,6 +108,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
           buyerEmail: buyer?.email,
           buyerName: buyer?.name,
           buyerPhone: buyer?.phone,
+          couponCode: appliedCoupon?.code,
         }),
       });
     } catch {
@@ -121,8 +125,9 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
 
   function confirmManual(m: "transferencia" | "payoneer") {
     const label = m === "transferencia" ? "Transferencia bancaria" : "Payoneer";
+    const couponLine = appliedCoupon ? `\n🎟️ Cupón: ${appliedCoupon.code} (${appliedCoupon.percentOff}% off)` : "";
     const message = encodeURIComponent(
-      `Hola Melisa 👋\n\nQuiero inscribirme al curso "${course.title}" de RIVARA HR Academy.\n\n📌 Nombre: ${buyer?.name}\n📧 Email: ${buyer?.email}\n📱 Celular: ${buyer?.phone}\n💳 Forma de pago: ${label}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
+      `Hola Melisa 👋\n\nQuiero inscribirme al curso "${course.title}" de RIVARA HR Academy.\n\n📌 Nombre: ${buyer?.name}\n📧 Email: ${buyer?.email}\n📱 Celular: ${buyer?.phone}\n💳 Forma de pago: ${label}${couponLine}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
     );
     window.open(`https://wa.me/5491123912820?text=${message}`, "_blank");
     router.push("/dashboard");
@@ -130,6 +135,24 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
 
   return (
     <div className="max-w-md">
+      <div className="mb-4">
+        <label className="text-sm text-bone/60 block mb-1">¿Tenés un cupón?</label>
+        <input
+          type="text"
+          value={couponInput}
+          onChange={(e) => setCouponInput(e.target.value)}
+          placeholder="Código de descuento (opcional)"
+          className="w-full rounded-lg bg-panel border border-black/10 px-4 py-2.5 text-bone focus:border-magenta outline-none"
+        />
+        {couponInput && (
+          <p className={`text-xs mt-1 ${appliedCoupon ? "text-sage" : "text-magenta"}`}>
+            {appliedCoupon
+              ? `✅ Cupón aplicado: ${appliedCoupon.percentOff}% off`
+              : "Ese cupón no es válido."}
+          </p>
+        )}
+      </div>
+
       <div className="mb-4">
         <label className="text-sm text-bone/60 block mb-1">¿Cómo querés pagar?</label>
         <select

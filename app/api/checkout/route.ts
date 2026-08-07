@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCourseBySlug } from "@/lib/courses";
 import { getPaidResourceBySlug } from "@/lib/resources";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { getCoupon, applyDiscount } from "@/lib/coupons";
 
 // Requiere la variable de entorno MP_ACCESS_TOKEN (Access Token de
 // Mercado Pago, modo Checkout Pro), configurada en Vercel. Sin esa
@@ -10,9 +11,12 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 export async function POST(req: NextRequest) {
   const accessToken = process.env.MP_ACCESS_TOKEN;
 
-  const { kind, slug, buyerEmail } = await req.json();
+  const { kind, slug, buyerEmail, couponCode } = await req.json();
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL || "https://hracademy.rivaraconsultora.com.ar";
+  // El cupón solo aplica a cursos (no a recursos pagos), y se valida acá,
+  // nunca confiando en un precio calculado del lado del cliente.
+  const coupon = kind === "course" ? getCoupon(couponCode) : null;
 
   let title = "";
   let unitPrice = 0;
@@ -60,7 +64,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "course_not_found" }, { status: 404 });
     }
     title = course.title;
-    unitPrice = course.priceARS ?? 0;
+    unitPrice = applyDiscount(course.priceARS ?? 0, coupon);
     failureUrl = `${siteUrl}/cursos/${course.slug}?compra=fallida`;
 
     if (supabaseAdmin) {
@@ -75,6 +79,7 @@ export async function POST(req: NextRequest) {
           status: "pending",
           payment_method: "mercadopago",
           buyer_email: buyerEmail || null,
+          discount_code: coupon?.code ?? null,
         })
         .select("id")
         .single();

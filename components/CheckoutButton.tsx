@@ -5,7 +5,13 @@ import Link from "next/link";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import type { Course } from "@/lib/courses";
 
-export default function CheckoutButton({ course }: { course: Course }) {
+export default function CheckoutButton({
+  course,
+  couponCode,
+}: {
+  course: Course;
+  couponCode?: string;
+}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [checkingSession, setCheckingSession] = useState(supabaseConfigured);
@@ -82,7 +88,7 @@ export default function CheckoutButton({ course }: { course: Course }) {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind: "course", slug: course.slug, buyerEmail }),
+        body: JSON.stringify({ kind: "course", slug: course.slug, buyerEmail, couponCode }),
       });
       if (!res.ok) throw new Error("no-config");
       const data = await res.json();
