@@ -1,13 +1,17 @@
 import Link from "next/link";
 import Image from "next/image";
 import { freeResources, paidResources } from "@/lib/resources";
+import { getCourseBySlug } from "@/lib/courses";
 import AboutSection from "@/components/AboutSection";
 import ResourcePaymentActions from "@/components/ResourcePaymentActions";
 import FreeResourceDownloadButton from "@/components/FreeResourceDownloadButton";
+import CoursePricingTeaser from "@/components/CoursePricingTeaser";
 
 function formatARS(n: number) {
   return `$${n.toLocaleString("es-AR")}`;
 }
+
+const featuredCourse = getCourseBySlug("de-cero-a-tu-asistente")!;
 
 export default function Home() {
   return (
@@ -115,31 +119,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="card-alt rounded-xl p-6 text-center">
-            <span className="inline-block text-xs font-semibold bg-magenta text-white px-3 py-1 rounded-full mb-3">
-              🔥 Ahorrá {formatARS(15000)}
-            </span>
-            <div className="mb-1">
-              <span className="text-bone/40 line-through text-lg mr-2">
-                {formatARS(60000)}
-              </span>
-              <span className="font-display text-3xl text-bone">
-                {formatARS(45000)} ARS
-              </span>
-            </div>
-            <div className="text-sm text-magenta mb-1">
-              Por transferencia o Payoneer, hasta el 9/8
-            </div>
-            <div className="detail-text mb-6">
-              Por Mercado Pago: {formatARS(60000)} ARS
-            </div>
-            <Link
-              href="/cursos/de-cero-a-tu-asistente"
-              className="btn-cta inline-block w-full bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors"
-            >
-              Me quiero inscribir →
-            </Link>
-          </div>
+          <CoursePricingTeaser course={featuredCourse} />
         </div>
       </section>
 

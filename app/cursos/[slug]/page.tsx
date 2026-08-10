@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { courses, getCourseBySlug } from "@/lib/courses";
+import { courses, getCourseBySlug, getCoursePriceSummary } from "@/lib/courses";
 import CoursePaymentActions from "@/components/CoursePaymentActions";
 
 export function generateStaticParams() {
@@ -86,27 +86,7 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
       {/* FORMAS DE PAGO */}
       {course.paymentOptions ? (
         <div className="card rounded-xl p-6 sm:p-8 mb-10">
-          <h2 className="font-display text-xl text-bone mb-1">Formas de pago</h2>
-          {course.priceNote && (
-            <p className="text-sm text-magenta mb-6">{course.priceNote}</p>
-          )}
-          <div className="space-y-4 mb-6">
-            {course.paymentOptions.map((opt) => (
-              <div
-                key={opt.method}
-                className="flex flex-wrap items-center justify-between gap-2 border-b border-black/5 pb-4 last:border-0 last:pb-0"
-              >
-                <div>
-                  <div className="font-semibold text-bone">{opt.method}</div>
-                  {opt.note && (
-                    <div className="detail-text mt-0.5">{opt.note}</div>
-                  )}
-                </div>
-                <div className="font-display text-xl text-bone">{opt.price}</div>
-              </div>
-            ))}
-          </div>
-
+          <h2 className="font-display text-xl text-bone mb-4">Formas de pago</h2>
           <CoursePaymentActions course={course} />
         </div>
       ) : (

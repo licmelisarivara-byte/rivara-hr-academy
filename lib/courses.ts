@@ -151,7 +151,7 @@ export function getCourseBySlug(slug: string) {
   return courses.find((c) => c.slug === slug);
 }
 
-function isEarlyBird(course: Course): boolean {
+export function isEarlyBird(course: Course): boolean {
   if (!course.earlyBirdUntil) return false;
   return Date.now() < new Date(course.earlyBirdUntil).getTime();
 }
@@ -168,4 +168,45 @@ export function getTransferenciaAmountARS(course: Course): number {
 export function getPayoneerAmountUSD(course: Course): number {
   const early = isEarlyBird(course);
   return (early ? course.priceUSDEarlyBird : course.priceUSDRegular) ?? 0;
+}
+
+// Resumen de precios ya resuelto contra la fecha real de hoy, para no
+// mostrar textos fijos (como "$45.000... antes del 9/8") que quedan
+// desactualizados solos apenas pasa la fecha. Se usa en la home y en la
+// página del curso en vez de los campos estáticos `price`/`priceNote`/
+// `paymentOptions`.
+export function getCoursePriceSummary(course: Course) {
+  const earlyBirdActive = isEarlyBird(course);
+  const transferenciaARS = getTransferenciaAmountARS(course);
+  const payoneerUSD = getPayoneerAmountUSD(course);
+  const mercadoPagoARS = course.priceARS ?? 0;
+  const savingsARS = earlyBirdActive ? Math.max(mercadoPagoARS - transferenciaARS, 0) : 0;
+  return {
+    earlyBirdActive,
+    transferenciaARS,
+    payoneerUSD,
+    mercadoPagoARS,
+    savingsARS,
+    paymentOptions: [
+      {
+        method: "Transferencia bancaria",
+        price: `$${transferenciaARS.toLocaleString("es-AR")} ARS`,
+        note: earlyBirdActive ? `Antes del 9/8 (después $${(course.priceARSRegular ?? mercadoPagoARS).toLocaleString("es-AR")})` : undefined,
+      },
+      ...(course.payoneerLink
+        ? [
+            {
+              method: "Payoneer",
+              price: `USD ${payoneerUSD}`,
+              note: earlyBirdActive ? `Antes del 9/8 (después USD ${course.priceUSDRegular})` : undefined,
+            },
+          ]
+        : []),
+      {
+        method: "Mercado Pago",
+        price: `$${mercadoPagoARS.toLocaleString("es-AR")} ARS`,
+        note: "Pago online inmediato, sin descuento",
+      },
+    ] as PaymentOption[],
+  };
 }
