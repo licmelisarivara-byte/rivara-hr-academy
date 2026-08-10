@@ -90,6 +90,11 @@ export default function CheckoutButton({
   async function handleClick() {
     setLoading(true);
     setError(null);
+    (window as any).gtag?.("event", "generate_lead", {
+      event_category: "curso",
+      event_label: course.slug,
+      payment_method: "mercadopago",
+    });
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",

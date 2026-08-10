@@ -119,6 +119,11 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
   }
 
   function confirmManual(m: "transferencia" | "payoneer") {
+    (window as any).gtag?.("event", "generate_lead", {
+      event_category: "curso",
+      event_label: course.slug,
+      payment_method: m,
+    });
     const label = m === "transferencia" ? "Transferencia bancaria" : "Payoneer";
     const couponLine =
       m === "transferencia" && appliedCoupon
