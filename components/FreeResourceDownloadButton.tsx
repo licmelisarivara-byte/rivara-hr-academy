@@ -42,6 +42,10 @@ export default function FreeResourceDownloadButton({ resource }: { resource: Fre
   function handleFormSubmit(e: React.FormEvent) {
     e.preventDefault();
     logDownload(email, name, phone);
+    (window as any).gtag?.("event", "generate_lead", {
+      event_category: "recurso_gratis",
+      event_label: resource.slug,
+    });
     setUnlocked(true);
     // El link real recién se monta en este render; hace falta esperar al
     // próximo tick para poder simular el click y disparar la descarga.
