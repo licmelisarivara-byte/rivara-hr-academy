@@ -129,6 +129,14 @@ export const courses: Course[] = [
         title: "Checklist para armar tu asistente",
         url: "https://noble-shawl-f26.notion.site/Tu-checklist-para-armar-tu-asistente-de-selecci-n-3ae5c6b67016816ead9ad4c5fb17d5a6",
       },
+      {
+        title: "Resumen Clase 1",
+        url: "/downloads/resumen-clase1-bot-seleccion.pdf",
+      },
+      {
+        title: "Slides Clase 1",
+        url: "/downloads/slides-clase1-bot-seleccion.pdf",
+      },
     ],
   },
   {
