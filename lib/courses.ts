@@ -124,6 +124,12 @@ export const courses: Course[] = [
     mpPaymentLink: "https://mpago.la/1urEhEV",
     payoneerLink: "https://link.payoneer.com/Token?t=55DF705DCE7144E59B7DAB4C198ACDB1&src=tpl",
     meetLink: "https://meet.google.com/ezw-ueie-xzd",
+    materials: [
+      {
+        title: "Checklist para armar tu asistente",
+        url: "https://noble-shawl-f26.notion.site/Tu-checklist-para-armar-tu-asistente-de-selecci-n-3ae5c6b67016816ead9ad4c5fb17d5a6",
+      },
+    ],
   },
   {
     slug: "claude-para-seleccion",
