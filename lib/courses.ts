@@ -57,6 +57,7 @@ export const courses: Course[] = [
           "Prompt maestro de análisis de CV",
           "Introducción a Botpress",
         ],
+        recordingVideoId: "_MtS9SPQ8vk",
       },
       {
         title: "Módulo 2 (18 de agosto) — Tu propio ATS con IA",
