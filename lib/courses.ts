@@ -138,6 +138,10 @@ export const courses: Course[] = [
         title: "Slides Clase 1",
         url: "/downloads/slides-clase1-bot-seleccion.pdf",
       },
+      {
+        title: "Ejemplo de CV y puesto (Clase 1)",
+        url: "/downloads/ejemplo-cv-puesto-clase1.pdf",
+      },
     ],
   },
   {
