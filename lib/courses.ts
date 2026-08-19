@@ -68,6 +68,7 @@ export const courses: Course[] = [
           "Pipeline de candidatos tipo Kanban",
           "Publicación del ATS recibiendo postulantes reales",
         ],
+        recordingVideoId: "mCt_krEKdAI",
       },
     ],
     outcomes: [
@@ -141,6 +142,18 @@ export const courses: Course[] = [
       {
         title: "Ejemplo de CV y puesto (Clase 1)",
         url: "/downloads/ejemplo-cv-puesto-clase1.pdf",
+      },
+      {
+        title: "Resumen Clase 2",
+        url: "/downloads/resumen-clase2-rivara.pdf",
+      },
+      {
+        title: "Slides Clase 2",
+        url: "/downloads/slides-clase2-ats.pdf",
+      },
+      {
+        title: "CV de ejemplo (Martín Sosa)",
+        url: "/downloads/cv-ejemplo-martin-sosa.pdf",
       },
     ],
   },
