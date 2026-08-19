@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { courses } from "@/lib/courses";
+import { courses, getCoursePriceSummary } from "@/lib/courses";
 
 export const metadata: Metadata = {
   title: "Cursos de IA para Selección de Personal",
@@ -15,7 +15,14 @@ export default function CursosPage() {
       <h1 className="font-display text-3xl sm:text-4xl text-bone mb-10">Cursos</h1>
 
       <div className="grid md:grid-cols-2 gap-6">
-        {courses.map((c) => (
+        {courses.map((c) => {
+          // Precio ya resuelto contra la fecha de hoy (nunca el campo
+          // estático `price`, que queda desactualizado apenas termina el
+          // early bird — ver comentario de getCoursePriceSummary).
+          const precioMostrado = c.priceARS
+            ? `$${getCoursePriceSummary(c).transferenciaARS.toLocaleString("es-AR")} ARS`
+            : c.price;
+          return (
           <div
             key={c.slug}
             className="card rounded-xl overflow-hidden flex flex-col hover:border-magenta/60 transition-colors"
@@ -34,7 +41,7 @@ export default function CursosPage() {
               <h2 className="font-display text-xl text-bone mt-2 mb-2">{c.title}</h2>
               <p className="text-bone/60 text-sm mb-6">{c.tagline}</p>
               <div className="mt-auto flex items-center justify-between gap-4">
-                <span className="detail-text">{c.price}</span>
+                <span className="detail-text">{precioMostrado}</span>
                 <Link
                   href={`/cursos/${c.slug}`}
                   className="btn-cta bg-magenta text-white px-5 py-2.5 rounded-full hover:bg-magentaSoft transition-colors"
@@ -44,7 +51,8 @@ export default function CursosPage() {
               </div>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

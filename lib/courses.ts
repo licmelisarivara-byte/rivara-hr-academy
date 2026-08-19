@@ -114,10 +114,9 @@ export const courses: Course[] = [
       "Grabación incluida de las dos clases",
       "Certificado de asistencia",
     ],
-    price: "$45.000 ARS",
+    price: "$60.000 ARS",
     priceARS: 60000,
-    priceNote:
-      "🔥 $45.000 ARS por transferencia o USD 30 por Payoneer, antes del 9/8 · Por Mercado Pago: $60.000 ARS (sin descuento)",
+    priceNote: "$60.000 ARS por transferencia · USD 40 por Payoneer · $60.000 ARS por Mercado Pago",
     earlyBirdUntil: "2026-08-09T23:59:59-03:00",
     priceARSEarlyBird: 45000,
     priceARSRegular: 60000,
@@ -126,13 +125,11 @@ export const courses: Course[] = [
     paymentOptions: [
       {
         method: "Transferencia bancaria",
-        price: "$45.000 ARS",
-        note: "Antes del 9/8 (después $60.000)",
+        price: "$60.000 ARS",
       },
       {
         method: "Payoneer",
-        price: "USD 30",
-        note: "Antes del 9/8 (después USD 40)",
+        price: "USD 40",
       },
       {
         method: "Mercado Pago",
