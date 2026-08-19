@@ -10,7 +10,12 @@ export type Course = {
   format: "En vivo" | "Grabado";
   tagline: string;
   description: string;
-  modules: { title: string; items: string[]; recordingVideoId?: string }[]; // recordingVideoId: YouTube ID no listado de la grabación de esa clase, se completa después de dictarla
+  modules: {
+    title: string;
+    items: string[];
+    recordingVideoId?: string; // YouTube ID no listado de la grabación de esa clase, se completa después de dictarla
+    materials?: { title: string; url: string }[]; // PDFs y otros materiales de ESTA clase puntual, se muestran debajo de su video en el dashboard
+  }[];
   image?: string; // portada en /public/images
   outcomes?: string[];
   price: string; // texto mostrado en pantalla
@@ -31,7 +36,6 @@ export type Course = {
   comingSoon?: boolean; // todavía no se vende; muestra "Próximamente" en vez de un botón de compra
   freePreviewVideoId?: string; // YouTube ID, unlisted is fine
   meetLink?: string; // link de Google Meet del curso en vivo, se muestra solo a quien ya se inscribió
-  materials?: { title: string; url: string }[]; // PDFs y otros materiales del curso, visibles en el dashboard
   whatsappGroupLink?: string; // link de invitación al grupo de WhatsApp del curso
 };
 
@@ -58,6 +62,24 @@ export const courses: Course[] = [
           "Introducción a Botpress",
         ],
         recordingVideoId: "_MtS9SPQ8vk",
+        materials: [
+          {
+            title: "Checklist para armar tu asistente",
+            url: "https://noble-shawl-f26.notion.site/Tu-checklist-para-armar-tu-asistente-de-selecci-n-3ae5c6b67016816ead9ad4c5fb17d5a6",
+          },
+          {
+            title: "Resumen Clase 1",
+            url: "/downloads/resumen-clase1-bot-seleccion.pdf",
+          },
+          {
+            title: "Slides Clase 1",
+            url: "/downloads/slides-clase1-bot-seleccion.pdf",
+          },
+          {
+            title: "Ejemplo de CV y puesto",
+            url: "/downloads/ejemplo-cv-puesto-clase1.pdf",
+          },
+        ],
       },
       {
         title: "Módulo 2 (18 de agosto) — Tu propio ATS con IA",
@@ -69,6 +91,20 @@ export const courses: Course[] = [
           "Publicación del ATS recibiendo postulantes reales",
         ],
         recordingVideoId: "mCt_krEKdAI",
+        materials: [
+          {
+            title: "Resumen Clase 2",
+            url: "/downloads/resumen-clase2-rivara.pdf",
+          },
+          {
+            title: "Slides Clase 2",
+            url: "/downloads/slides-clase2-ats.pdf",
+          },
+          {
+            title: "CV de ejemplo (Martín Sosa)",
+            url: "/downloads/cv-ejemplo-martin-sosa.pdf",
+          },
+        ],
       },
     ],
     outcomes: [
@@ -126,36 +162,6 @@ export const courses: Course[] = [
     mpPaymentLink: "https://mpago.la/1urEhEV",
     payoneerLink: "https://link.payoneer.com/Token?t=55DF705DCE7144E59B7DAB4C198ACDB1&src=tpl",
     meetLink: "https://meet.google.com/ezw-ueie-xzd",
-    materials: [
-      {
-        title: "Checklist para armar tu asistente",
-        url: "https://noble-shawl-f26.notion.site/Tu-checklist-para-armar-tu-asistente-de-selecci-n-3ae5c6b67016816ead9ad4c5fb17d5a6",
-      },
-      {
-        title: "Resumen Clase 1",
-        url: "/downloads/resumen-clase1-bot-seleccion.pdf",
-      },
-      {
-        title: "Slides Clase 1",
-        url: "/downloads/slides-clase1-bot-seleccion.pdf",
-      },
-      {
-        title: "Ejemplo de CV y puesto (Clase 1)",
-        url: "/downloads/ejemplo-cv-puesto-clase1.pdf",
-      },
-      {
-        title: "Resumen Clase 2",
-        url: "/downloads/resumen-clase2-rivara.pdf",
-      },
-      {
-        title: "Slides Clase 2",
-        url: "/downloads/slides-clase2-ats.pdf",
-      },
-      {
-        title: "CV de ejemplo (Martín Sosa)",
-        url: "/downloads/cv-ejemplo-martin-sosa.pdf",
-      },
-    ],
   },
   {
     slug: "claude-para-seleccion",

@@ -214,7 +214,7 @@ function DashboardContent() {
                   </div>
                 )}
 
-                <div className="space-y-4 mb-4">
+                <div className="space-y-6 mb-4">
                   {c.modules.map((m) => (
                     <div key={m.title}>
                       <p className="text-xs text-bone/50 mb-2">{m.title}</p>
@@ -232,28 +232,25 @@ function DashboardContent() {
                           Grabación disponible después de esta clase.
                         </p>
                       )}
+
+                      {m.materials && m.materials.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          {m.materials.map((mat) => (
+                            <a
+                              key={mat.url}
+                              href={mat.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="btn-cta bg-sage text-white px-3 py-1.5 rounded-full hover:opacity-90 transition-colors inline-block text-xs"
+                            >
+                              {mat.title} →
+                            </a>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
-
-                {c.materials && c.materials.length > 0 && (
-                  <div className="mb-4">
-                    <p className="text-xs text-bone/50 mb-2">Materiales</p>
-                    <div className="flex flex-wrap gap-2">
-                      {c.materials.map((mat) => (
-                        <a
-                          key={mat.url}
-                          href={mat.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn-cta bg-sage text-white px-3 py-1.5 rounded-full hover:opacity-90 transition-colors inline-block text-xs"
-                        >
-                          {mat.title} →
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                )}
 
                 <div className="flex flex-wrap gap-4 text-sm">
                   <a
