@@ -252,7 +252,25 @@ function DashboardContent() {
                   ))}
                 </div>
 
+                {c.checklistUrl && (
+                  <div className="mb-4">
+                    <a
+                      href={c.checklistUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-cta bg-sage text-white px-3 py-1.5 rounded-full hover:opacity-90 transition-colors inline-block text-xs"
+                    >
+                      ✅ Checklist para ir chequeando tus pasos →
+                    </a>
+                  </div>
+                )}
+
                 <div className="flex flex-wrap gap-4 text-sm">
+                  {c.certificadoUrl && (
+                    <a href={c.certificadoUrl} className="text-magenta hover:underline">
+                      🏆 Pedí tu certificado →
+                    </a>
+                  )}
                   <a
                     href="https://wa.me/5491123912820"
                     target="_blank"
@@ -269,11 +287,6 @@ function DashboardContent() {
                       className="text-magenta hover:underline"
                     >
                       Sumarte al grupo de WhatsApp →
-                    </a>
-                  )}
-                  {c.certificadoUrl && (
-                    <a href={c.certificadoUrl} className="text-magenta hover:underline">
-                      🏆 Pedí tu certificado →
                     </a>
                   )}
                 </div>
