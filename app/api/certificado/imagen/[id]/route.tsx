@@ -37,7 +37,12 @@ export async function GET(
 
   const esCurso = data.tipo === "curso-bot-ats";
   const evento = esCurso ? CERTIFICADO_CURSO_BOT_ATS : CERTIFICADO_EVENTO;
-  const nombre = String(data.nombre).slice(0, 120);
+  // Se capitaliza cada palabra sin importar cómo la haya tipeado quien pide
+  // el certificado (ej: "melisa rivara" -> "Melisa Rivara").
+  const nombre = String(data.nombre)
+    .slice(0, 120)
+    .toLowerCase()
+    .replace(/(^|\s)\S/g, (c) => c.toUpperCase());
 
   // Alfabeto completo en español + el nombre y el título reales, para que
   // Google Fonts devuelva un único subset con todos los glifos que se van
@@ -95,7 +100,7 @@ export async function GET(
           {/* Logo + wordmark */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={logoDataUri} width={72} height={72} style={{ borderRadius: 16 }} />
+            <img src={logoDataUri} width={108} height={108} style={{ borderRadius: 24 }} />
             <div
               style={{
                 marginTop: 12,
