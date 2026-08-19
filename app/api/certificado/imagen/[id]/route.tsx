@@ -145,7 +145,7 @@ export async function GET(
             {evento.titulo}
           </div>
 
-          <div style={{ marginTop: 10, fontSize: 15, color: "rgba(247,244,238,0.5)" }}>
+          <div style={{ marginTop: 10, fontSize: 17, fontWeight: 700, color: "#FFFFFF" }}>
             {esCurso ? "Duración: 2 clases en vivo de 90 minutos" : "Duración: 60 minutos en vivo"}
           </div>
 
@@ -171,9 +171,10 @@ export async function GET(
           <div
             style={{
               marginTop: 36,
-              fontSize: 19,
+              fontSize: 21,
+              fontWeight: 700,
               lineHeight: 1.6,
-              color: "rgba(247,244,238,0.82)",
+              color: "#FFFFFF",
               textAlign: "center",
               maxWidth: 1180,
             }}
