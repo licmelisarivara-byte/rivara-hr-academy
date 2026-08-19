@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 import { supabaseAdmin, supabaseAdminConfigured } from "@/lib/supabaseAdmin";
-import { CERTIFICADO_EVENTO } from "@/lib/certificado";
+import { CERTIFICADO_EVENTO, CERTIFICADO_CURSO_BOT_ATS } from "@/lib/certificado";
 import { loadGoogleFont } from "@/lib/googleFont";
 
 export const runtime = "nodejs";
@@ -27,7 +27,7 @@ export async function GET(
 
   const { data, error } = await supabaseAdmin
     .from("certificado_solicitudes")
-    .select("nombre, respuesta_correcta")
+    .select("nombre, respuesta_correcta, tipo")
     .eq("id", params.id)
     .single();
 
@@ -35,6 +35,8 @@ export async function GET(
     return new Response("not_found", { status: 404 });
   }
 
+  const esCurso = data.tipo === "curso-bot-ats";
+  const evento = esCurso ? CERTIFICADO_CURSO_BOT_ATS : CERTIFICADO_EVENTO;
   const nombre = String(data.nombre).slice(0, 120);
 
   // Alfabeto completo en español + el nombre y el título reales, para que
@@ -43,8 +45,8 @@ export async function GET(
   const fontText =
     "ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyz0123456789ÁÉÍÓÚáéíóúÜü.,:—-'\"/() " +
     nombre +
-    CERTIFICADO_EVENTO.titulo +
-    CERTIFICADO_EVENTO.fecha;
+    evento.titulo +
+    evento.fecha;
 
   const [logoDataUri, firmaDataUri, regular, semibold, bold, extrabold] = await Promise.all([
     fetchAsDataUri(req, "/images/logo-isotipo.png", "image/png"),
@@ -140,11 +142,11 @@ export async function GET(
               maxWidth: 1150,
             }}
           >
-            {CERTIFICADO_EVENTO.titulo}
+            {evento.titulo}
           </div>
 
           <div style={{ marginTop: 10, fontSize: 15, color: "rgba(247,244,238,0.5)" }}>
-            Duración: 60 minutos en vivo
+            {esCurso ? "Duración: 2 clases en vivo de 90 minutos" : "Duración: 60 minutos en vivo"}
           </div>
 
           <div style={{ marginTop: 40, fontSize: 20, color: "rgba(247,244,238,0.55)" }}>
@@ -176,7 +178,9 @@ export async function GET(
               maxWidth: 1180,
             }}
           >
-            {`Por su participación activa en la masterclass en vivo "${CERTIFICADO_EVENTO.titulo.split("— ")[1] ?? CERTIFICADO_EVENTO.titulo}", dictada el ${CERTIFICADO_EVENTO.fecha} por RIVARA HR Academy.`}
+            {esCurso
+              ? `Por completar el curso en vivo "${evento.titulo}" (2 clases), dictado los días ${evento.fecha} por RIVARA HR Academy.`
+              : `Por su participación activa en la masterclass en vivo "${evento.titulo.split("— ")[1] ?? evento.titulo}", dictada el ${evento.fecha} por RIVARA HR Academy.`}
           </div>
 
           {/* Firma + fecha */}
@@ -234,10 +238,10 @@ export async function GET(
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 260 }}>
               <div style={{ width: "100%", height: 1, background: "rgba(247,244,238,0.3)", display: "flex" }} />
               <div style={{ marginTop: 10, fontSize: 16, fontWeight: 700, color: "#FFFFFF" }}>
-                {CERTIFICADO_EVENTO.fechaCorta}
+                {evento.fechaCorta}
               </div>
               <div style={{ fontSize: 13, color: "rgba(247,244,238,0.55)" }}>
-                Fecha de la masterclass
+                {esCurso ? "Fechas del curso" : "Fecha de la masterclass"}
               </div>
             </div>
           </div>

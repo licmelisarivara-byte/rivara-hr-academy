@@ -271,6 +271,11 @@ function DashboardContent() {
                       Sumarte al grupo de WhatsApp →
                     </a>
                   )}
+                  {c.certificadoUrl && (
+                    <a href={c.certificadoUrl} className="text-magenta hover:underline">
+                      🏆 Pedí tu certificado →
+                    </a>
+                  )}
                 </div>
               </div>
             ))}

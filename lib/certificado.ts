@@ -26,6 +26,16 @@ export const CERTIFICADO_OPCIONES = ["28/100", "48/100", "76/100", "95/100"];
 export const CERTIFICADO_GRABACION_URL =
   process.env.CERTIFICADO_GRABACION_URL ?? evento?.youtubeLink ?? "";
 
+// Certificado del curso pago "Creá tu propio Bot de Selección + ATS con IA".
+// A diferencia de la masterclass (gratis, se valida con una pregunta trivia),
+// acá se valida contra una compra aprobada del curso (ver /api/certificado).
+export const CERTIFICADO_CURSO_BOT_ATS = {
+  titulo: "Creá tu propio Bot de Selección + ATS con IA",
+  fecha: "11 y 18 de agosto de 2026",
+  fechaCorta: "11-18 / 08 / 2026",
+  resourceSlug: "de-cero-a-tu-asistente",
+};
+
 export function normalizarRespuesta(raw: string): string {
   return raw
     .trim()

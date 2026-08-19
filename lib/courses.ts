@@ -36,6 +36,7 @@ export type Course = {
   comingSoon?: boolean; // todavía no se vende; muestra "Próximamente" en vez de un botón de compra
   freePreviewVideoId?: string; // YouTube ID, unlisted is fine
   meetLink?: string; // link de Google Meet del curso en vivo, se muestra solo a quien ya se inscribió
+  certificadoUrl?: string; // página para pedir el certificado de este curso, se muestra en el dashboard
   whatsappGroupLink?: string; // link de invitación al grupo de WhatsApp del curso
 };
 
@@ -162,6 +163,7 @@ export const courses: Course[] = [
     mpPaymentLink: "https://mpago.la/1urEhEV",
     payoneerLink: "https://link.payoneer.com/Token?t=55DF705DCE7144E59B7DAB4C198ACDB1&src=tpl",
     meetLink: "https://meet.google.com/ezw-ueie-xzd",
+    certificadoUrl: "/cursos/de-cero-a-tu-asistente/certificado",
   },
   {
     slug: "claude-para-seleccion",
