@@ -222,7 +222,9 @@ function DashboardContent() {
                         <div className="aspect-video rounded-lg overflow-hidden">
                           <iframe
                             className="w-full h-full"
-                            src={`https://www.youtube.com/embed/${m.recordingVideoId}`}
+                            src={`https://www.youtube.com/embed/${m.recordingVideoId}${
+                              m.recordingStartSeconds ? `?start=${m.recordingStartSeconds}` : ""
+                            }`}
                             title={m.title}
                             allowFullScreen
                           />

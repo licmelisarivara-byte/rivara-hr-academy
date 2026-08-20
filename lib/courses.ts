@@ -14,6 +14,7 @@ export type Course = {
     title: string;
     items: string[];
     recordingVideoId?: string; // YouTube ID no listado de la grabación de esa clase, se completa después de dictarla
+    recordingStartSeconds?: number; // si el módulo arranca a mitad de un video compartido con otro módulo (ej: el cierre del módulo anterior queda al principio)
     materials?: { title: string; url: string }[]; // PDFs y otros materiales de ESTA clase puntual, se muestran debajo de su video en el dashboard
   }[];
   image?: string; // portada en /public/images
@@ -171,9 +172,24 @@ export const courses: Course[] = [
     description:
       "Curso grabado de 6 módulos (~2.5 horas en total) para aprender a usar Claude en cada etapa del proceso de selección: desde el análisis de CVs hasta el informe ejecutivo post-entrevista.",
     modules: [
-      { title: "Módulo 1", items: ["Fundamentos: cómo piensa Claude y cómo escribirle bien"] },
-      { title: "Módulo 2", items: ["Análisis de CVs con el prompt maestro"] },
-      { title: "Módulo 3", items: ["Preguntas STAR y guías de entrevista"] },
+      {
+        title: "Módulo 1",
+        items: ["Fundamentos: cómo piensa Claude y cómo escribirle bien"],
+        recordingVideoId: "tva0e-JLfUs",
+      },
+      {
+        title: "Módulo 2",
+        items: ["Análisis de CVs con el prompt maestro"],
+        recordingVideoId: "IAQMzHHJGDk",
+      },
+      {
+        title: "Módulo 3",
+        items: ["Preguntas STAR y guías de entrevista"],
+        // Comparte video con el cierre del Módulo 2: arranca en 6:24 para
+        // no repetirle a la alumna el repaso del módulo anterior.
+        recordingVideoId: "rdacogYyOiM",
+        recordingStartSeconds: 384,
+      },
       { title: "Módulo 4", items: ["Comparar candidatos y armar la terna"] },
       { title: "Módulo 5", items: ["Informes ejecutivos y comunicación con el cliente"] },
       { title: "Módulo 6", items: ["Armar tu propio Proyecto de Claude para no repetir el prompt cada vez"] },
