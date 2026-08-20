@@ -173,6 +173,11 @@ export const courses: Course[] = [
       "Curso grabado de 6 módulos (~2.5 horas en total) para aprender a usar Claude en cada etapa del proceso de selección: desde el análisis de CVs hasta el informe ejecutivo post-entrevista.",
     modules: [
       {
+        title: "Bienvenida",
+        items: ["Presentación del curso"],
+        recordingVideoId: "Uolt_JCNOOM",
+      },
+      {
         title: "Módulo 1",
         items: ["Fundamentos: cómo piensa Claude y cómo escribirle bien"],
         recordingVideoId: "tva0e-JLfUs",
