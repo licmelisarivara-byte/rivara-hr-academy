@@ -185,15 +185,12 @@ export const courses: Course[] = [
       {
         title: "Módulo 2",
         items: ["Análisis de CVs con el prompt maestro"],
-        recordingVideoId: "IAQMzHHJGDk",
+        recordingVideoId: "DEai1Icm7AM",
       },
       {
         title: "Módulo 3",
         items: ["Preguntas STAR y guías de entrevista"],
-        // Comparte video con el cierre del Módulo 2: arranca en 6:24 para
-        // no repetirle a la alumna el repaso del módulo anterior.
-        recordingVideoId: "rdacogYyOiM",
-        recordingStartSeconds: 384,
+        recordingVideoId: "m-Vqeg2qSB4",
       },
       { title: "Módulo 4", items: ["Comparar candidatos y armar la terna"] },
       { title: "Módulo 5", items: ["Informes ejecutivos y comunicación con el cliente"] },
