@@ -48,10 +48,44 @@ export default function CareerFooter() {
             href="https://www.rivaraconsultora.com.ar"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-careerCream/60 hover:text-careerRose transition-colors inline-block"
+            className="text-careerCream/60 hover:text-careerRose transition-colors inline-block mb-3"
           >
             rivaraconsultora.com.ar
           </a>
+          <div className="flex flex-wrap gap-3 text-careerCream/60">
+            <a
+              href="https://www.instagram.com/lic.melisarivara/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-careerRose transition-colors"
+            >
+              Instagram
+            </a>
+            <a
+              href="https://www.facebook.com/Recursoshumanosydigitalizacion"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-careerRose transition-colors"
+            >
+              Facebook
+            </a>
+            <a
+              href="http://www.youtube.com/@recursoshumanosydigitalizacion"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-careerRose transition-colors"
+            >
+              YouTube
+            </a>
+            <a
+              href="https://www.linkedin.com/company/rivara-hr-academy/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-careerRose transition-colors"
+            >
+              LinkedIn
+            </a>
+          </div>
         </div>
       </div>
       <div className="max-w-5xl mx-auto px-6 py-4 text-xs text-careerCream/40 font-body">
