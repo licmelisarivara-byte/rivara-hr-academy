@@ -54,7 +54,7 @@ const organizationJsonLd = {
     "https://www.instagram.com/lic.melisarivara/",
     "https://www.facebook.com/Recursoshumanosydigitalizacion",
     "https://www.linkedin.com/company/rivara-hr-academy/",
-    "http://www.youtube.com/@recursoshumanosydigitalizacion",
+    "https://www.youtube.com/@rivarahracademy",
   ],
 };
 

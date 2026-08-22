@@ -82,7 +82,7 @@ export default function MasterclassForm({
               <strong>25% off</strong> hasta el domingo 9/8
             </a>
             <a
-              href="http://www.youtube.com/@recursoshumanosydigitalizacion"
+              href="https://www.youtube.com/@rivarahracademy"
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-lg bg-panel border border-black/10 px-4 py-3 text-bone hover:border-magenta transition-colors"

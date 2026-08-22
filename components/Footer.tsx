@@ -63,7 +63,7 @@ export default function Footer() {
               Facebook
             </a>
             <a
-              href="http://www.youtube.com/@recursoshumanosydigitalizacion"
+              href="https://www.youtube.com/@rivarahracademy"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-magenta transition-colors"
