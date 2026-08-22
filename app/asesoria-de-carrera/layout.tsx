@@ -19,6 +19,14 @@ export const metadata: Metadata = {
   metadataBase: new URL(pageUrl),
   title: { absolute: title },
   description,
+  keywords: [
+    "asesoría de carrera",
+    "armado de CV",
+    "CV profesional Argentina",
+    "optimización de LinkedIn",
+    "búsqueda laboral Argentina",
+    "CV ATS",
+  ],
   alternates: { canonical: pageUrl },
   openGraph: {
     type: "website",

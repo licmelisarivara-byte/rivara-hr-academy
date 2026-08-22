@@ -73,14 +73,22 @@ const proceso = [
 
 const testimonios = [
   {
+    type: "quote" as const,
     quote:
       "Con Meli reorganizamos mi CV y mi LinkedIn de punta a punta, con foco en los puestos que realmente quería. En el camino resolví un montón de dudas que tenía. Un trabajo excelente y muy completo.",
     author: "Vicky Z.",
   },
   {
+    type: "quote" as const,
     quote:
       "El acompañamiento con mi CV fue clave — conseguí trabajo nuevo enseguida. Un servicio excelente, de principio a fin.",
     author: "Jeny",
+  },
+  {
+    type: "caso" as const,
+    titulo: "Caso: profesional bilingüe recién radicada en Buenos Aires",
+    texto:
+      "Lola es estadounidense, se mudó a Buenos Aires con más de 8 años de experiencia en atención al cliente y hospitality. Armamos su CV (ATS y con foto), su LinkedIn, y un Informe de Estrategia con 4 ofertas activas verificadas para que empezara a postularse desde la primera semana.",
   },
 ];
 
@@ -261,23 +269,37 @@ export default function AsesoriaCarreraPage() {
         <h2 className="font-display text-2xl sm:text-3xl text-careerNavy mb-10 text-center">
           Lo que dicen quienes ya hicieron la asesoría
         </h2>
-        <div className="grid sm:grid-cols-2 gap-6">
-          {testimonios.map((t) => (
-            <figure
-              key={t.author}
-              className="rounded-2xl p-7 bg-white/60 border border-careerNavy/10"
-            >
-              <span className="text-careerFucsia font-display text-4xl leading-none block mb-2">
-                "
-              </span>
-              <blockquote className="font-body text-careerNavy/80 mb-4">
-                {t.quote}
-              </blockquote>
-              <figcaption className="font-display text-sm text-careerNavy">
-                {t.author}
-              </figcaption>
-            </figure>
-          ))}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {testimonios.map((t) =>
+            t.type === "quote" ? (
+              <figure
+                key={t.author}
+                className="rounded-2xl p-7 bg-white/60 border border-careerNavy/10"
+              >
+                <span className="text-careerFucsia font-display text-4xl leading-none block mb-2">
+                  "
+                </span>
+                <blockquote className="font-body text-careerNavy/80 mb-4">
+                  {t.quote}
+                </blockquote>
+                <figcaption className="font-display text-sm text-careerNavy">
+                  {t.author}
+                </figcaption>
+              </figure>
+            ) : (
+              <figure
+                key={t.titulo}
+                className="rounded-2xl p-7 bg-white/60 border border-careerNavy/10"
+              >
+                <figcaption className="font-display text-sm text-careerFucsia mb-3">
+                  {t.titulo}
+                </figcaption>
+                <blockquote className="font-body text-careerNavy/80">
+                  {t.texto}
+                </blockquote>
+              </figure>
+            )
+          )}
         </div>
       </section>
 
