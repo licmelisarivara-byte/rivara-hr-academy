@@ -9,12 +9,13 @@ const lato = Lato({
   variable: "--font-lato",
 });
 
-const pageUrl = "https://hracademy.rivaraconsultora.com.ar/asesoria-de-carrera";
+const pageUrl = "https://carrera.rivaraconsultora.com.ar";
 const description =
   "Armamos tu CV, tu LinkedIn y tu estrategia de búsqueda laboral en Argentina. Asesoría de carrera personalizada con Lic. Melisa Rivara.";
 const title = "Asesoría de Carrera y CV Profesional | RIVARA Consultora";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(pageUrl),
   title: { absolute: title },
   description,
   alternates: { canonical: pageUrl },
