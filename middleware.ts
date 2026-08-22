@@ -13,7 +13,7 @@ function stripCareerPrefix(pathname: string) {
 }
 
 export function middleware(request: NextRequest) {
-  const host = request.headers.get("host") || "";
+  const host = (request.headers.get("host") || "").split(":")[0];
   const { pathname } = request.nextUrl;
   const isCareerPath = pathname === CAREER_PATH || pathname.startsWith(`${CAREER_PATH}/`);
 
