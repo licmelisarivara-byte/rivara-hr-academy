@@ -5,7 +5,7 @@ import { notes } from "@/lib/notes";
 const siteUrl = "https://hracademy.rivaraconsultora.com.ar";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticRoutes = ["", "/cursos", "/recursos", "/ebooks", "/masterclass", "/notas", "/contacto"].map((path) => ({
+  const staticRoutes = ["", "/cursos", "/recursos", "/ebooks", "/masterclass", "/notas", "/contacto", "/asesoria-de-carrera"].map((path) => ({
     url: `${siteUrl}${path}`,
     lastModified: new Date(),
   }));

@@ -14,11 +14,16 @@ const config: Config = {
         parchment: "#F4F1EA",
         bone: "#2A2620",
         sage: "#2ECC71",
+        careerNavy: "#1B2A4A",
+        careerFucsia: "#A0005A",
+        careerRose: "#F0A6C8",
+        careerCream: "#ECE4D6",
       },
       fontFamily: {
         display: ["Montserrat", "ui-sans-serif", "system-ui", "sans-serif"],
         sans: ["Montserrat", "ui-sans-serif", "system-ui", "sans-serif"],
         mono: ["'Courier New'", "ui-monospace", "monospace"],
+        body: ["var(--font-lato)", "Lato", "Calibri", "ui-sans-serif", "sans-serif"],
       },
       backgroundImage: {
         "score-grid":
