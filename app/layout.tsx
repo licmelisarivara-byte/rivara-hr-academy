@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
-import SiteChrome from "@/components/SiteChrome";
 
 const siteUrl = "https://hracademy.rivaraconsultora.com.ar";
 const siteDescription =
@@ -127,7 +126,7 @@ export default function RootLayout({
             </noscript>
           </>
         )}
-        <SiteChrome>{children}</SiteChrome>
+        {children}
         <Analytics />
       </body>
     </html>
