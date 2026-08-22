@@ -62,7 +62,7 @@ export default function CareerFooter() {
               Instagram
             </a>
             <a
-              href="https://www.facebook.com/Recursoshumanosydigitalizacion"
+              href="https://www.facebook.com/share/19KdWjRkCG/"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-careerRose transition-colors"
@@ -70,7 +70,7 @@ export default function CareerFooter() {
               Facebook
             </a>
             <a
-              href="http://www.youtube.com/@recursoshumanosydigitalizacion"
+              href="https://www.youtube.com/@rivarahracademy"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-careerRose transition-colors"
@@ -78,7 +78,7 @@ export default function CareerFooter() {
               YouTube
             </a>
             <a
-              href="https://www.linkedin.com/company/rivara-hr-academy/"
+              href="https://www.linkedin.com/in/melisa-rivara"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-careerRose transition-colors"
