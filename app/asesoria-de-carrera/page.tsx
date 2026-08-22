@@ -71,6 +71,19 @@ const proceso = [
   },
 ];
 
+const testimonios = [
+  {
+    quote:
+      "Con Meli reorganizamos mi CV y mi LinkedIn de punta a punta, con foco en los puestos que realmente quería. En el camino resolví un montón de dudas que tenía. Un trabajo excelente y muy completo.",
+    author: "Vicky Z.",
+  },
+  {
+    quote:
+      "El acompañamiento con mi CV fue clave — conseguí trabajo nuevo enseguida. Un servicio excelente, de principio a fin.",
+    author: "Jeny",
+  },
+];
+
 const faqs = [
   {
     q: "¿Cuánto tarda la entrega?",
@@ -121,17 +134,13 @@ export default function AsesoriaCarreraPage() {
           <div className="relative max-w-md mx-auto w-full">
             <div className="relative rounded-[20px] overflow-hidden border border-careerRose/30 shadow-2xl shadow-black/30">
               <Image
-                src="/images/melisa-portrait.jpg"
-                alt="Lic. Melisa Rivara"
-                width={700}
-                height={840}
+                src="/images/asesoria/hero-cv.jpg"
+                alt="Entrevista de trabajo con CV impreso sobre la mesa"
+                width={1696}
+                height={2106}
                 className="w-full h-auto object-cover"
                 priority
               />
-            </div>
-            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-max rounded-full px-5 py-2.5 bg-careerNavy/80 backdrop-blur border border-careerRose/30 shadow-xl shadow-black/30 flex items-center gap-2 text-sm font-body text-careerCream whitespace-nowrap">
-              <span className="w-2 h-2 rounded-full bg-careerFucsia" />
-              Lic. Melisa Rivara — Especialista en Selección de Personal
             </div>
           </div>
         </div>
@@ -245,6 +254,31 @@ export default function AsesoriaCarreraPage() {
           qué hace que una postulación llegue a entrevista. Este servicio no
           es una plantilla bonita: es estrategia real de búsqueda laboral.
         </p>
+      </section>
+
+      {/* TESTIMONIOS */}
+      <section className="max-w-5xl mx-auto px-6 py-24">
+        <h2 className="font-display text-2xl sm:text-3xl text-careerNavy mb-10 text-center">
+          Lo que dicen quienes ya hicieron la asesoría
+        </h2>
+        <div className="grid sm:grid-cols-2 gap-6">
+          {testimonios.map((t) => (
+            <figure
+              key={t.author}
+              className="rounded-2xl p-7 bg-white/60 border border-careerNavy/10"
+            >
+              <span className="text-careerFucsia font-display text-4xl leading-none block mb-2">
+                "
+              </span>
+              <blockquote className="font-body text-careerNavy/80 mb-4">
+                {t.quote}
+              </blockquote>
+              <figcaption className="font-display text-sm text-careerNavy">
+                {t.author}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
       </section>
 
       {/* FAQ */}
