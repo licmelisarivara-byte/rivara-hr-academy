@@ -23,7 +23,7 @@ const config: Config = {
         display: ["Montserrat", "ui-sans-serif", "system-ui", "sans-serif"],
         sans: ["Montserrat", "ui-sans-serif", "system-ui", "sans-serif"],
         mono: ["'Courier New'", "ui-monospace", "monospace"],
-        body: ["var(--font-lato)", "Lato", "Calibri", "ui-sans-serif", "sans-serif"],
+        body: ["var(--font-lato, Lato)", "Calibri", "ui-sans-serif", "sans-serif"],
       },
       backgroundImage: {
         "score-grid":
