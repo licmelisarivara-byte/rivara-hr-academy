@@ -134,17 +134,13 @@ export default function AsesoriaCarreraPage() {
           <div className="relative max-w-md mx-auto w-full">
             <div className="relative rounded-[20px] overflow-hidden border border-careerRose/30 shadow-2xl shadow-black/30">
               <Image
-                src="/images/melisa-portrait.jpg"
-                alt="Lic. Melisa Rivara"
-                width={700}
-                height={840}
+                src="/images/asesoria/hero-cv.jpg"
+                alt="Entrevista de trabajo con CV impreso sobre la mesa"
+                width={1696}
+                height={2106}
                 className="w-full h-auto object-cover"
                 priority
               />
-            </div>
-            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-max rounded-full px-5 py-2.5 bg-careerNavy/80 backdrop-blur border border-careerRose/30 shadow-xl shadow-black/30 flex items-center gap-2 text-sm font-body text-careerCream whitespace-nowrap">
-              <span className="w-2 h-2 rounded-full bg-careerFucsia" />
-              Lic. Melisa Rivara — Especialista en Selección de Personal
             </div>
           </div>
         </div>
