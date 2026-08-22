@@ -15,6 +15,18 @@ function stripCareerPrefix(pathname: string) {
 export function middleware(request: NextRequest) {
   const host = (request.headers.get("host") || "").split(":")[0];
   const { pathname } = request.nextUrl;
+
+  // Cualquier request a un archivo estático (tiene "." en el último tramo:
+  // /images/x.jpg, /recursos/x.pdf, /icon.png, /robots.txt, etc.) se sirve
+  // tal cual, sin pasar por el rewrite/redirect de abajo — si no, un archivo
+  // nuevo en public/ que no esté en una carpeta ya contemplada rompe en el
+  // subdominio de carrera (ya pasó una vez con /images antes de esta regla
+  // genérica, y de nuevo con /recursos).
+  const lastSegment = pathname.split("/").pop() || "";
+  if (lastSegment.includes(".")) {
+    return NextResponse.next();
+  }
+
   const isCareerPath = pathname === CAREER_PATH || pathname.startsWith(`${CAREER_PATH}/`);
 
   if (host === CAREER_HOST) {
@@ -44,7 +56,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|icon.png|images|robots.txt|sitemap.xml).*)",
-  ],
+  matcher: ["/((?!api|_next/static|_next/image).*)"],
 };
