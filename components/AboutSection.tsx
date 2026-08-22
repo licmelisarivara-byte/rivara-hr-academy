@@ -16,7 +16,7 @@ export default function AboutSection() {
               priority={false}
             />
           </div>
-          <div className="absolute -bottom-10 -right-8 w-40 sm:w-48 rounded-xl overflow-hidden border-2 border-ink shadow-xl shadow-black/50 rotate-3">
+          <div className="absolute -bottom-10 right-0 sm:-right-8 w-32 sm:w-48 rounded-xl overflow-hidden border-2 border-ink shadow-xl shadow-black/50 rotate-3">
             <Image
               src="/images/melisa-kit.jpg"
               alt="Melisa Rivara mostrando el Kit de Prompts"

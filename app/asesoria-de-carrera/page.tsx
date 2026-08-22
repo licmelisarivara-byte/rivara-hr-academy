@@ -440,6 +440,49 @@ export default function AsesoriaCarreraPage() {
         </div>
       </section>
 
+      {/* OTROS SERVICIOS RIVARA */}
+      <section className="max-w-5xl mx-auto px-6 pb-24 grid gap-6 sm:grid-cols-2">
+        <div className="rounded-2xl p-8 bg-white/60 border border-careerNavy/10 flex flex-col justify-between gap-6 text-center sm:text-left">
+          <div>
+            <h2 className="font-display text-xl sm:text-2xl text-careerNavy mb-2">
+              ¿Sos de RRHH?
+            </h2>
+            <p className="font-body text-careerNavy/70">
+              Conocé RIVARA HR Academy: cursos y recursos de IA aplicada a
+              selección de personal.
+            </p>
+          </div>
+          <a
+            href="https://hracademy.rivaraconsultora.com.ar/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-cta inline-block bg-careerFucsia text-careerCream px-6 py-3 rounded-full hover:bg-careerFucsia/85 transition-colors whitespace-normal sm:whitespace-nowrap self-center sm:self-start"
+          >
+            Conocé HR Academy →
+          </a>
+        </div>
+
+        <div className="rounded-2xl p-8 bg-white/60 border border-careerNavy/10 flex flex-col justify-between gap-6 text-center sm:text-left">
+          <div>
+            <h2 className="font-display text-xl sm:text-2xl text-careerNavy mb-2">
+              ¿Sos empresa?
+            </h2>
+            <p className="font-body text-careerNavy/70">
+              Conocé nuestros servicios de RRHH y selección de personal en
+              RIVARA Consultora.
+            </p>
+          </div>
+          <a
+            href="https://www.rivaraconsultora.com.ar/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-cta inline-block bg-careerFucsia text-careerCream px-6 py-3 rounded-full hover:bg-careerFucsia/85 transition-colors whitespace-normal sm:whitespace-nowrap self-center sm:self-start"
+          >
+            Conocé nuestros servicios →
+          </a>
+        </div>
+      </section>
+
       {/* CTA FINAL */}
       <section className="bg-careerNavy">
         <div className="max-w-3xl mx-auto px-6 py-24 text-center">
