@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Lato } from "next/font/google";
-import AudienceStrip from "@/components/AudienceStrip";
 import CareerHeader from "@/components/CareerHeader";
 import CareerFooter from "@/components/CareerFooter";
 
@@ -52,7 +51,6 @@ export default function AsesoriaCarreraLayout({
 }) {
   return (
     <div className={`${lato.variable} font-body bg-careerCream text-careerNavy min-h-screen`}>
-      <AudienceStrip />
       <CareerHeader />
       <main>{children}</main>
       <CareerFooter />

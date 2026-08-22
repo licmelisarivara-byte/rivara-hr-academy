@@ -59,8 +59,8 @@ export default function Home() {
                 priority
               />
             </div>
-            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-max rounded-full px-5 py-2.5 bg-black/60 backdrop-blur border border-magenta/40 shadow-xl shadow-black/30 flex items-center gap-2 text-sm text-white whitespace-nowrap">
-              <span className="w-2 h-2 rounded-full bg-magenta" />
+            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-max max-w-[90%] rounded-2xl sm:rounded-full px-5 py-2.5 bg-black/60 backdrop-blur border border-magenta/40 shadow-xl shadow-black/30 flex items-center gap-2 text-sm text-white text-center whitespace-normal sm:whitespace-nowrap">
+              <span className="w-2 h-2 rounded-full bg-magenta shrink-0" />
               Lic. Melisa Rivara — Especialista en Selección de Personal
             </div>
           </div>
@@ -202,7 +202,26 @@ export default function Home() {
       <AboutSection />
 
       {/* SOS EMPRESA */}
-      <section className="max-w-6xl mx-auto px-6 pb-24 grid gap-6 sm:grid-cols-2">
+      <section className="max-w-6xl mx-auto px-6 pb-24 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="card-alt rounded-2xl p-8 flex flex-col justify-between gap-6 text-center sm:text-left">
+          <div>
+            <h2 className="font-display text-xl sm:text-2xl text-bone mb-2">
+              ¿Estás buscando trabajo?
+            </h2>
+            <p className="text-bone/60">
+              Conocé la Asesoría de Carrera: armamos tu CV, tu LinkedIn y tu estrategia de búsqueda laboral.
+            </p>
+          </div>
+          <a
+            href="https://carrera.rivaraconsultora.com.ar/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-cta inline-block bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors whitespace-normal sm:whitespace-nowrap self-center sm:self-start"
+          >
+            Conocé la asesoría →
+          </a>
+        </div>
+
         <div className="card-alt rounded-2xl p-8 flex flex-col justify-between gap-6 text-center sm:text-left">
           <div>
             <h2 className="font-display text-xl sm:text-2xl text-bone mb-2">
@@ -216,7 +235,7 @@ export default function Home() {
             href="https://rivaraconsultora.com.ar/"
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-cta inline-block bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors whitespace-nowrap self-center sm:self-start"
+            className="btn-cta inline-block bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors whitespace-normal sm:whitespace-nowrap self-center sm:self-start"
           >
             Conocé nuestros servicios →
           </a>
@@ -235,7 +254,7 @@ export default function Home() {
             href="https://hrsuite.rivaraconsultora.com.ar/"
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-cta inline-block bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors whitespace-nowrap self-center sm:self-start"
+            className="btn-cta inline-block bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors whitespace-normal sm:whitespace-nowrap self-center sm:self-start"
           >
             Conocé HR Suite →
           </a>
