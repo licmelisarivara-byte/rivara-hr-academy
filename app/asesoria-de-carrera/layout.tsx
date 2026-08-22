@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Lato } from "next/font/google";
+import AudienceStrip from "@/components/AudienceStrip";
 import CareerHeader from "@/components/CareerHeader";
 import CareerFooter from "@/components/CareerFooter";
 
@@ -26,13 +27,13 @@ export const metadata: Metadata = {
     siteName: "RIVARA Consultora",
     title,
     description,
-    images: [{ url: "/images/melisa-portrait.jpg", width: 700, height: 840 }],
+    images: [{ url: "/images/asesoria/hero-cv.jpg", width: 1696, height: 2106 }],
   },
   twitter: {
     card: "summary",
     title,
     description,
-    images: ["/images/melisa-portrait.jpg"],
+    images: ["/images/asesoria/hero-cv.jpg"],
   },
 };
 
@@ -43,6 +44,7 @@ export default function AsesoriaCarreraLayout({
 }) {
   return (
     <div className={`${lato.variable} font-body bg-careerCream text-careerNavy min-h-screen`}>
+      <AudienceStrip />
       <CareerHeader />
       <main>{children}</main>
       <CareerFooter />

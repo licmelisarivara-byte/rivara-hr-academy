@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import AudienceStrip from "@/components/AudienceStrip";
 
 // Rutas que llevan su propia identidad de marca (header/footer propios)
 // y no deben mostrar el Nav/Footer de RIVARA HR Academy.
@@ -20,6 +21,7 @@ export default function SiteChrome({ children }: { children: React.ReactNode }) 
 
   return (
     <>
+      <AudienceStrip />
       <Nav />
       <main className="min-h-screen">{children}</main>
       <Footer />

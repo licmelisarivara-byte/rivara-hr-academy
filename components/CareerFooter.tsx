@@ -1,11 +1,16 @@
+import RivaraMark from "@/components/RivaraMark";
+
 export default function CareerFooter() {
   return (
     <footer className="bg-careerNavy border-t border-white/10 mt-24">
       <div className="max-w-5xl mx-auto px-6 py-12 grid gap-8 sm:grid-cols-3 text-sm font-body">
         <div>
-          <p className="font-display font-extrabold text-careerCream text-sm tracking-wide mb-2">
-            RIVARA CONSULTORA
-          </p>
+          <div className="flex items-center gap-2 mb-3">
+            <RivaraMark className="h-6 w-6 shrink-0" />
+            <p className="font-display font-extrabold text-careerCream text-sm tracking-wide">
+              RIVARA CONSULTORA
+            </p>
+          </div>
           <p className="text-careerCream/60">
             Asesoría de carrera personalizada — CV, LinkedIn y estrategia de
             búsqueda laboral en Argentina.
