@@ -134,8 +134,8 @@ export default function AsesoriaCarreraPage() {
           <div className="relative max-w-md mx-auto w-full">
             <div className="relative rounded-[20px] overflow-hidden border border-careerRose/30 shadow-2xl shadow-black/30">
               <Image
-                src="/images/asesoria/hero-cv.jpg"
-                alt="Entrevista de trabajo con CV impreso sobre la mesa"
+                src="/images/asesoria/hero-cv-2.jpg"
+                alt="Persona sonriendo con su CV impreso en la mano"
                 width={1696}
                 height={2106}
                 className="w-full h-auto object-cover"

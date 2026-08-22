@@ -27,13 +27,13 @@ export const metadata: Metadata = {
     siteName: "RIVARA Consultora",
     title,
     description,
-    images: [{ url: "/images/asesoria/hero-cv.jpg", width: 1696, height: 2106 }],
+    images: [{ url: "/images/asesoria/hero-cv-2.jpg", width: 1696, height: 2106 }],
   },
   twitter: {
     card: "summary",
     title,
     description,
-    images: ["/images/asesoria/hero-cv.jpg"],
+    images: ["/images/asesoria/hero-cv-2.jpg"],
   },
 };
 
