@@ -1,4 +1,5 @@
 import Image from "next/image";
+import CareerResourceDownload from "@/components/CareerResourceDownload";
 
 const WHATSAPP_URL =
   "https://wa.me/5491123912820?text=" +
@@ -324,13 +325,7 @@ export default function AsesoriaCarreraPage() {
               </div>
             ))}
           </div>
-          <a
-            href="/recursos/5-tips-busqueda-laboral.pdf"
-            download
-            className="btn-cta inline-block bg-careerFucsia text-careerCream px-8 py-4 rounded-full hover:bg-careerFucsia/85 transition-colors"
-          >
-            Descargar los 5 tips en PDF →
-          </a>
+          <CareerResourceDownload />
         </div>
       </section>
 
