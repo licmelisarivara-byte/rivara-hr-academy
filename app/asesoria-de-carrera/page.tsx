@@ -1,4 +1,5 @@
 import Image from "next/image";
+import CareerResourceDownload from "@/components/CareerResourceDownload";
 
 const WHATSAPP_URL =
   "https://wa.me/5491123912820?text=" +
@@ -14,16 +15,19 @@ const audiencia = [
 
 const incluye = [
   {
+    icon: "/images/asesoria/icons/cv-ats.png",
     title: "CV ATS",
     description:
       "Versión optimizada para sistemas de selección automatizados — así tu CV no se pierde antes de que lo vea una persona.",
   },
   {
+    icon: "/images/asesoria/icons/cv-foto.png",
     title: "CV con foto y diseño",
     description:
       "Versión profesional con diseño de marca, pensada para contacto directo por mail con empresas, agencias y contactos personales.",
   },
   {
+    icon: "/images/asesoria/icons/estrategia.png",
     title: "Informe de Estrategia Laboral",
     description: 'No es una lista de consejos genéricos. Es un análisis de tu perfil con:',
     bullets: [
@@ -35,11 +39,13 @@ const incluye = [
     ],
   },
   {
+    icon: "/images/asesoria/icons/linkedin.png",
     title: "Optimización de LinkedIn",
     description:
       'Headline, sección "Acerca de" y recomendaciones de perfil — listas para usar o para que las carguemos juntos.',
   },
   {
+    icon: "/images/asesoria/icons/seguimiento.png",
     title: "Sesión de seguimiento (1 hora, post-entrega)",
     description: "Una vez que tenés todo el material, nos volvemos a encontrar para:",
     bullets: [
@@ -47,6 +53,33 @@ const incluye = [
       "Revisar si hubo cambios en tu búsqueda (nueva info, otro enfoque, corrección de último momento)",
       "Ajustar lo que haga falta antes de que empieces a postularte en serio",
     ],
+  },
+];
+
+const recursos = [
+  {
+    title: "Tené dos versiones de tu CV, no una sola",
+    description:
+      'Un CV "ATS" (sin foto, texto plano) para portales automáticos, y uno con foto y diseño para contacto directo por mail.',
+  },
+  {
+    title: 'Activá "Abierta a oportunidades" en LinkedIn, en modo privado',
+    description:
+      "Solo lo ven reclutadores verificados, no tu red ni tu empleador actual.",
+  },
+  {
+    title: "Enviá siempre PDF, salvo que te pidan Word",
+    description:
+      "Se ve igual en cualquier dispositivo y no se desarma el formato.",
+  },
+  {
+    title: "Practicá en voz alta, no solo mentalmente",
+    description:
+      "Lo que suena bien en tu cabeza puede trabarse la primera vez que lo decís en voz alta.",
+  },
+  {
+    title: "Verificá cada contacto antes de escribir",
+    description: "Confirmá que la búsqueda siga activa antes de postular.",
   },
 ];
 
@@ -187,6 +220,13 @@ export default function AsesoriaCarreraPage() {
                 key={item.title}
                 className="rounded-2xl p-7 bg-careerCream border border-careerNavy/10"
               >
+                <Image
+                  src={item.icon}
+                  alt=""
+                  width={40}
+                  height={40}
+                  className="h-9 w-9 mb-4"
+                />
                 <h3 className="font-display text-lg text-careerNavy mb-2">
                   {item.title}
                 </h3>
@@ -217,18 +257,75 @@ export default function AsesoriaCarreraPage() {
         <h2 className="font-display text-2xl sm:text-3xl text-careerNavy mb-10">
           El proceso
         </h2>
-        <div className="grid sm:grid-cols-3 gap-6">
-          {proceso.map((p) => (
-            <div key={p.step} className="rounded-2xl p-7 bg-careerNavy text-careerCream">
-              <span className="font-display text-3xl text-careerRose mb-3 block">
-                {p.step}
-              </span>
-              <h3 className="font-display text-lg mb-2">{p.title}</h3>
-              <p className="font-body text-careerCream/70 text-sm">
-                {p.description}
-              </p>
+        <div className="grid sm:grid-cols-3 gap-6 sm:gap-0 relative">
+          {proceso.map((p, i) => (
+            <div key={p.step} className="relative sm:flex sm:items-stretch">
+              <div className="rounded-2xl p-7 bg-careerNavy text-careerCream sm:mr-6 flex-1">
+                <span className="font-display text-3xl text-careerRose mb-3 block">
+                  {p.step}
+                </span>
+                <h3 className="font-display text-lg mb-2">{p.title}</h3>
+                <p className="font-body text-careerCream/70 text-sm">
+                  {p.description}
+                </p>
+              </div>
+              {i < proceso.length - 1 && (
+                <span
+                  aria-hidden
+                  className="hidden sm:flex items-center justify-center absolute top-1/2 -translate-y-1/2 -right-3 z-10 w-6 h-6 rounded-full bg-careerFucsia text-careerCream text-sm"
+                >
+                  →
+                </span>
+              )}
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* RECURSOS GRATIS */}
+      <section className="bg-white/50 border-y border-careerNavy/10">
+        <div className="max-w-5xl mx-auto px-6 py-24">
+          <div className="flex items-center gap-3 mb-3">
+            <svg
+              aria-hidden
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#A0005A"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-8 w-8 shrink-0"
+            >
+              <rect x="3" y="8" width="18" height="13" rx="2" />
+              <path d="M3 12h18" />
+              <path d="M12 8v13" />
+              <path d="M12 8c-1.2-3-3.2-4.5-4.8-4.5S4.5 4.5 4.5 6 6 8 7.5 8H12z" />
+              <path d="M12 8c1.2-3 3.2-4.5 4.8-4.5S19.5 4.5 19.5 6 18 8 16.5 8H12z" />
+            </svg>
+            <h2 className="font-display text-2xl sm:text-3xl text-careerNavy">
+              Recursos gratis
+            </h2>
+          </div>
+          <p className="font-body text-careerNavy/70 text-lg mb-10">
+            Consejos prácticos para tu búsqueda laboral, sin necesidad de
+            agendar nada.
+          </p>
+          <div className="grid sm:grid-cols-2 gap-5 mb-10">
+            {recursos.map((r) => (
+              <div
+                key={r.title}
+                className="rounded-xl p-5 bg-careerCream border border-careerNavy/10"
+              >
+                <h3 className="font-display text-base text-careerNavy mb-1.5">
+                  {r.title}
+                </h3>
+                <p className="font-body text-sm text-careerNavy/70">
+                  {r.description}
+                </p>
+              </div>
+            ))}
+          </div>
+          <CareerResourceDownload />
         </div>
       </section>
 
@@ -255,16 +352,28 @@ export default function AsesoriaCarreraPage() {
       </section>
 
       {/* POR QUÉ CONMIGO */}
-      <section className="max-w-3xl mx-auto px-6 py-24 text-center">
-        <h2 className="font-display text-2xl sm:text-3xl text-careerNavy mb-6">
-          No es solo diseño de CV
-        </h2>
-        <p className="font-body text-careerNavy/75 text-lg">
-          Soy Lic. en Recursos Humanos y trabajo del lado de la selección de
-          personal — sé qué mira un reclutador antes de descartar un CV, y
-          qué hace que una postulación llegue a entrevista. Este servicio no
-          es una plantilla bonita: es estrategia real de búsqueda laboral.
-        </p>
+      <section className="max-w-4xl mx-auto px-6 py-24">
+        <div className="grid sm:grid-cols-[auto_1fr] gap-8 items-center text-center sm:text-left">
+          <Image
+            src="/images/melisa-portrait.jpg"
+            alt="Lic. Melisa Rivara"
+            width={200}
+            height={240}
+            className="w-32 sm:w-40 h-auto rounded-2xl object-cover mx-auto sm:mx-0 border border-careerNavy/10"
+          />
+          <div>
+            <h2 className="font-display text-2xl sm:text-3xl text-careerNavy mb-6">
+              No es solo diseño de CV
+            </h2>
+            <p className="font-body text-careerNavy/75 text-lg">
+              Soy Lic. en Recursos Humanos y trabajo del lado de la selección
+              de personal — sé qué mira un reclutador antes de descartar un
+              CV, y qué hace que una postulación llegue a entrevista. Este
+              servicio no es una plantilla bonita: es estrategia real de
+              búsqueda laboral.
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* TESTIMONIOS */}
