@@ -137,6 +137,9 @@ export default function AsesoriaCarreraPage() {
             >
               Quiero mi asesoría →
             </a>
+            <p className="font-body text-careerRose text-sm mt-4">
+              +10 personas asesoradas
+            </p>
           </div>
 
           <div className="relative max-w-md mx-auto w-full">
