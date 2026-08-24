@@ -29,13 +29,13 @@ export const metadata: Metadata = {
     siteName: "RIVARA HR Academy",
     title: "RIVARA HR Academy | Cursos de IA para Selección de Personal",
     description: siteDescription,
-    images: [{ url: "/images/logo-horizontal.png", width: 640, height: 162 }],
+    images: [{ url: "/images/logo-horizontal-dark.png", width: 640, height: 162 }],
   },
   twitter: {
     card: "summary",
     title: "RIVARA HR Academy | Cursos de IA para Selección de Personal",
     description: siteDescription,
-    images: ["/images/logo-horizontal.png"],
+    images: ["/images/logo-horizontal-dark.png"],
   },
 };
 
@@ -44,7 +44,7 @@ const organizationJsonLd = {
   "@type": "EducationalOrganization",
   name: "RIVARA HR Academy",
   url: siteUrl,
-  logo: `${siteUrl}/images/logo-horizontal.png`,
+  logo: `${siteUrl}/images/logo-horizontal-dark.png`,
   description: siteDescription,
   founder: {
     "@type": "Person",
