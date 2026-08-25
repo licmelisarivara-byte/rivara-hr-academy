@@ -181,20 +181,115 @@ export const courses: Course[] = [
         title: "Módulo 1",
         items: ["Fundamentos: cómo piensa Claude y cómo escribirle bien"],
         recordingVideoId: "tva0e-JLfUs",
+        materials: [
+          {
+            title: "Kit Módulo 1 — Fórmula de Prompting",
+            url: "/downloads/kit-modulo-1-claude-seleccion.pdf",
+          },
+        ],
       },
       {
         title: "Módulo 2",
         items: ["Análisis de CVs con el prompt maestro"],
         recordingVideoId: "DEai1Icm7AM",
+        materials: [
+          {
+            title: "Kit Módulo 2 — Análisis de CVs",
+            url: "/downloads/kit-modulo-2-claude-seleccion.pdf",
+          },
+          {
+            title: "Descripción del puesto (caso)",
+            url: "/downloads/descripcion-puesto-vendedor-salon.pdf",
+          },
+          {
+            title: "CV Facundo García (caso)",
+            url: "/downloads/cv-facundo-garcia.pdf",
+          },
+          {
+            title: "CV Lucía Martínez (caso)",
+            url: "/downloads/cv-lucia-martinez.pdf",
+          },
+          {
+            title: "CV Roberto Sánchez (caso)",
+            url: "/downloads/cv-roberto-sanchez.pdf",
+          },
+        ],
       },
       {
         title: "Módulo 3",
         items: ["Preguntas STAR y guías de entrevista"],
         recordingVideoId: "m-Vqeg2qSB4",
+        materials: [
+          {
+            title: "Kit Módulo 3 — Entrevistas STAR",
+            url: "/downloads/kit-modulo-3-claude-seleccion.pdf",
+          },
+        ],
       },
-      { title: "Módulo 4", items: ["Comparar candidatos y armar la terna"] },
-      { title: "Módulo 5", items: ["Informes ejecutivos y comunicación con el cliente"] },
-      { title: "Módulo 6", items: ["Armar tu propio Proyecto de Claude para no repetir el prompt cada vez"] },
+      {
+        title: "Módulo 4",
+        items: ["Comparar candidatos y armar la terna"],
+        recordingVideoId: "LSw4MtYmXI4",
+        materials: [
+          {
+            title: "Kit Módulo 4 — Comparar y armar la Terna",
+            url: "/downloads/kit-modulo-4-claude-seleccion.pdf",
+          },
+          {
+            title: "CV Valentina Torres (caso)",
+            url: "/downloads/cv-valentina-torres.pdf",
+          },
+          {
+            title: "CV Martín Ibarra (caso)",
+            url: "/downloads/cv-martin-ibarra.pdf",
+          },
+        ],
+      },
+      {
+        title: "Módulo 5",
+        items: ["Informes ejecutivos y comunicación con el cliente"],
+        recordingVideoId: "BOeJRAPkhWw",
+        materials: [
+          {
+            title: "Kit Módulo 5 — Informes Ejecutivos",
+            url: "/downloads/kit-modulo-5-claude-seleccion.pdf",
+          },
+          {
+            title: "Notas de entrevista — Facundo García",
+            url: "/downloads/notas-entrevista-facundo-garcia.pdf",
+          },
+          {
+            title: "Notas de entrevista — Martín Ibarra",
+            url: "/downloads/notas-entrevista-martin-ibarra.pdf",
+          },
+          {
+            title: "Notas de entrevista — Lucía Martínez",
+            url: "/downloads/notas-entrevista-lucia-martinez.pdf",
+          },
+        ],
+      },
+      {
+        title: "Módulo 6",
+        items: ["Armar tu propio Proyecto de Claude para no repetir el prompt cada vez"],
+        recordingVideoId: "paa2PaednSY",
+        materials: [
+          {
+            title: "Kit Módulo 6 — Proyecto de Claude",
+            url: "/downloads/kit-modulo-6-claude-seleccion.pdf",
+          },
+        ],
+      },
+      {
+        title: "Módulo Bonus",
+        items: ["Atracción de talento: antes de que lleguen los CVs"],
+        recordingVideoId: "ULEoHMV70_8",
+        materials: [
+          {
+            title: "Kit Módulo Bonus — Atracción de Talento",
+            url: "/downloads/kit-bonus-atraccion-talento.pdf",
+          },
+        ],
+      },
     ],
     price: "Próximamente",
     comingSoon: true,
