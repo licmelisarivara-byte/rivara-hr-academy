@@ -53,7 +53,7 @@ export async function GET(
       evento: CERTIFICADO_CLAUDE_SELECCION,
       duracion: "Duración: 7 módulos grabados (~2.5 horas)",
       descripcion: (evento: typeof CERTIFICADO_CLAUDE_SELECCION) =>
-        `Por completar el curso grabado "${evento.titulo}", dictado por RIVARA HR Academy.`,
+        `Por completar el curso "${evento.titulo}", dictado por RIVARA HR Academy.`,
       fechaLabel: "Modalidad",
     },
     masterclass: {
