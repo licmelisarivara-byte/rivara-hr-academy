@@ -1,0 +1,165 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+
+declare global {
+  interface Window {
+    YT: any;
+    onYouTubeIframeAPIReady?: () => void;
+  }
+}
+
+// Se carga una sola vez para toda la página, sin importar cuántos
+// ModuleVideoPlayer con triggersCertificate haya montados.
+let apiLoadingPromise: Promise<void> | null = null;
+
+function loadYouTubeApi(): Promise<void> {
+  if (typeof window === "undefined") return Promise.resolve();
+  if (window.YT?.Player) return Promise.resolve();
+  if (apiLoadingPromise) return apiLoadingPromise;
+
+  apiLoadingPromise = new Promise((resolve) => {
+    const previous = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => {
+      previous?.();
+      resolve();
+    };
+    const script = document.createElement("script");
+    script.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(script);
+  });
+  return apiLoadingPromise;
+}
+
+type Props = {
+  title: string;
+  videoId: string;
+  startSeconds?: number;
+  // Si está en true, al terminar este video se genera solo el certificado
+  // del curso (ver lib/courses.ts) usando el mail/nombre de la sesión.
+  triggersCertificate?: boolean;
+  certificadoTipo?: string;
+  certificadoUrl?: string;
+  userEmail?: string | null;
+  userName?: string | null;
+};
+
+type CertState =
+  | { paso: "idle" }
+  | { paso: "generando" }
+  | { paso: "listo"; id: string; nombre: string }
+  | { paso: "error" };
+
+export default function ModuleVideoPlayer({
+  title,
+  videoId,
+  startSeconds,
+  triggersCertificate,
+  certificadoTipo,
+  certificadoUrl,
+  userEmail,
+  userName,
+}: Props) {
+  const iframeId = `yt-player-${videoId}`;
+  const yaDisparado = useRef(false);
+  const [cert, setCert] = useState<CertState>({ paso: "idle" });
+
+  useEffect(() => {
+    if (!triggersCertificate || !userEmail || !certificadoTipo) return;
+    let cancelado = false;
+
+    loadYouTubeApi().then(() => {
+      if (cancelado) return;
+      new window.YT.Player(iframeId, {
+        events: {
+          onStateChange: (e: any) => {
+            if (e.data === window.YT.PlayerState.ENDED && !yaDisparado.current) {
+              yaDisparado.current = true;
+              generarCertificado();
+            }
+          },
+        },
+      });
+    });
+
+    return () => {
+      cancelado = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [triggersCertificate, userEmail, certificadoTipo]);
+
+  async function generarCertificado() {
+    if (!userEmail || !certificadoTipo) return;
+    setCert({ paso: "generando" });
+    const nombre = (userName || userEmail.split("@")[0])
+      .toLowerCase()
+      .replace(/(^|\s)\S/g, (c) => c.toUpperCase());
+    try {
+      const res = await fetch("/api/certificado", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nombre, email: userEmail, tipo: certificadoTipo }),
+      });
+      const data = await res.json();
+      if (res.ok && data.correcta) {
+        setCert({ paso: "listo", id: data.id, nombre });
+      } else {
+        setCert({ paso: "error" });
+      }
+    } catch {
+      setCert({ paso: "error" });
+    }
+  }
+
+  return (
+    <div>
+      <div className="aspect-video rounded-lg overflow-hidden">
+        <iframe
+          id={iframeId}
+          className="w-full h-full"
+          src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1${
+            startSeconds ? `&start=${startSeconds}` : ""
+          }`}
+          title={title}
+          allowFullScreen
+        />
+      </div>
+
+      {cert.paso === "generando" && (
+        <p className="text-xs text-bone/50 mt-3">Generando tu certificado…</p>
+      )}
+
+      {cert.paso === "listo" && (
+        <div className="card-alt rounded-xl p-5 mt-4 border border-sage/40 text-center">
+          <p className="text-sm text-bone/80 mb-3">
+            🎉 ¡Terminaste el curso, {cert.nombre.split(" ")[0]}! Ya generamos tu certificado.
+          </p>
+          <div className="rounded-lg overflow-hidden border border-black/10 mb-4 max-w-md mx-auto">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`/api/certificado/imagen/${cert.id}`}
+              alt={`Certificado de participación de ${cert.nombre}`}
+              className="w-full h-auto"
+            />
+          </div>
+          <a
+            href={`/api/certificado/imagen/${cert.id}`}
+            download
+            className="btn-cta bg-magenta text-white px-5 py-2.5 rounded-full hover:bg-magentaSoft transition-colors inline-block text-sm"
+          >
+            Descargar mi certificado
+          </a>
+        </div>
+      )}
+
+      {cert.paso === "error" && certificadoUrl && (
+        <p className="text-xs text-bone/50 mt-3">
+          No pudimos generar tu certificado automáticamente.{" "}
+          <a href={certificadoUrl} className="text-magenta hover:underline">
+            Pedilo acá →
+          </a>
+        </p>
+      )}
+    </div>
+  );
+}

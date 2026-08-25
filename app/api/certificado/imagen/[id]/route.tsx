@@ -1,7 +1,11 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 import { supabaseAdmin, supabaseAdminConfigured } from "@/lib/supabaseAdmin";
-import { CERTIFICADO_EVENTO, CERTIFICADO_CURSO_BOT_ATS } from "@/lib/certificado";
+import {
+  CERTIFICADO_EVENTO,
+  CERTIFICADO_CURSO_BOT_ATS,
+  CERTIFICADO_CLAUDE_SELECCION,
+} from "@/lib/certificado";
 import { loadGoogleFont } from "@/lib/googleFont";
 
 export const runtime = "nodejs";
@@ -35,8 +39,35 @@ export async function GET(
     return new Response("not_found", { status: 404 });
   }
 
-  const esCurso = data.tipo === "curso-bot-ats";
-  const evento = esCurso ? CERTIFICADO_CURSO_BOT_ATS : CERTIFICADO_EVENTO;
+  // Plantilla de textos por tipo de certificado — cada uno con su propio
+  // evento, duración, descripción y etiqueta de fecha/modalidad.
+  const plantillas = {
+    "curso-bot-ats": {
+      evento: CERTIFICADO_CURSO_BOT_ATS,
+      duracion: "Duración: 2 clases en vivo de 90 minutos",
+      descripcion: (evento: typeof CERTIFICADO_CURSO_BOT_ATS) =>
+        `Por completar el curso en vivo "${evento.titulo}" (2 clases), dictado los días ${evento.fecha} por RIVARA HR Academy.`,
+      fechaLabel: "Fechas del curso",
+    },
+    "claude-seleccion": {
+      evento: CERTIFICADO_CLAUDE_SELECCION,
+      duracion: "Duración: 7 módulos grabados (~2.5 horas)",
+      descripcion: (evento: typeof CERTIFICADO_CLAUDE_SELECCION) =>
+        `Por completar el curso grabado "${evento.titulo}", dictado por RIVARA HR Academy.`,
+      fechaLabel: "Modalidad",
+    },
+    masterclass: {
+      evento: CERTIFICADO_EVENTO,
+      duracion: "Duración: 60 minutos en vivo",
+      descripcion: (evento: typeof CERTIFICADO_EVENTO) =>
+        `Por su participación activa en la masterclass en vivo "${evento.titulo.split("— ")[1] ?? evento.titulo}", dictada el ${evento.fecha} por RIVARA HR Academy.`,
+      fechaLabel: "Fecha de la masterclass",
+    },
+  } as const;
+
+  const plantilla =
+    plantillas[data.tipo as keyof typeof plantillas] ?? plantillas.masterclass;
+  const evento = plantilla.evento;
   // Se capitaliza cada palabra sin importar cómo la haya tipeado quien pide
   // el certificado (ej: "melisa rivara" -> "Melisa Rivara").
   const nombre = String(data.nombre)
@@ -151,7 +182,7 @@ export async function GET(
           </div>
 
           <div style={{ marginTop: 10, fontSize: 17, fontWeight: 700, color: "#FFFFFF" }}>
-            {esCurso ? "Duración: 2 clases en vivo de 90 minutos" : "Duración: 60 minutos en vivo"}
+            {plantilla.duracion}
           </div>
 
           <div style={{ marginTop: 40, fontSize: 20, color: "rgba(247,244,238,0.55)" }}>
@@ -184,9 +215,7 @@ export async function GET(
               maxWidth: 1180,
             }}
           >
-            {esCurso
-              ? `Por completar el curso en vivo "${evento.titulo}" (2 clases), dictado los días ${evento.fecha} por RIVARA HR Academy.`
-              : `Por su participación activa en la masterclass en vivo "${evento.titulo.split("— ")[1] ?? evento.titulo}", dictada el ${evento.fecha} por RIVARA HR Academy.`}
+            {plantilla.descripcion(evento as never)}
           </div>
 
           {/* Firma + fecha */}
@@ -247,7 +276,7 @@ export async function GET(
                 {evento.fechaCorta}
               </div>
               <div style={{ fontSize: 13, color: "rgba(247,244,238,0.55)" }}>
-                {esCurso ? "Fechas del curso" : "Fecha de la masterclass"}
+                {plantilla.fechaLabel}
               </div>
             </div>
           </div>

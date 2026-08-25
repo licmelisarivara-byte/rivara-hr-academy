@@ -8,6 +8,7 @@ import ConfigNotice from "@/components/ConfigNotice";
 import { courses } from "@/lib/courses";
 import { getPaidResourceBySlug, freeResources } from "@/lib/resources";
 import FreeResourceDownloadButton from "@/components/FreeResourceDownloadButton";
+import ModuleVideoPlayer from "@/components/ModuleVideoPlayer";
 
 type MyPurchase = {
   kind: "resource" | "course";
@@ -31,6 +32,7 @@ function DashboardContent() {
   const nextAfterVerify = searchParams.get("next");
   const [checking, setChecking] = useState(true);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
   const [purchases, setPurchases] = useState<MyPurchase[]>([]);
 
   useEffect(() => {
@@ -50,6 +52,7 @@ function DashboardContent() {
     }
     supabase.auth.getSession().then(async ({ data }) => {
       setUserEmail(data.session?.user.email ?? null);
+      setUserName(data.session?.user.user_metadata?.full_name ?? null);
       setChecking(false);
 
       const token = data.session?.access_token;
@@ -219,16 +222,16 @@ function DashboardContent() {
                     <div key={m.title}>
                       <p className="text-xs text-bone/50 mb-2">{m.title}</p>
                       {m.recordingVideoId ? (
-                        <div className="aspect-video rounded-lg overflow-hidden">
-                          <iframe
-                            className="w-full h-full"
-                            src={`https://www.youtube.com/embed/${m.recordingVideoId}${
-                              m.recordingStartSeconds ? `?start=${m.recordingStartSeconds}` : ""
-                            }`}
-                            title={m.title}
-                            allowFullScreen
-                          />
-                        </div>
+                        <ModuleVideoPlayer
+                          title={m.title}
+                          videoId={m.recordingVideoId}
+                          startSeconds={m.recordingStartSeconds}
+                          triggersCertificate={m.triggersCertificate}
+                          certificadoTipo={c.certificadoTipo}
+                          certificadoUrl={c.certificadoUrl}
+                          userEmail={userEmail}
+                          userName={userName}
+                        />
                       ) : (
                         <p className="text-xs text-bone/40">
                           Grabación disponible después de esta clase.

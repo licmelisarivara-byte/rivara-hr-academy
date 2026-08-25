@@ -16,6 +16,7 @@ export type Course = {
     recordingVideoId?: string; // YouTube ID no listado de la grabación de esa clase, se completa después de dictarla
     recordingStartSeconds?: number; // si el módulo arranca a mitad de un video compartido con otro módulo (ej: el cierre del módulo anterior queda al principio)
     materials?: { title: string; url: string }[]; // PDFs y otros materiales de ESTA clase puntual, se muestran debajo de su video en el dashboard
+    triggersCertificate?: boolean; // al terminar este video se genera el certificado del curso automáticamente (ver components/ModuleVideoPlayer.tsx)
   }[];
   image?: string; // portada en /public/images
   outcomes?: string[];
@@ -39,6 +40,7 @@ export type Course = {
   meetLink?: string; // link de Google Meet del curso en vivo, se muestra solo a quien ya se inscribió
   checklistUrl?: string; // checklist final del curso, se muestra debajo de todos los módulos
   certificadoUrl?: string; // página para pedir el certificado de este curso, se muestra en el dashboard
+  certificadoTipo?: string; // "tipo" que se manda a /api/certificado (curso-bot-ats, claude-seleccion, etc.)
   whatsappGroupLink?: string; // link de invitación al grupo de WhatsApp del curso
 };
 
@@ -161,6 +163,7 @@ export const courses: Course[] = [
     checklistUrl:
       "https://noble-shawl-f26.notion.site/Tu-checklist-para-armar-tu-asistente-de-selecci-n-3ae5c6b67016816ead9ad4c5fb17d5a6",
     certificadoUrl: "/cursos/de-cero-a-tu-asistente/certificado",
+    certificadoTipo: "curso-bot-ats",
   },
   {
     slug: "claude-para-seleccion",
@@ -272,6 +275,7 @@ export const courses: Course[] = [
         title: "Módulo 6",
         items: ["Armar tu propio Proyecto de Claude para no repetir el prompt cada vez"],
         recordingVideoId: "paa2PaednSY",
+        triggersCertificate: true,
         materials: [
           {
             title: "Kit Módulo 6 — Proyecto de Claude",
@@ -293,6 +297,8 @@ export const courses: Course[] = [
     ],
     price: "Próximamente",
     comingSoon: true,
+    certificadoUrl: "/cursos/claude-para-seleccion/certificado",
+    certificadoTipo: "claude-seleccion",
   },
 ];
 

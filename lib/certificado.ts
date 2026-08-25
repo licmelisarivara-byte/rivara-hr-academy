@@ -36,6 +36,18 @@ export const CERTIFICADO_CURSO_BOT_ATS = {
   resourceSlug: "de-cero-a-tu-asistente",
 };
 
+// Certificado del curso grabado "Claude para Selección". Es autoservicio (a
+// su ritmo, sin fecha fija), así que en vez de fechas se muestra la
+// modalidad. Se valida contra una compra aprobada, igual que el curso en
+// vivo, y además se dispara solo al terminar el video del Módulo 6 (ver
+// components/ModuleVideoPlayer.tsx).
+export const CERTIFICADO_CLAUDE_SELECCION = {
+  titulo: "Claude para Selección",
+  fecha: "curso grabado, a tu ritmo",
+  fechaCorta: "A TU RITMO",
+  resourceSlug: "claude-para-seleccion",
+};
+
 export function normalizarRespuesta(raw: string): string {
   return raw
     .trim()
