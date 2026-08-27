@@ -232,7 +232,7 @@ export const courses: Course[] = [
       {
         title: "Módulo 4",
         items: ["Comparar candidatos y armar la terna"],
-        recordingVideoId: "LSw4MtYmXI4",
+        recordingVideoId: "QCExLmdFLjY",
         materials: [
           {
             title: "Kit Módulo 4 — Comparar y armar la Terna",
@@ -251,7 +251,7 @@ export const courses: Course[] = [
       {
         title: "Módulo 5",
         items: ["Informes ejecutivos y comunicación con el cliente"],
-        recordingVideoId: "BOeJRAPkhWw",
+        recordingVideoId: "RyRDNLEcarg",
         materials: [
           {
             title: "Kit Módulo 5 — Informes Ejecutivos",
@@ -274,7 +274,7 @@ export const courses: Course[] = [
       {
         title: "Módulo 6",
         items: ["Armar tu propio Proyecto de Claude para no repetir el prompt cada vez"],
-        recordingVideoId: "paa2PaednSY",
+        recordingVideoId: "wB0W6jSYvR8",
         triggersCertificate: true,
         materials: [
           {
@@ -286,7 +286,7 @@ export const courses: Course[] = [
       {
         title: "Módulo Bonus",
         items: ["Atracción de talento: antes de que lleguen los CVs"],
-        recordingVideoId: "ULEoHMV70_8",
+        recordingVideoId: "fvOezdtGWCo",
         materials: [
           {
             title: "Kit Módulo Bonus — Atracción de Talento",
