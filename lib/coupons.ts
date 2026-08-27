@@ -1,6 +1,14 @@
 // Cupones de descuento para cursos. La validación real (nunca confiar en lo
 // que mande el cliente) se hace siempre server-side, en /api/checkout y
 // /api/manual-purchase.
+//
+// ⚠️ Este archivo (con la lista completa de códigos) NUNCA se tiene que
+// importar desde un componente "use client" — quedaría embebido tal cual
+// en el bundle de JS del navegador y cualquiera podría leer los códigos
+// inspeccionando la página. El frontend valida cupones a través de
+// /api/coupon (ver esa ruta), que solo revela si el código es válido y
+// su % — nunca la lista completa. Para aplicar el descuento en el
+// cliente una vez ya conocido el %, usar lib/discount.ts en su lugar.
 export type Coupon = {
   code: string;
   percentOff: number;
@@ -54,9 +62,4 @@ export function getCoupon(
   if (coupon.activeUntil && now > new Date(coupon.activeUntil).getTime()) return null;
   if (coupon.courses && (!courseSlug || !coupon.courses.includes(courseSlug))) return null;
   return coupon;
-}
-
-export function applyDiscount(amount: number, coupon: Coupon | null): number {
-  if (!coupon) return amount;
-  return Math.round(amount * (1 - coupon.percentOff / 100));
 }

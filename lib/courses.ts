@@ -307,8 +307,7 @@ export const courses: Course[] = [
     price: "$70.000 ARS",
     priceARS: 70000,
     priceUSDRegular: 50,
-    priceNote:
-      "$70.000 ARS por transferencia o Mercado Pago · USD 50 por Payoneer · Cupón CLAUDE25: 25% off por transferencia o Payoneer, válido 7 días",
+    priceNote: "$70.000 ARS por transferencia o Mercado Pago · USD 50 por Payoneer",
     bankDetails,
     payoneerLink: "https://link.payoneer.com/Token?t=55DF705DCE7144E59B7DAB4C198ACDB1&src=tpl",
     faqs: [

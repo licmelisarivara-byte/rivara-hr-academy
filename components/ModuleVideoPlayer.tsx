@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { markVideoCompleted } from "@/lib/progress";
 
 declare global {
   interface Window {
@@ -42,6 +43,10 @@ type Props = {
   certificadoUrl?: string;
   userEmail?: string | null;
   userName?: string | null;
+  // Se llama al terminar el video, para que el dashboard actualice el
+  // indicador de progreso ("X de Y módulos completados") sin esperar a un
+  // reload — ver app/(academy)/dashboard/page.tsx.
+  onComplete?: (videoId: string) => void;
 };
 
 type CertState =
@@ -59,13 +64,17 @@ export default function ModuleVideoPlayer({
   certificadoUrl,
   userEmail,
   userName,
+  onComplete,
 }: Props) {
   const iframeId = `yt-player-${videoId}`;
-  const yaDisparado = useRef(false);
+  const yaTerminado = useRef(false);
   const [cert, setCert] = useState<CertState>({ paso: "idle" });
 
+  // El listener de "video terminado" corre para TODOS los módulos (no
+  // solo el que dispara el certificado): sirve para marcar el progreso de
+  // cada uno en el dashboard. El certificado automático solo se dispara
+  // además, puntualmente, cuando triggersCertificate está en true.
   useEffect(() => {
-    if (!triggersCertificate || !userEmail || !certificadoTipo) return;
     let cancelado = false;
 
     loadYouTubeApi().then(() => {
@@ -73,9 +82,13 @@ export default function ModuleVideoPlayer({
       new window.YT.Player(iframeId, {
         events: {
           onStateChange: (e: any) => {
-            if (e.data === window.YT.PlayerState.ENDED && !yaDisparado.current) {
-              yaDisparado.current = true;
-              generarCertificado();
+            if (e.data === window.YT.PlayerState.ENDED && !yaTerminado.current) {
+              yaTerminado.current = true;
+              markVideoCompleted(videoId);
+              onComplete?.(videoId);
+              if (triggersCertificate && userEmail && certificadoTipo) {
+                generarCertificado();
+              }
             }
           },
         },
@@ -86,7 +99,7 @@ export default function ModuleVideoPlayer({
       cancelado = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [triggersCertificate, userEmail, certificadoTipo]);
+  }, [videoId, triggersCertificate, userEmail, certificadoTipo]);
 
   async function generarCertificado() {
     if (!userEmail || !certificadoTipo) return;

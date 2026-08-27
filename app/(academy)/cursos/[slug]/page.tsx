@@ -17,6 +17,17 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   };
 }
 
+// Ancla estable por módulo, para el menú "Ir a:" de abajo — sin acentos
+// ni espacios, así funciona como #id de HTML.
+function moduleAnchor(title: string): string {
+  return title
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
 export default function CourseDetailPage({ params }: { params: { slug: string } }) {
   const course = getCourseBySlug(params.slug);
   if (!course) return notFound();
@@ -59,6 +70,20 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
       <p className="eyebrow mb-4">{course.format}</p>
       <h1 className="font-display text-3xl sm:text-4xl text-bone mb-4">{course.title}</h1>
       <p className="text-bone/70 text-lg mb-8">{course.description}</p>
+
+      {course.modules.length > 3 && (
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-bone/50 mb-8">
+          <span>Ir a:</span>
+          {course.modules.map((m, i) => (
+            <span key={m.title}>
+              <a href={`#${moduleAnchor(m.title)}`} className="text-magenta hover:underline">
+                {m.title}
+              </a>
+              {i < course.modules.length - 1 && <span className="text-bone/30"> ·</span>}
+            </span>
+          ))}
+        </div>
+      )}
 
       {course.schedule && (
         <div className="detail-text card rounded-xl p-4 mb-8">
@@ -104,7 +129,11 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
       <h2 className="font-display text-2xl text-bone mb-6">Contenido</h2>
       <div className="space-y-6 mb-10">
         {course.modules.map((m) => (
-          <div key={m.title} className="card-alt rounded-xl p-6">
+          <div
+            key={m.title}
+            id={moduleAnchor(m.title)}
+            className="card-alt rounded-xl p-6 scroll-mt-24"
+          >
             <h3 className="font-semibold text-bone mb-3">{m.title}</h3>
             <ul className="space-y-1.5 text-sm text-bone/70 list-disc list-inside">
               {m.items.map((it) => (

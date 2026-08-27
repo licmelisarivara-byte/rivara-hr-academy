@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCourseBySlug, getTransferenciaAmountARS, getPayoneerAmountUSD } from "@/lib/courses";
 import { getPaidResourceBySlug } from "@/lib/resources";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { getCoupon, applyDiscount } from "@/lib/coupons";
+import { getCoupon } from "@/lib/coupons";
+import { applyDiscount } from "@/lib/discount";
 
 // Registra la intención de compra (curso o recurso pago) por un método
 // MANUAL (transferencia o Payoneer): no hay preferencia de Mercado Pago ni
@@ -38,8 +39,8 @@ export async function POST(req: NextRequest) {
     const course = item as ReturnType<typeof getCourseBySlug>;
     amount =
       method === "payoneer"
-        ? applyDiscount(getPayoneerAmountUSD(course!), coupon)
-        : applyDiscount(getTransferenciaAmountARS(course!), coupon);
+        ? applyDiscount(getPayoneerAmountUSD(course!), coupon?.percentOff)
+        : applyDiscount(getTransferenciaAmountARS(course!), coupon?.percentOff);
   } else {
     const resource = item as ReturnType<typeof getPaidResourceBySlug>;
     amount = method === "payoneer" ? resource!.priceUSD : resource!.priceARS;

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import CheckoutButton from "@/components/CheckoutButton";
-import { getCoupon, applyDiscount } from "@/lib/coupons";
+import { applyDiscount } from "@/lib/discount";
 import {
   getTransferenciaAmountARS,
   getPayoneerAmountUSD,
@@ -13,6 +13,7 @@ import {
 
 type Method = "" | "transferencia" | "mercadopago" | "payoneer";
 type Buyer = { email: string; phone: string };
+type AppliedCoupon = { code: string; percentOff: number };
 
 // Orden pensado para no perder gente en el camino: primero elige CÓMO
 // quiere pagar (con los precios ya a la vista), recién ahí deja su mail —
@@ -26,7 +27,49 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
 
   const [method, setMethod] = useState<Method>("");
   const [couponInput, setCouponInput] = useState("");
-  const appliedCoupon = getCoupon(couponInput, course.slug);
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
+  const [couponInvalid, setCouponInvalid] = useState(false);
+
+  // El código y el % de descuento nunca viajan en el bundle de JS (no se
+  // importa lib/coupons acá) — se valida contra /api/coupon, que solo
+  // contesta si ESE código puntual es válido, sin revelar la lista.
+  useEffect(() => {
+    const code = couponInput.trim();
+    if (!code) {
+      setAppliedCoupon(null);
+      setCouponInvalid(false);
+      return;
+    }
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      fetch("/api/coupon", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, courseSlug: course.slug }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (cancelled) return;
+          if (data.valid) {
+            setAppliedCoupon({ code: data.code, percentOff: data.percentOff });
+            setCouponInvalid(false);
+          } else {
+            setAppliedCoupon(null);
+            setCouponInvalid(true);
+          }
+        })
+        .catch(() => {
+          if (!cancelled) {
+            setAppliedCoupon(null);
+            setCouponInvalid(true);
+          }
+        });
+    }, 400);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [couponInput, course.slug]);
 
   const [contactSubmitted, setContactSubmitted] = useState(false);
   const [formEmail, setFormEmail] = useState("");
@@ -63,7 +106,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
         method,
         buyerEmail: buyer.email,
         buyerPhone: buyer.phone,
-        couponCode: method === "transferencia" ? appliedCoupon?.code : undefined,
+        couponCode: appliedCoupon?.code,
       }),
     }).catch(() => {
       // No bloqueamos la UI si esto falla; Melisa igual recibe el WhatsApp/mail.
@@ -110,8 +153,8 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
 
   // El cupón aplica pagando por transferencia o Payoneer por igual —
   // Mercado Pago sigue siempre a precio de lista, sin descuento.
-  const transferenciaARS = applyDiscount(getTransferenciaAmountARS(course), appliedCoupon);
-  const payoneerUSD = applyDiscount(getPayoneerAmountUSD(course), appliedCoupon);
+  const transferenciaARS = applyDiscount(getTransferenciaAmountARS(course), appliedCoupon?.percentOff);
+  const payoneerUSD = applyDiscount(getPayoneerAmountUSD(course), appliedCoupon?.percentOff);
 
   function handleContactSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -147,7 +190,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
           placeholder="Código de descuento (opcional)"
           className="w-full rounded-lg bg-panel border border-black/10 px-4 py-2.5 text-bone focus:border-magenta outline-none"
         />
-        {couponInput && (
+        {couponInput && (appliedCoupon || couponInvalid) && (
           <p className={`text-xs mt-1 ${appliedCoupon ? "text-sage" : "text-magenta"}`}>
             {appliedCoupon
               ? `✅ Cupón aplicado: ${appliedCoupon.percentOff}% off pagando por transferencia o Payoneer`
