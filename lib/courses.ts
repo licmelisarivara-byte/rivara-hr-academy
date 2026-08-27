@@ -50,7 +50,7 @@ export const courses: Course[] = [
   {
     slug: "de-cero-a-tu-asistente",
     title: "Creá tu propio Bot de Selección + ATS con IA",
-    format: "En vivo",
+    format: "Grabado",
     image: "/images/covers/curso-bot-seleccion.png",
     tagline:
       "En 2 clases en vivo armás tu asistente de selección con IA y publicás tu propio ATS, sin perfil técnico.",

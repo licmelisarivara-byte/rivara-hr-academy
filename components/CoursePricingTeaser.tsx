@@ -36,7 +36,9 @@ export default function CoursePricingTeaser({ course }: { course: Course }) {
           </div>
         </>
       ) : (
-        <div className="detail-text mb-6">Transferencia, Payoneer o Mercado Pago</div>
+        <div className="detail-text mb-6">
+          Transferencia{course.payoneerLink ? ", Payoneer" : ""} o Mercado Pago
+        </div>
       )}
       <Link
         href={`/cursos/${course.slug}`}

@@ -18,8 +18,11 @@ export default function CursosPage() {
         {courses.map((c) => {
           // Precio ya resuelto contra la fecha de hoy (nunca el campo
           // estático `price`, que queda desactualizado apenas termina el
-          // early bird — ver comentario de getCoursePriceSummary).
-          const precioMostrado = c.priceARS
+          // early bird — ver comentario de getCoursePriceSummary). Si el
+          // curso es comingSoon, siempre mostramos `price` ("Próximamente")
+          // aunque tenga priceARS cargado (queda ahí para cuando se
+          // reactive la venta, o por alumnas ya inscriptas).
+          const precioMostrado = !c.comingSoon && c.priceARS
             ? `$${getCoursePriceSummary(c).transferenciaARS.toLocaleString("es-AR")} ARS`
             : c.price;
           return (

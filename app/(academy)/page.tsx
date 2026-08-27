@@ -11,7 +11,7 @@ function formatARS(n: number) {
   return `$${n.toLocaleString("es-AR")}`;
 }
 
-const featuredCourse = getCourseBySlug("de-cero-a-tu-asistente")!;
+const featuredCourse = getCourseBySlug("claude-para-seleccion")!;
 
 export default function Home() {
   return (
@@ -97,25 +97,22 @@ export default function Home() {
         </Link>
       </section>
 
-      {/* CURSOS EN VIVO */}
+      {/* CURSO DESTACADO */}
       <section id="cursos-en-vivo" className="max-w-6xl mx-auto px-6 py-28">
-        <p className="eyebrow mb-3">📚 Cursos en vivo</p>
+        <p className="eyebrow mb-3">📚 Curso destacado</p>
         <h2 className="font-display text-2xl sm:text-3xl text-bone mb-10">
-          Aprendé en vivo, con casos reales
+          Aprendé con Claude, a tu ritmo
         </h2>
 
         <div className="card rounded-2xl p-8 sm:p-10 grid md:grid-cols-[1.3fr_1fr] gap-8 items-center">
           <div>
-            <span className="eyebrow">En vivo</span>
+            <span className="eyebrow">{featuredCourse.format}</span>
             <h3 className="font-display text-2xl sm:text-3xl text-bone mt-3 mb-4">
-              Creá tu propio Bot de Selección + ATS con IA
+              {featuredCourse.title}
             </h3>
-            <p className="text-bone/70 text-lg mb-6">
-              En 2 clases en vivo armás tu asistente de selección con IA y
-              publicás tu propio ATS, sin perfil técnico.
-            </p>
+            <p className="text-bone/70 text-lg mb-6">{featuredCourse.tagline}</p>
             <div className="detail-text flex flex-col gap-2 mb-2">
-              <span>📅 Martes 11 y martes 18 de agosto · 17 a 18:30 hs (ARG)</span>
+              <span>🎥 7 módulos grabados · A tu ritmo</span>
             </div>
           </div>
 
