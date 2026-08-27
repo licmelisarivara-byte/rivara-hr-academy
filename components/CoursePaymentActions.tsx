@@ -26,7 +26,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
 
   const [method, setMethod] = useState<Method>("");
   const [couponInput, setCouponInput] = useState("");
-  const appliedCoupon = getCoupon(couponInput);
+  const appliedCoupon = getCoupon(couponInput, course.slug);
 
   const [contactSubmitted, setContactSubmitted] = useState(false);
   const [formEmail, setFormEmail] = useState("");
@@ -108,10 +108,10 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
     );
   }
 
-  // El cupón DESCARGA5 solo aplica pagando por transferencia — Mercado
-  // Pago y Payoneer usan links fijos que no reflejan el descuento.
+  // El cupón aplica pagando por transferencia o Payoneer por igual —
+  // Mercado Pago sigue siempre a precio de lista, sin descuento.
   const transferenciaARS = applyDiscount(getTransferenciaAmountARS(course), appliedCoupon);
-  const payoneerUSD = getPayoneerAmountUSD(course);
+  const payoneerUSD = applyDiscount(getPayoneerAmountUSD(course), appliedCoupon);
 
   function handleContactSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -125,10 +125,9 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
       payment_method: m,
     });
     const label = m === "transferencia" ? "Transferencia bancaria" : "Payoneer";
-    const couponLine =
-      m === "transferencia" && appliedCoupon
-        ? `\n🎟️ Cupón: ${appliedCoupon.code} (${appliedCoupon.percentOff}% off)`
-        : "";
+    const couponLine = appliedCoupon
+      ? `\n🎟️ Cupón: ${appliedCoupon.code} (${appliedCoupon.percentOff}% off)`
+      : "";
     const phoneLine = buyer?.phone ? `\n📱 Celular: ${buyer.phone}` : "";
     const message = encodeURIComponent(
       `Hola Melisa 👋\n\nQuiero inscribirme al curso "${course.title}" de RIVARA HR Academy.\n\n📧 Email: ${buyer?.email}${phoneLine}\n💳 Forma de pago: ${label}${couponLine}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
@@ -151,7 +150,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
         {couponInput && (
           <p className={`text-xs mt-1 ${appliedCoupon ? "text-sage" : "text-magenta"}`}>
             {appliedCoupon
-              ? `✅ Cupón aplicado: ${appliedCoupon.percentOff}% off pagando por transferencia`
+              ? `✅ Cupón aplicado: ${appliedCoupon.percentOff}% off pagando por transferencia o Payoneer`
               : "Ese cupón no es válido."}
           </p>
         )}

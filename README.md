@@ -57,8 +57,9 @@ variables de entorno ya cargadas en Vercel.
 3. **Subir los videos de las clases** a YouTube/Vimeo como "no listado" y
    pegar el ID en `lib/courses.ts` (`freePreviewVideoId`) — hoy dice "Video
    no cargado todavía".
-4. El curso **"Claude para Selección"** sigue marcado `comingSoon`, no se
-   vende todavía.
+4. El curso **"Claude para Selección"** ya se vende ($70.000 ARS / USD 50,
+   cupón `CLAUDE25` 25% off por transferencia o Payoneer los primeros 7
+   días desde el lanzamiento — ver `lib/coupons.ts`).
 5. Campo cosmético `mp_preference_id` en `compras` no siempre se guarda
    (no afecta el funcionamiento, el matching real usa `external_reference`
    / `mp_payment_id`).

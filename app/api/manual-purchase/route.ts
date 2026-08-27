@@ -28,18 +28,17 @@ export async function POST(req: NextRequest) {
 
   // Monto real según el método (antes acá siempre se usaba el precio de
   // Mercado Pago sin descuento, aunque fuera transferencia o Payoneer en
-  // pleno early bird). El cupón DESCARGA5 solo aplica a cursos pagados por
-  // transferencia — Payoneer y Mercado Pago van con links fijos que Melisa
-  // tendría que recrear a mano para reflejar cualquier descuento, así que
-  // por ahora no se les aplica.
+  // pleno early bird). El cupón aplica a transferencia y Payoneer por igual
+  // — Mercado Pago sigue siempre sin descuento (link/preferencia a precio
+  // de lista), a propósito.
   const coupon =
-    kind === "course" && method === "transferencia" ? getCoupon(couponCode) : null;
+    kind === "course" ? getCoupon(couponCode, (item as ReturnType<typeof getCourseBySlug>)!.slug) : null;
   let amount: number;
   if (kind === "course") {
     const course = item as ReturnType<typeof getCourseBySlug>;
     amount =
       method === "payoneer"
-        ? getPayoneerAmountUSD(course!)
+        ? applyDiscount(getPayoneerAmountUSD(course!), coupon)
         : applyDiscount(getTransferenciaAmountARS(course!), coupon);
   } else {
     const resource = item as ReturnType<typeof getPaidResourceBySlug>;

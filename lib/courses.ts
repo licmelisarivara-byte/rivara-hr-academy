@@ -295,8 +295,35 @@ export const courses: Course[] = [
         ],
       },
     ],
-    price: "Próximamente",
-    comingSoon: true,
+    outcomes: [
+      "Prompts maestros para analizar CVs, armar preguntas STAR y comparar candidatos",
+      "Tu propio Proyecto de Claude configurado, para no repetir el prompt cada vez",
+      "Informes ejecutivos automáticos para comunicar decisiones de selección",
+      "Estrategias de atracción de talento con IA, antes de recibir postulaciones",
+      "7 módulos grabados (~2.5 horas) para ver a tu ritmo, con acceso ilimitado",
+      "Certificado de finalización",
+    ],
+    price: "$70.000 ARS",
+    priceARS: 70000,
+    priceUSDRegular: 50,
+    priceNote:
+      "$70.000 ARS por transferencia o Mercado Pago · USD 50 por Payoneer · Cupón CLAUDE25: 25% off por transferencia o Payoneer, válido 7 días",
+    bankDetails,
+    payoneerLink: "https://link.payoneer.com/Token?t=55DF705DCE7144E59B7DAB4C198ACDB1&src=tpl",
+    faqs: [
+      {
+        q: "¿Necesito conocimientos técnicos?",
+        a: "No. Está pensado para recruiters y profesionales de RRHH sin perfil técnico.",
+      },
+      {
+        q: "¿El curso tiene fecha de vencimiento?",
+        a: "No. Es grabado y lo mirás a tu ritmo, con acceso permanente.",
+      },
+      {
+        q: "¿Qué pasa si tengo dudas mientras lo hago?",
+        a: "Podés escribirnos por WhatsApp en cualquier momento.",
+      },
+    ],
     certificadoUrl: "/cursos/claude-para-seleccion/certificado",
     certificadoTipo: "claude-seleccion",
   },
