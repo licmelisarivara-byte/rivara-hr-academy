@@ -162,6 +162,20 @@ export default function ModuleVideoPlayer({
           >
             Descargar mi certificado
           </a>
+
+          <div className="hairline my-4" />
+
+          <p className="text-xs text-bone/60 mb-2">
+            ¿Te sirvió el curso? Dejame tu reseña en Google 🙏
+          </p>
+          <a
+            href="https://maps.app.goo.gl/XEqBvBxA2DWxxUrZ8"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-cta bg-sage text-white px-4 py-2 rounded-full hover:opacity-90 transition-colors inline-block text-sm"
+          >
+            Dejar mi reseña →
+          </a>
         </div>
       )}
 

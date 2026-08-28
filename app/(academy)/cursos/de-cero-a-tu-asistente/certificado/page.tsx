@@ -92,6 +92,20 @@ export default function CertificadoCursoBotAtsPage() {
           >
             Seguinos en LinkedIn →
           </a>
+
+          <div className="hairline my-6" />
+
+          <p className="text-bone/70 mb-3">
+            ¿Te sirvió el curso? Dejame tu reseña en Google — me ayuda un montón a que más gente te encuentre 🙏
+          </p>
+          <a
+            href="https://maps.app.goo.gl/XEqBvBxA2DWxxUrZ8"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-cta bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors inline-block"
+          >
+            Dejar mi reseña en Google →
+          </a>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="card rounded-xl p-6 sm:p-8 space-y-4">
