@@ -37,6 +37,30 @@ function DashboardContent() {
   const [purchases, setPurchases] = useState<MyPurchase[]>([]);
   const [completedVideoIds, setCompletedVideoIds] = useState<Set<string>>(new Set());
   const [collapsedCourses, setCollapsedCourses] = useState<Set<string>>(new Set());
+  const [editingName, setEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState("");
+  const [savingName, setSavingName] = useState(false);
+
+  function startEditingName() {
+    setNameInput(userName || "");
+    setEditingName(true);
+  }
+
+  // Este nombre es el que se usa en el certificado (ver ModuleVideoPlayer
+  // y las páginas de certificado) — por eso conviene poder corregirlo acá
+  // sin depender de que haya quedado bien puesto en el registro.
+  async function saveName() {
+    if (!supabase) return;
+    const trimmed = nameInput.trim();
+    if (!trimmed) return;
+    setSavingName(true);
+    const { error } = await supabase.auth.updateUser({ data: { full_name: trimmed } });
+    setSavingName(false);
+    if (!error) {
+      setUserName(trimmed);
+      setEditingName(false);
+    }
+  }
 
   // El progreso vive en localStorage (por navegador, ver lib/progress.ts).
   // Se carga al entrar y se actualiza en vivo cuando termina un video,
@@ -310,7 +334,46 @@ function DashboardContent() {
       <meta name="robots" content="noindex, nofollow" />
       <p className="eyebrow mb-4">Mi cuenta</p>
       <h1 className="font-display text-3xl text-bone mb-2">Hola de nuevo</h1>
-      <p className="text-bone/50 mb-10">{userEmail}</p>
+      <p className="text-bone/50 mb-2">{userEmail}</p>
+
+      {editingName ? (
+        <div className="flex flex-wrap items-center gap-2 mb-10">
+          <input
+            value={nameInput}
+            onChange={(e) => setNameInput(e.target.value)}
+            placeholder="Tu nombre completo"
+            autoFocus
+            className="rounded-lg bg-panel border border-black/10 px-3 py-1.5 text-sm text-bone focus:border-magenta outline-none"
+          />
+          <button
+            type="button"
+            onClick={saveName}
+            disabled={savingName}
+            className="btn-cta bg-magenta text-white px-4 py-1.5 rounded-full text-sm hover:bg-magentaSoft transition-colors disabled:opacity-50"
+          >
+            {savingName ? "Guardando..." : "Guardar"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setEditingName(false)}
+            className="text-xs text-bone/50 hover:underline"
+          >
+            Cancelar
+          </button>
+        </div>
+      ) : (
+        <p className="text-sm text-bone/50 mb-10">
+          {userName ? `Nombre: ${userName}` : "Todavía no cargaste tu nombre"} ·{" "}
+          <button type="button" onClick={startEditingName} className="text-magenta hover:underline">
+            ✏️ Editar
+          </button>
+          {userName && (
+            <span className="block text-xs text-bone/40 mt-0.5">
+              (así aparece en tu certificado)
+            </span>
+          )}
+        </p>
+      )}
 
       {verified && (
         <div className="card-alt rounded-xl p-4 mb-10 border border-sage/40 text-sm text-bone/80">
