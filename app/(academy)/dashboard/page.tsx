@@ -36,6 +36,7 @@ function DashboardContent() {
   const [userName, setUserName] = useState<string | null>(null);
   const [purchases, setPurchases] = useState<MyPurchase[]>([]);
   const [completedVideoIds, setCompletedVideoIds] = useState<Set<string>>(new Set());
+  const [collapsedCourses, setCollapsedCourses] = useState<Set<string>>(new Set());
 
   // El progreso vive en localStorage (por navegador, ver lib/progress.ts).
   // Se carga al entrar y se actualiza en vivo cuando termina un video,
@@ -43,6 +44,35 @@ function DashboardContent() {
   useEffect(() => {
     setCompletedVideoIds(getCompletedVideoIds());
   }, []);
+
+  // Qué cursos dejó plegados la alumna (acordeón) — también en
+  // localStorage, así que si cerró "Creá tu propio asistente" para
+  // enfocarse en el otro, sigue cerrado la próxima vez que entra.
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem("rivara_cursos_colapsados");
+      if (raw) setCollapsedCourses(new Set(JSON.parse(raw)));
+    } catch {
+      // Si falla, arrancan todos expandidos — no es grave.
+    }
+  }, []);
+
+  function toggleCourseCollapsed(slug: string) {
+    setCollapsedCourses((prev) => {
+      const next = new Set(prev);
+      if (next.has(slug)) {
+        next.delete(slug);
+      } else {
+        next.add(slug);
+      }
+      try {
+        window.localStorage.setItem("rivara_cursos_colapsados", JSON.stringify([...next]));
+      } catch {
+        // No es grave si no se puede guardar — solo no persiste entre visitas.
+      }
+      return next;
+    });
+  }
 
   useEffect(() => {
     if (compra !== "exitosa") return;
@@ -122,21 +152,39 @@ function DashboardContent() {
       completedVideoIds.has(m.recordingVideoId!)
     ).length;
     const totalCount = trackableModules.length;
+    const isCollapsed = collapsedCourses.has(c.slug);
 
     return (
-      <div key={c.slug} className="card rounded-xl p-6">
-        <span className="eyebrow">{c.format}</span>
-        <p className="eyebrow mb-1 mt-1">¡Bienvenida al curso!</p>
-        <h3 className="font-semibold text-bone mb-2">{c.title}</h3>
-        {c.schedule && (
-          <p className="text-sm text-bone/60 mb-4">
-            📅 {c.format === "En vivo" ? "Próxima clase: " : ""}
-            {c.schedule}
-          </p>
-        )}
+      <div key={c.slug} className="card rounded-xl p-6 border-t-4 border-t-magenta">
+        <button
+          type="button"
+          onClick={() => toggleCourseCollapsed(c.slug)}
+          className="w-full text-left flex items-start justify-between gap-4"
+          aria-expanded={!isCollapsed}
+        >
+          <div className="flex-1">
+            <span className="eyebrow">{c.format}</span>
+            <p className="eyebrow mb-1 mt-1">¡Bienvenida al curso!</p>
+            <h3 className="font-semibold text-bone mb-2">{c.title}</h3>
+            {c.schedule && (
+              <p className="text-sm text-bone/60">
+                📅 {c.format === "En vivo" ? "Próxima clase: " : ""}
+                {c.schedule}
+              </p>
+            )}
+          </div>
+          <span
+            className={`text-bone/40 text-lg leading-none mt-1 transition-transform ${
+              isCollapsed ? "" : "rotate-180"
+            }`}
+            aria-hidden="true"
+          >
+            ▾
+          </span>
+        </button>
 
         {totalCount > 0 && (
-          <div className="mb-4">
+          <div className="mt-4">
             <p className="text-xs text-bone/50 mb-1.5">
               {completedCount} de {totalCount} módulos completados
             </p>
@@ -149,106 +197,110 @@ function DashboardContent() {
           </div>
         )}
 
-        {c.format === "En vivo" && (
-          <div className="mb-4">
-            {c.meetLink ? (
+        {!isCollapsed && (
+          <>
+            {c.format === "En vivo" && (
+              <div className="mt-4">
+                {c.meetLink ? (
+                  <a
+                    href={c.meetLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-cta bg-magenta text-white px-4 py-2 rounded-full hover:bg-magentaSoft transition-colors inline-block text-sm"
+                  >
+                    Unirte a la clase por Google Meet →
+                  </a>
+                ) : (
+                  <p className="text-sm text-bone/50">
+                    Te vamos a compartir acá el link de Google Meet antes de la clase.
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="space-y-6 mt-4">
+              {c.modules.map((m) => (
+                <div key={m.title}>
+                  <p className="text-xs text-bone/50 mb-2">{m.title}</p>
+                  {m.recordingVideoId ? (
+                    <ModuleVideoPlayer
+                      title={m.title}
+                      videoId={m.recordingVideoId}
+                      startSeconds={m.recordingStartSeconds}
+                      triggersCertificate={m.triggersCertificate}
+                      certificadoTipo={c.certificadoTipo}
+                      certificadoUrl={c.certificadoUrl}
+                      userEmail={userEmail}
+                      userName={userName}
+                      onComplete={(videoId) =>
+                        setCompletedVideoIds((prev) => new Set(prev).add(videoId))
+                      }
+                    />
+                  ) : (
+                    <p className="text-xs text-bone/40">
+                      Grabación disponible después de esta clase.
+                    </p>
+                  )}
+
+                  {m.materials && m.materials.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {m.materials.map((mat) => (
+                        <a
+                          key={mat.url}
+                          href={mat.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn-cta bg-sage text-white px-3 py-1.5 rounded-full hover:opacity-90 transition-colors inline-block text-xs"
+                        >
+                          {mat.title} →
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {c.checklistUrl && (
+              <div className="mb-4">
+                <a
+                  href={c.checklistUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-cta bg-sage text-white px-3 py-1.5 rounded-full hover:opacity-90 transition-colors inline-block text-xs"
+                >
+                  ✅ Checklist para ir chequeando tus pasos →
+                </a>
+              </div>
+            )}
+
+            <div className="flex flex-wrap gap-4 text-sm">
+              {c.certificadoUrl && (
+                <a href={c.certificadoUrl} className="text-magenta hover:underline">
+                  🏆 Pedí tu certificado →
+                </a>
+              )}
               <a
-                href={c.meetLink}
+                href="https://wa.me/5491123912820"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-cta bg-magenta text-white px-4 py-2 rounded-full hover:bg-magentaSoft transition-colors inline-block text-sm"
+                className="text-magenta hover:underline"
               >
-                Unirte a la clase por Google Meet →
+                Consultas por WhatsApp →
               </a>
-            ) : (
-              <p className="text-sm text-bone/50">
-                Te vamos a compartir acá el link de Google Meet antes de la clase.
-              </p>
-            )}
-          </div>
-        )}
-
-        <div className="space-y-6 mb-4">
-          {c.modules.map((m) => (
-            <div key={m.title}>
-              <p className="text-xs text-bone/50 mb-2">{m.title}</p>
-              {m.recordingVideoId ? (
-                <ModuleVideoPlayer
-                  title={m.title}
-                  videoId={m.recordingVideoId}
-                  startSeconds={m.recordingStartSeconds}
-                  triggersCertificate={m.triggersCertificate}
-                  certificadoTipo={c.certificadoTipo}
-                  certificadoUrl={c.certificadoUrl}
-                  userEmail={userEmail}
-                  userName={userName}
-                  onComplete={(videoId) =>
-                    setCompletedVideoIds((prev) => new Set(prev).add(videoId))
-                  }
-                />
-              ) : (
-                <p className="text-xs text-bone/40">
-                  Grabación disponible después de esta clase.
-                </p>
-              )}
-
-              {m.materials && m.materials.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {m.materials.map((mat) => (
-                    <a
-                      key={mat.url}
-                      href={mat.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn-cta bg-sage text-white px-3 py-1.5 rounded-full hover:opacity-90 transition-colors inline-block text-xs"
-                    >
-                      {mat.title} →
-                    </a>
-                  ))}
-                </div>
+              {c.whatsappGroupLink && (
+                <a
+                  href={c.whatsappGroupLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-magenta hover:underline"
+                >
+                  Sumarte al grupo de WhatsApp →
+                </a>
               )}
             </div>
-          ))}
-        </div>
-
-        {c.checklistUrl && (
-          <div className="mb-4">
-            <a
-              href={c.checklistUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-cta bg-sage text-white px-3 py-1.5 rounded-full hover:opacity-90 transition-colors inline-block text-xs"
-            >
-              ✅ Checklist para ir chequeando tus pasos →
-            </a>
-          </div>
+          </>
         )}
-
-        <div className="flex flex-wrap gap-4 text-sm">
-          {c.certificadoUrl && (
-            <a href={c.certificadoUrl} className="text-magenta hover:underline">
-              🏆 Pedí tu certificado →
-            </a>
-          )}
-          <a
-            href="https://wa.me/5491123912820"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-magenta hover:underline"
-          >
-            Consultas por WhatsApp →
-          </a>
-          {c.whatsappGroupLink && (
-            <a
-              href={c.whatsappGroupLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-magenta hover:underline"
-            >
-              Sumarte al grupo de WhatsApp →
-            </a>
-          )}
-        </div>
       </div>
     );
   }
@@ -345,19 +397,26 @@ function DashboardContent() {
           </>
         ) : splitByFormat ? (
           <>
-            <div className="mb-8">
-              <h2 className="font-display text-xl text-bone mb-4">Tus cursos en vivo</h2>
-              <div className="space-y-4">{liveCourses.map(renderCourseCard)}</div>
-            </div>
             <div>
-              <h2 className="font-display text-xl text-bone mb-4">Tus cursos grabados</h2>
-              <div className="space-y-4">{recordedCourses.map(renderCourseCard)}</div>
+              <h2 className="font-display text-xl text-bone mb-4">
+                🔴 Tus cursos en vivo
+              </h2>
+              <div className="space-y-8">{liveCourses.map(renderCourseCard)}</div>
+            </div>
+
+            <div className="hairline my-10" />
+
+            <div>
+              <h2 className="font-display text-xl text-bone mb-4">
+                🎬 Tus cursos grabados
+              </h2>
+              <div className="space-y-8">{recordedCourses.map(renderCourseCard)}</div>
             </div>
           </>
         ) : (
           <>
             <h2 className="font-display text-xl text-bone mb-4">Tus clases</h2>
-            <div className="space-y-4">{myCourses.map(renderCourseCard)}</div>
+            <div className="space-y-8">{myCourses.map(renderCourseCard)}</div>
           </>
         )}
       </div>
