@@ -34,10 +34,13 @@ export async function POST(req: NextRequest) {
   // Evita duplicar filas si el certificado ya se generó antes para ese
   // mail (por ejemplo, el disparo automático al terminar el video del
   // Módulo 6 podría llegar a pegar dos veces). Si ya existe uno aprobado,
-  // devolvemos el mismo id en vez de crear uno nuevo.
+  // devolvemos el mismo id en vez de crear uno nuevo — pero actualizamos
+  // el nombre al recién enviado, así no queda congelado el que se haya
+  // cargado la primera vez (por ejemplo un nombre de prueba, o uno viejo
+  // de antes de que existiera "Permitir editar el nombre desde Mi cuenta").
   const { data: existente } = await supabaseAdmin
     .from("certificado_solicitudes")
-    .select("id")
+    .select("id, nombre")
     .eq("tipo", tipo)
     .ilike("email", email)
     .eq("respuesta_correcta", true)
@@ -45,6 +48,12 @@ export async function POST(req: NextRequest) {
     .limit(1)
     .maybeSingle();
   if (existente) {
+    if (existente.nombre !== nombre) {
+      await supabaseAdmin
+        .from("certificado_solicitudes")
+        .update({ nombre })
+        .eq("id", existente.id);
+    }
     return NextResponse.json({ correcta: true, id: existente.id });
   }
 

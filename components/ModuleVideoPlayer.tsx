@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { markVideoCompleted } from "@/lib/progress";
+import { markVideoCompleted, getCertificadoGenerado, setCertificadoGenerado } from "@/lib/progress";
 
 declare global {
   interface Window {
@@ -68,7 +68,15 @@ export default function ModuleVideoPlayer({
 }: Props) {
   const iframeId = `yt-player-${videoId}`;
   const yaTerminado = useRef(false);
-  const [cert, setCert] = useState<CertState>({ paso: "idle" });
+  // Si esta alumna ya se había generado el certificado antes (en este
+  // mismo navegador), arrancamos directo mostrando la tarjeta de "listo"
+  // en vez del video — así no se pierde de vista al recargar o volver al
+  // dashboard.
+  const [cert, setCert] = useState<CertState>(() => {
+    if (!triggersCertificate || !certificadoTipo) return { paso: "idle" };
+    const guardado = getCertificadoGenerado(certificadoTipo);
+    return guardado ? { paso: "listo", id: guardado.id, nombre: guardado.nombre } : { paso: "idle" };
+  });
 
   // El listener de "video terminado" corre para TODOS los módulos (no
   // solo el que dispara el certificado): sirve para marcar el progreso de
@@ -116,6 +124,7 @@ export default function ModuleVideoPlayer({
       const data = await res.json();
       if (res.ok && data.correcta) {
         setCert({ paso: "listo", id: data.id, nombre });
+        setCertificadoGenerado(certificadoTipo, { id: data.id, nombre });
       } else {
         setCert({ paso: "error" });
       }

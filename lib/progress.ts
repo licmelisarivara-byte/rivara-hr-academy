@@ -28,3 +28,40 @@ export function markVideoCompleted(videoId: string) {
     // es grave, el progreso es solo un indicador visual.
   }
 }
+
+// Certificado ya generado por curso (certificadoTipo -> {id, nombre}). Se
+// guarda acá, en el mismo estilo que el progreso de arriba, para que la
+// tarjeta de "ya tenés tu certificado" siga a la vista al recargar la
+// página o volver al dashboard — sin esto, ModuleVideoPlayer perdía el
+// estado en cada mount y la alumna veía de nuevo solo el video, como si no
+// hubiera generado nada.
+const CERT_KEY = "rivara_certificados_generados";
+
+type CertificadoGuardado = { id: string; nombre: string };
+
+export function getCertificadoGenerado(tipo: string): CertificadoGuardado | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(CERT_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    const cert = parsed?.[tipo];
+    return cert?.id && cert?.nombre ? cert : null;
+  } catch {
+    return null;
+  }
+}
+
+export function setCertificadoGenerado(tipo: string, cert: CertificadoGuardado) {
+  if (typeof window === "undefined") return;
+  try {
+    const raw = window.localStorage.getItem(CERT_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    parsed[tipo] = cert;
+    window.localStorage.setItem(CERT_KEY, JSON.stringify(parsed));
+  } catch {
+    // Igual que arriba: si falla, la alumna solo pierde el atajo visual,
+    // no el certificado en sí (sigue existiendo en certificado_solicitudes
+    // y se puede volver a pedir desde /cursos/.../certificado).
+  }
+}
