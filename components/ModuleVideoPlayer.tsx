@@ -147,6 +147,12 @@ export default function ModuleVideoPlayer({
         />
       </div>
 
+      {triggersCertificate && cert.paso === "idle" && (
+        <p className="text-xs text-bone/40 mt-2">
+          🎓 Al terminar este video vas a recibir tu certificado automáticamente.
+        </p>
+      )}
+
       {cert.paso === "generando" && (
         <p className="text-xs text-bone/50 mt-3">Generando tu certificado…</p>
       )}
