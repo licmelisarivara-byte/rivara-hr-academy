@@ -1,12 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import {
-  markVideoCompleted,
-  getCompletedVideoIds,
-  getCertificadoGenerado,
-  setCertificadoGenerado,
-} from "@/lib/progress";
+import { markVideoCompleted, getCertificadoGenerado, setCertificadoGenerado } from "@/lib/progress";
 
 declare global {
   interface Window {
@@ -73,10 +68,6 @@ export default function ModuleVideoPlayer({
 }: Props) {
   const iframeId = `yt-player-${videoId}`;
   const yaTerminado = useRef(false);
-  // Si el video ya se había marcado como completado antes (por el player
-  // embebido o a mano, ver completarVideo más abajo), no repetimos el
-  // enlace de "marcalo a mano" — evita confusión y clicks de más.
-  const [completado, setCompletado] = useState(() => getCompletedVideoIds().has(videoId));
   // Si esta alumna ya se había generado el certificado antes (en este
   // mismo navegador), arrancamos directo mostrando la tarjeta de "listo"
   // en vez del video — así no se pierde de vista al recargar o volver al
@@ -87,30 +78,10 @@ export default function ModuleVideoPlayer({
     return guardado ? { paso: "listo", id: guardado.id, nombre: guardado.nombre } : { paso: "idle" };
   });
 
-  // Se llama tanto al terminar el video adentro del player embebido como
-  // al tocar "marcarlo a mano" (ver más abajo) — mismo resultado en los
-  // dos casos: progreso guardado y, si corresponde, certificado generado.
-  function completarVideo() {
-    if (yaTerminado.current) return;
-    yaTerminado.current = true;
-    setCompletado(true);
-    markVideoCompleted(videoId);
-    onComplete?.(videoId);
-    if (triggersCertificate && userEmail && certificadoTipo) {
-      generarCertificado();
-    }
-  }
-
   // El listener de "video terminado" corre para TODOS los módulos (no
   // solo el que dispara el certificado): sirve para marcar el progreso de
   // cada uno en el dashboard. El certificado automático solo se dispara
   // además, puntualmente, cuando triggersCertificate está en true.
-  //
-  // Ojo: esto SOLO se dispara si la alumna mira el video adentro de este
-  // player embebido. Si en cambio toca el link de YouTube del embed y lo
-  // termina de ver allá (fuera del sitio), nunca llega el evento ENDED acá
-  // — por eso existe el link de "marcarlo a mano" más abajo, para esos
-  // casos.
   useEffect(() => {
     let cancelado = false;
 
@@ -119,8 +90,13 @@ export default function ModuleVideoPlayer({
       new window.YT.Player(iframeId, {
         events: {
           onStateChange: (e: any) => {
-            if (e.data === window.YT.PlayerState.ENDED) {
-              completarVideo();
+            if (e.data === window.YT.PlayerState.ENDED && !yaTerminado.current) {
+              yaTerminado.current = true;
+              markVideoCompleted(videoId);
+              onComplete?.(videoId);
+              if (triggersCertificate && userEmail && certificadoTipo) {
+                generarCertificado();
+              }
             }
           },
         },
@@ -163,27 +139,13 @@ export default function ModuleVideoPlayer({
         <iframe
           id={iframeId}
           className="w-full h-full"
-          src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&rel=0&modestbranding=1${
+          src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1${
             startSeconds ? `&start=${startSeconds}` : ""
           }`}
           title={title}
           allowFullScreen
         />
       </div>
-
-      {!completado && (
-        <p className="text-xs text-bone/40 mt-2">
-          ¿Ya viste el video pero no se marcó como completado (por ejemplo, si lo terminaste
-          de ver en YouTube en vez de acá arriba)?{" "}
-          <button
-            type="button"
-            onClick={completarVideo}
-            className="text-magenta hover:underline"
-          >
-            Marcarlo como visto →
-          </button>
-        </p>
-      )}
 
       {cert.paso === "generando" && (
         <p className="text-xs text-bone/50 mt-3">Generando tu certificado…</p>
