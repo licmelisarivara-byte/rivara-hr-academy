@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { freeResources } from "@/lib/resources";
 import FreeResourceDownloadButton from "@/components/FreeResourceDownloadButton";
@@ -24,6 +25,30 @@ export default function RecursosPage() {
           Mirá los ebooks pagos →
         </Link>
       </p>
+
+      <Link
+        href="/masterclass"
+        className="card-alt rounded-xl p-4 grid sm:grid-cols-[auto_1fr] gap-4 items-center hover:border-magenta/40 transition-colors mb-6"
+      >
+        <Image
+          src="/images/masterclass/invite-flyer.jpg"
+          alt="Masterclass gratuita: Analizá un CV con IA en segundos"
+          width={80}
+          height={100}
+          className="w-14 h-auto rounded-md object-cover mx-auto sm:mx-0"
+        />
+        <div>
+          <span className="inline-block text-[10px] font-semibold bg-magenta/80 text-white px-2 py-0.5 rounded-full mb-1.5">
+            🎥 Masterclass grabada
+          </span>
+          <h3 className="font-display text-base text-bone mb-0.5">
+            Analizá un CV con IA en segundos
+          </h3>
+          <span className="text-magenta text-xs font-semibold">
+            Ver la grabación gratis →
+          </span>
+        </div>
+      </Link>
 
       <div className="rounded-xl p-5 sm:p-6 grid sm:grid-cols-[1fr_auto] gap-5 items-center border border-magenta bg-gradient-to-br from-panelAlt to-panel mb-10">
         <div>
