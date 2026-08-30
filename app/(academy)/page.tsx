@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { freeResources, paidResources } from "@/lib/resources";
@@ -13,6 +14,12 @@ function formatARS(n: number) {
 
 const featuredCourse = getCourseBySlug("claude-para-seleccion")!;
 
+export const metadata: Metadata = {
+  title: "Curso de Claude para RRHH",
+  description:
+    "Curso grabado de 7 módulos para recruiters. Aprendé a usar Claude para filtrar CVs, generar preguntas STAR y automatizar tu proceso de selección.",
+};
+
 export default function Home() {
   return (
     <div>
@@ -27,20 +34,18 @@ export default function Home() {
           <div>
             <p className="eyebrow mb-5 text-magenta">RIVARA HR ACADEMY</p>
             <h1 className="font-display text-4xl sm:text-5xl leading-[1.08] text-white mb-6">
-              Dejá de perder horas filtrando CVs y empezá a tomar mejores
-              decisiones <span className="text-magenta">con IA</span>.
+              Aprendé a usar Claude en tu proceso de selección
             </h1>
             <p className="text-white/70 text-lg max-w-xl mb-8">
-              Cursos, herramientas y recursos para recruiters que quieren
-              aplicar inteligencia artificial en selección de personal. Sin
-              tecnicismos, con resultados desde el día 1.
+              Curso grabado de 7 módulos para recruiters que quieren aplicar
+              IA sin tecnicismos, a tu ritmo.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link
-                href="#cursos-en-vivo"
+                href={`/cursos/${featuredCourse.slug}`}
                 className="btn-cta bg-magenta text-white px-8 py-4 rounded-full hover:bg-magentaSoft transition-colors shadow-lg shadow-magenta/30"
               >
-                Quiero mi lugar →
+                Ver el programa del curso →
               </Link>
             </div>
           </div>
@@ -74,16 +79,33 @@ export default function Home() {
           Aprendé con Claude, a tu ritmo
         </h2>
 
-        <div className="card rounded-2xl p-8 sm:p-10 grid md:grid-cols-[1.3fr_1fr] gap-8 items-center">
+        <div className="relative card rounded-2xl p-8 sm:p-10 grid md:grid-cols-[1.3fr_1fr] gap-8 items-center border-2 border-magenta/60">
+          <span className="absolute -top-3 left-8 text-xs font-semibold bg-magenta text-white px-3 py-1 rounded-full shadow-md">
+            ⭐ Curso destacado
+          </span>
           <div>
             <span className="eyebrow">{featuredCourse.format}</span>
             <h3 className="font-display text-2xl sm:text-3xl text-bone mt-3 mb-4">
               {featuredCourse.title}
             </h3>
-            <p className="text-bone/70 text-lg mb-6">{featuredCourse.tagline}</p>
-            <div className="detail-text flex flex-col gap-2 mb-2">
+            <p className="text-bone/70 text-lg mb-4">{featuredCourse.tagline}</p>
+            <div className="card-alt rounded-lg p-4 mb-4">
+              <p className="text-magenta text-sm mb-1">⭐⭐⭐⭐</p>
+              <p className="text-sm text-bone/80 mb-2">
+                &ldquo;Es muy valioso su aporte para automatizar tareas y agilizar todo el
+                proceso de selección. Muy útil.&rdquo;
+              </p>
+              <p className="text-xs text-bone/50">Paula G. — Reseña de Google</p>
+            </div>
+            <div className="detail-text flex flex-col gap-2 mb-4">
               <span>🎥 7 módulos grabados · A tu ritmo</span>
             </div>
+            <Link
+              href={`/cursos/${featuredCourse.slug}`}
+              className="text-magenta text-sm font-semibold hover:underline"
+            >
+              Ver detalles del curso →
+            </Link>
           </div>
 
           <CoursePricingTeaser course={featuredCourse} />
@@ -111,7 +133,7 @@ export default function Home() {
           />
           <div>
             <span className="inline-block text-[10px] font-semibold bg-magenta/80 text-white px-2 py-0.5 rounded-full mb-1.5">
-              GRABACIÓN · GRATIS
+              🎥 Masterclass grabada
             </span>
             <h3 className="font-display text-base text-bone mb-0.5">
               Analizá un CV con IA en segundos
@@ -125,7 +147,7 @@ export default function Home() {
         <div className="grid md:grid-cols-3 gap-4 mb-12">
           {freeResources.map((r) => (
             <div key={r.slug} className="card-alt rounded-xl p-5 flex flex-col">
-              <span className="eyebrow">{r.kind}</span>
+              <span className="eyebrow">⬇️ Kit de prompts descargable</span>
               <h3 className="font-display text-base text-bone mt-2 mb-1.5">
                 {r.title}
               </h3>
@@ -169,7 +191,10 @@ export default function Home() {
               <h3 className="font-display text-lg text-bone mt-2 mb-2">
                 {r.title}
               </h3>
-              <p className="text-bone/60 text-sm mb-5">{r.description}</p>
+              <p className="text-bone/60 text-sm mb-3">{r.description}</p>
+              {r.benefit && (
+                <p className="text-sage text-xs font-semibold mb-3">{r.benefit}</p>
+              )}
               <div className="mt-auto">
                 <div className="flex items-baseline gap-2 mb-1">
                   <span className="font-display text-2xl text-bone">
