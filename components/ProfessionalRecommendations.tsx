@@ -5,7 +5,6 @@ type Recommendation = {
   role: string;
   relationship: string;
   quote: string;
-  complete?: boolean;
 };
 
 const recommendations: Recommendation[] = [
@@ -28,8 +27,7 @@ const recommendations: Recommendation[] = [
     role: "Comprador Técnico Senior",
     relationship: "Estudió con Melisa",
     quote:
-      "Conozco a Melisa desde nuestra etapa de formación, donde se destacó por su responsabilidad, compromiso y calidad humana. Es una profesional empática y organizada, con muy buena capacidad para trabajar con…",
-    complete: false,
+      "Conozco a Melisa desde nuestra etapa de formación, donde se destacó por su responsabilidad, compromiso y calidad humana. Es una profesional empática y organizada, con muy buena capacidad para trabajar con personas. Sin dudas, alguien recomendable en su rol dentro de Recursos Humanos.",
   },
 ];
 
@@ -64,9 +62,6 @@ export default function ProfessionalRecommendations() {
               </div>
             </div>
             <p className="text-sm text-bone/80">&ldquo;{r.quote}&rdquo;</p>
-            {r.complete === false && (
-              <p className="text-xs text-bone/40 italic mt-2">Reseña completa próximamente.</p>
-            )}
           </div>
         ))}
       </div>
