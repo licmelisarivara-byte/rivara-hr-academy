@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { freeResources } from "@/lib/resources";
 import FreeResourceDownloadButton from "@/components/FreeResourceDownloadButton";
+import FreeComboSignup from "@/components/FreeComboSignup";
 
 export const metadata: Metadata = {
   title: "Recursos Gratis de IA para Selección de Personal",
@@ -23,6 +24,23 @@ export default function RecursosPage() {
           Mirá los ebooks pagos →
         </Link>
       </p>
+
+      <div className="rounded-xl p-5 sm:p-6 grid sm:grid-cols-[1fr_auto] gap-5 items-center border border-magenta bg-gradient-to-br from-panelAlt to-panel mb-10">
+        <div>
+          <span className="inline-block text-[10px] font-semibold bg-magenta text-white px-2 py-0.5 rounded-full mb-1.5">
+            🎁 Combo gratis
+          </span>
+          <h3 className="font-display text-base text-bone mb-1">
+            Llevate todo el combo gratis
+          </h3>
+          <p className="text-bone/60 text-xs">
+            Los 3 PDFs + la masterclass grabada, con un solo registro.
+          </p>
+        </div>
+        <div className="w-full sm:w-64">
+          <FreeComboSignup />
+        </div>
+      </div>
 
       <div className="grid md:grid-cols-3 gap-6">
         {freeResources.map((r) => (
