@@ -16,9 +16,11 @@ type Method = "" | "transferencia" | "mercadopago" | "payoneer";
 type Buyer = { email: string; phone: string };
 type AppliedCoupon = { code: string; percentOff: number };
 
-// 15% adicional sobre la suma del curso + el recurso elegido — permanente,
-// sin fecha de vencimiento (a diferencia del cupón del curso, que sí puede
-// vencer). Solo transferencia/Payoneer, nunca Mercado Pago.
+// 15% sobre el PRECIO DE LISTA del addon elegido — reemplaza su
+// descuento individual del 10% (no se acumulan). El precio del curso no
+// se toca: se suma tal cual, con o sin cupón, para no descontarlo dos
+// veces. Permanente, sin fecha de vencimiento. Solo transferencia/
+// Payoneer, nunca Mercado Pago.
 const BUNDLE_DISCOUNT_PERCENT = 15;
 
 // Nombre corto de cada addon para el mensaje de ahorro ("...llevando el
@@ -189,19 +191,16 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
   const transferenciaARS = applyDiscount(getTransferenciaAmountARS(course), appliedCoupon?.percentOff);
   const payoneerUSD = applyDiscount(getPayoneerAmountUSD(course), appliedCoupon?.percentOff);
 
-  // Combo curso + recurso pago (Kit/Guía/Combo de ebooks): se suma el
-  // precio del curso (ya con cupón, si corresponde) al precio del recurso
-  // (ya con su 10% permanente por transferencia) y se le aplica un 15%
-  // adicional sobre esa suma — solo transferencia/Payoneer.
+  // Combo curso + recurso pago (Kit/Guía/Combo de ebooks): el curso se
+  // suma tal cual (con cupón si corresponde, sin ningún % adicional — no
+  // se descuenta dos veces), y al addon se le aplica un 15% sobre su
+  // precio de lista, EN REEMPLAZO de su 10% individual (no se acumulan)
+  // — solo transferencia/Payoneer.
   const addon = addonSlug ? getPaidResourceBySlug(addonSlug) : undefined;
-  const addonTransferenciaARS = addon ? addon.priceARSTransferencia ?? addon.priceARS : 0;
-  const addonUSD = addon?.priceUSD ?? 0;
-  const rawBundleTransferenciaARS = addon
-    ? applyDiscount(transferenciaARS + addonTransferenciaARS, BUNDLE_DISCOUNT_PERCENT)
-    : transferenciaARS;
-  const rawBundlePayoneerUSD = addon
-    ? applyDiscount(payoneerUSD + addonUSD, BUNDLE_DISCOUNT_PERCENT)
-    : payoneerUSD;
+  const addonBundleARS = addon ? applyDiscount(addon.priceARS, BUNDLE_DISCOUNT_PERCENT) : 0;
+  const addonBundleUSD = addon ? applyDiscount(addon.priceUSD, BUNDLE_DISCOUNT_PERCENT) : 0;
+  const rawBundleTransferenciaARS = addon ? transferenciaARS + addonBundleARS : transferenciaARS;
+  const rawBundlePayoneerUSD = addon ? payoneerUSD + addonBundleUSD : payoneerUSD;
 
   // Resguardo: el combo nunca puede salir más barato que el curso solo. Si
   // por algún cambio futuro en los precios eso pasara, no se publica ese
@@ -239,7 +238,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
       ? `\n🎟️ Cupón: ${appliedCoupon.code} (${appliedCoupon.percentOff}% off)`
       : "";
     const comboLine = addon
-      ? `\n📦 Combo: + ${addon.title}\n💰 Total con combo (${BUNDLE_DISCOUNT_PERCENT}% off adicional): ${
+      ? `\n📦 Combo: + ${addon.title}\n💰 Total con combo: ${
           m === "payoneer" ? `USD ${bundlePayoneerUSD}` : `$${bundleTransferenciaARS.toLocaleString("es-AR")} ARS`
         }`
       : "";
@@ -355,7 +354,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
                     : "border-black/10 bg-panel/50 text-bone/70 hover:border-magenta/40"
                 }`}
               >
-                {r.title} — ${(r.priceARSTransferencia ?? r.priceARS).toLocaleString("es-AR")}
+                {r.title} — ${applyDiscount(r.priceARS, BUNDLE_DISCOUNT_PERCENT).toLocaleString("es-AR")}
               </button>
             ))}
           </div>

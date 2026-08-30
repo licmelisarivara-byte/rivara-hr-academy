@@ -5,11 +5,14 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { getCoupon } from "@/lib/coupons";
 import { applyDiscount } from "@/lib/discount";
 
-// Igual que /api/manual-purchase, pero para el combo curso + recurso pago
-// (15% adicional sobre la suma de ambos, solo transferencia/Payoneer). Se
-// insertan DOS filas en `compras` (una "course", una "resource") que
-// comparten `bundle_group_id`, para no tener que agregar un tercer valor
-// de `kind` ni tocar el resto del sistema (dashboard, entrega, etc.) — ver
+// Igual que /api/manual-purchase, pero para el combo curso + recurso pago:
+// el curso se cobra tal cual (con cupón si corresponde, sin descontarlo
+// una segunda vez) y al recurso se le aplica 15% sobre su precio de
+// lista, en reemplazo de su 10% individual (no se acumulan) — solo
+// transferencia/Payoneer. Se insertan DOS filas en `compras` (una
+// "course", una "resource") que comparten `bundle_group_id`, para no
+// tener que agregar un tercer valor de `kind` ni tocar el resto del
+// sistema (dashboard, entrega, etc.) — ver
 // app/api/admin/approve-purchase/route.ts, que aprueba y entrega las dos
 // filas juntas cuando comparten ese id.
 export async function POST(req: NextRequest) {
@@ -34,14 +37,14 @@ export async function POST(req: NextRequest) {
     method === "payoneer"
       ? applyDiscount(getPayoneerAmountUSD(course), coupon?.percentOff)
       : applyDiscount(getTransferenciaAmountARS(course), coupon?.percentOff);
-  const resourceAmount =
-    method === "payoneer"
-      ? resource.priceUSD
-      : resource.priceARSTransferencia ?? resource.priceARS;
+  // Precio de LISTA del recurso (no el de transferencia individual): el
+  // 15% del combo reemplaza ese 10%, no se suma a él.
+  const resourceAmount = method === "payoneer" ? resource.priceUSD : resource.priceARS;
 
-  // 15% adicional por llevar los dos juntos — permanente, sin fecha de
+  // El curso no se toca — se suma tal cual, con o sin cupón. Solo el
+  // recurso se descuenta un 15% adicional, permanente, sin fecha de
   // vencimiento (a diferencia del cupón del curso, que sí puede vencer).
-  const bundleCourseAmount = applyDiscount(courseAmount, 15);
+  const bundleCourseAmount = courseAmount;
   const bundleResourceAmount = applyDiscount(resourceAmount, 15);
 
   const currency = method === "payoneer" ? "USD" : "ARS";
