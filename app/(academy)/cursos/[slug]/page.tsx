@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { courses, getCourseBySlug, getCoursePriceSummary } from "@/lib/courses";
 import CoursePaymentActions from "@/components/CoursePaymentActions";
+import Testimonials from "@/components/Testimonials";
 
 export function generateStaticParams() {
   return courses.map((c) => ({ slug: c.slug }));
@@ -108,6 +109,16 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
         </div>
       )}
 
+      {course.slug === "claude-para-seleccion" && (
+        <div className="card rounded-xl p-6 mb-10 border border-magenta/30">
+          <p className="text-sm text-bone/80">
+            Con el kit de prompts gratis empezás a probar. Con el curso aprendés a aplicar IA con
+            criterio profesional, a interpretar resultados y a adaptarlo a distintos perfiles. Eso
+            no viene en un PDF.
+          </p>
+        </div>
+      )}
+
       {/* FORMAS DE PAGO */}
       {course.paymentOptions ? (
         <div className="card rounded-xl p-6 sm:p-8 mb-10">
@@ -134,6 +145,9 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
             id={moduleAnchor(m.title)}
             className="card-alt rounded-xl p-6 scroll-mt-24"
           >
+            {m.benefit && (
+              <p className="text-magenta text-sm font-semibold mb-1">{m.benefit}</p>
+            )}
             <h3 className="font-semibold text-bone mb-3">{m.title}</h3>
             <ul className="space-y-1.5 text-sm text-bone/70 list-disc list-inside">
               {m.items.map((it) => (
@@ -143,6 +157,42 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
           </div>
         ))}
       </div>
+
+      {course.slug === "claude-para-seleccion" && (
+        <>
+          <Testimonials />
+
+          <div className="mb-10">
+            <h2 className="font-display text-2xl text-bone mb-6">Sobre mí</h2>
+            <div className="card-alt rounded-xl p-6 text-sm text-bone/70 space-y-4">
+              <p>
+                Soy Melisa Rivara, Licenciada en Recursos Humanos (2019) y estudiante de
+                Psicología. Antes de dedicarme a selección, pasé por varios roles que hoy se
+                notan en cómo trabajo: 4 años como vendedora de seguros, 3 años en una
+                importadora de calzado haciendo administración de ventas — carga de pedidos,
+                facturación, notas de crédito, control de logística, y trato directo con
+                vendedores mayoristas y clientes — donde además armé desde cero el organigrama,
+                la descripción de mi puesto y los manuales de procedimiento que no existían, 5
+                años en operaciones de cliente en una multinacional donde empecé a dar mis
+                primeras capacitaciones internas, y un tiempo en emprendimientos digitales
+                propios haciendo community management y marketing.
+              </p>
+              <p>
+                Hace un año y medio me especialicé en selección de personal — y ahí fue cuando
+                empecé a aplicar Claude a mis propios procesos, no como demo para vender un
+                curso, sino porque necesitaba filtrar más rápido sin bajar la calidad de mis
+                ternas.
+              </p>
+              <p>
+                Fundé RIVARA Consultora y RIVARA HR Academy para compartir ese método con
+                colegas de RRHH: no vengo a venderte una promesa de IA genérica, vengo de armar
+                organigramas, dar capacitaciones y hacer selección real, y te enseño lo que uso
+                yo, todas las semanas, en búsquedas reales.
+              </p>
+            </div>
+          </div>
+        </>
+      )}
 
       {course.faqs && (
         <div>

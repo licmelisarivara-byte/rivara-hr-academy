@@ -200,23 +200,55 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
       </div>
 
       <div className="mb-4">
-        <label className="text-sm text-bone/60 block mb-1">¿Cómo querés pagar?</label>
-        <select
-          value={method}
-          onChange={(e) => setMethod(e.target.value as Method)}
-          className="w-full rounded-lg bg-panel border border-black/10 px-4 py-2.5 text-bone focus:border-magenta outline-none"
-        >
-          <option value="">— Elegí una opción —</option>
-          <option value="transferencia">
+        <label className="text-sm text-bone/60 block mb-2">¿Cómo querés pagar?</label>
+        {/* Antes era un <select> nativo: en mobile el navegador recorta el
+            texto de la opción elegida (ej. "$52.500" quedaba en "$52"), y
+            no hay CSS que lo arregle porque el recorte lo hace el control
+            nativo del sistema operativo, no el layout de la página. Un
+            grupo de botones propios evita ese problema de raíz. */}
+        <div className="space-y-2" role="radiogroup" aria-label="¿Cómo querés pagar?">
+          <button
+            type="button"
+            role="radio"
+            aria-checked={method === "transferencia"}
+            onClick={() => setMethod("transferencia")}
+            className={`w-full text-left rounded-lg border px-4 py-2.5 text-sm transition-colors ${
+              method === "transferencia"
+                ? "border-magenta bg-panel text-bone"
+                : "border-black/10 bg-panel/50 text-bone/70 hover:border-magenta/40"
+            }`}
+          >
             Transferencia bancaria — ${transferenciaARS.toLocaleString("es-AR")} ARS
-          </option>
+          </button>
           {course.payoneerLink && (
-            <option value="payoneer">Payoneer — USD {payoneerUSD}</option>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={method === "payoneer"}
+              onClick={() => setMethod("payoneer")}
+              className={`w-full text-left rounded-lg border px-4 py-2.5 text-sm transition-colors ${
+                method === "payoneer"
+                  ? "border-magenta bg-panel text-bone"
+                  : "border-black/10 bg-panel/50 text-bone/70 hover:border-magenta/40"
+              }`}
+            >
+              Payoneer — USD {payoneerUSD}
+            </button>
           )}
-          <option value="mercadopago">
+          <button
+            type="button"
+            role="radio"
+            aria-checked={method === "mercadopago"}
+            onClick={() => setMethod("mercadopago")}
+            className={`w-full text-left rounded-lg border px-4 py-2.5 text-sm transition-colors ${
+              method === "mercadopago"
+                ? "border-magenta bg-panel text-bone"
+                : "border-black/10 bg-panel/50 text-bone/70 hover:border-magenta/40"
+            }`}
+          >
             Mercado Pago — ${(course.priceARS ?? 0).toLocaleString("es-AR")} ARS (sin descuento)
-          </option>
-        </select>
+          </button>
+        </div>
       </div>
 
       {method && !buyer && (
@@ -278,6 +310,13 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
 
       {method === "payoneer" && buyer && course.payoneerLink && (
         <div className="card-alt rounded-lg p-4 mb-4 text-sm text-bone/70">
+          {appliedCoupon && (
+            <p className="text-xs text-magenta mb-3">
+              ⚠️ Este link de Payoneer cobra el precio de lista en USD — todavía no puede aplicar
+              el cupón automáticamente. Pagá con el link y avisanos por WhatsApp con tu cupón: te
+              devolvemos la diferencia o la descontamos de tu próxima compra.
+            </p>
+          )}
           <a
             href={course.payoneerLink}
             target="_blank"

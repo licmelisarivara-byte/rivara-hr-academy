@@ -12,6 +12,7 @@ export type Course = {
   description: string;
   modules: {
     title: string;
+    benefit?: string; // título en clave de beneficio, mostrado arriba de `title` en la página del curso (ver app/(academy)/cursos/[slug]/page.tsx)
     items: string[];
     recordingVideoId?: string; // YouTube ID no listado de la grabación de esa clase, se completa después de dictarla
     recordingStartSeconds?: number; // si el módulo arranca a mitad de un video compartido con otro módulo (ej: el cierre del módulo anterior queda al principio)
@@ -172,9 +173,9 @@ export const courses: Course[] = [
     format: "Grabado",
     image: "/images/covers/curso-claude-seleccion.svg",
     tagline:
-      "6 módulos grabados para incorporar Claude a tu día a día de selección, a tu ritmo.",
+      "7 módulos grabados para incorporar Claude a tu día a día de selección, a tu ritmo.",
     description:
-      "Curso grabado de 6 módulos (~2.5 horas en total) para aprender a usar Claude en cada etapa del proceso de selección: desde el análisis de CVs hasta el informe ejecutivo post-entrevista.",
+      "Curso grabado de 7 módulos (~2.5 horas en total) para aprender a usar Claude en cada etapa del proceso de selección: desde el análisis de CVs hasta el informe ejecutivo post-entrevista.",
     modules: [
       {
         title: "Bienvenida",
@@ -183,6 +184,7 @@ export const courses: Course[] = [
       },
       {
         title: "Módulo 1",
+        benefit: "Escribile bien a Claude desde el primer prompt",
         items: ["Fundamentos: cómo piensa Claude y cómo escribirle bien"],
         recordingVideoId: "tva0e-JLfUs",
         materials: [
@@ -194,6 +196,7 @@ export const courses: Course[] = [
       },
       {
         title: "Módulo 2",
+        benefit: "Analizá CVs en segundos, con criterio consistente",
         items: ["Análisis de CVs con el prompt maestro"],
         recordingVideoId: "DEai1Icm7AM",
         materials: [
@@ -221,6 +224,7 @@ export const courses: Course[] = [
       },
       {
         title: "Módulo 3",
+        benefit: "Llegá a cada entrevista con las preguntas justas",
         items: ["Preguntas STAR y guías de entrevista"],
         recordingVideoId: "m-Vqeg2qSB4",
         materials: [
@@ -232,6 +236,7 @@ export const courses: Course[] = [
       },
       {
         title: "Módulo 4",
+        benefit: "Armá la terna sin dudar entre candidatos parecidos",
         items: ["Comparar candidatos y armar la terna"],
         recordingVideoId: "QCExLmdFLjY",
         materials: [
@@ -251,6 +256,7 @@ export const courses: Course[] = [
       },
       {
         title: "Módulo 5",
+        benefit: "Comunicá tus decisiones con informes profesionales",
         items: ["Informes ejecutivos y comunicación con el cliente"],
         recordingVideoId: "RyRDNLEcarg",
         materials: [
@@ -274,6 +280,7 @@ export const courses: Course[] = [
       },
       {
         title: "Módulo 6",
+        benefit: "Dejá de repetir el mismo prompt cada vez",
         items: ["Armar tu propio Proyecto de Claude para no repetir el prompt cada vez"],
         recordingVideoId: "wB0W6jSYvR8",
         triggersCertificate: true,
@@ -286,6 +293,7 @@ export const courses: Course[] = [
       },
       {
         title: "Módulo Bonus",
+        benefit: "Atraé mejores candidatos antes de que lleguen los CVs",
         items: ["Atracción de talento: antes de que lleguen los CVs"],
         recordingVideoId: "fvOezdtGWCo",
         materials: [
@@ -312,16 +320,16 @@ export const courses: Course[] = [
     payoneerLink: "https://link.payoneer.com/Token?t=55DF705DCE7144E59B7DAB4C198ACDB1&src=tpl",
     faqs: [
       {
-        q: "¿Necesito conocimientos técnicos?",
-        a: "No. Está pensado para recruiters y profesionales de RRHH sin perfil técnico.",
+        q: "¿Necesito saber programar?",
+        a: "No.",
+      },
+      {
+        q: "¿Qué versión de Claude necesito?",
+        a: "Ninguna en particular — el que tengas disponible en tu cuenta (gratuita o paga) sirve. Las versiones cambian de nombre seguido, así que no te atés a un número puntual.",
       },
       {
         q: "¿El curso tiene fecha de vencimiento?",
-        a: "No. Es grabado y lo mirás a tu ritmo, con acceso permanente.",
-      },
-      {
-        q: "¿Qué pasa si tengo dudas mientras lo hago?",
-        a: "Podés escribirnos por WhatsApp en cualquier momento.",
+        a: "Por ahora no tiene fecha de vencimiento — lo mirás cuando quieras.",
       },
     ],
     certificadoUrl: "/cursos/claude-para-seleccion/certificado",

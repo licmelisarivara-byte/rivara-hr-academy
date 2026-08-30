@@ -67,38 +67,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* MASTERCLASS GRATUITA */}
-      <section className="max-w-6xl mx-auto px-6 pt-20">
-        <Link
-          href="/masterclass"
-          className="card rounded-2xl p-6 sm:p-8 grid sm:grid-cols-[auto_1fr] gap-6 items-center hover:border-magenta/40 transition-colors"
-        >
-          <Image
-            src="/images/masterclass/invite-flyer.jpg"
-            alt="Masterclass gratuita: Analizá un CV con IA en segundos"
-            width={140}
-            height={175}
-            className="w-24 sm:w-36 h-auto rounded-lg object-cover mx-auto sm:mx-0"
-          />
-          <div>
-            <span className="inline-block text-xs font-semibold bg-magenta text-white px-2.5 py-1 rounded-full mb-3">
-              GRABACIÓN · GRATIS
-            </span>
-            <h2 className="font-display text-xl sm:text-2xl text-bone mb-2">
-              Analizá un CV con IA en segundos
-            </h2>
-            <p className="text-bone/60 text-sm mb-1">
-              Masterclass gratuita · Grabación disponible
-            </p>
-            <span className="text-magenta text-sm font-semibold">
-              Ver la grabación gratis →
-            </span>
-          </div>
-        </Link>
-      </section>
-
-      {/* CURSO DESTACADO */}
-      <section id="cursos-en-vivo" className="max-w-6xl mx-auto px-6 py-28">
+      {/* CURSO DESTACADO — oferta principal, primero después del hero */}
+      <section id="cursos-en-vivo" className="max-w-6xl mx-auto px-6 pt-20 pb-28">
         <p className="eyebrow mb-3">📚 Curso destacado</p>
         <h2 className="font-display text-2xl sm:text-3xl text-bone mb-10">
           Aprendé con Claude, a tu ritmo
@@ -120,21 +90,46 @@ export default function Home() {
         </div>
       </section>
 
-      {/* RECURSOS */}
-      <section id="recursos" className="max-w-6xl mx-auto px-6 py-28">
-        {/* GRATIS */}
-        <p className="eyebrow mb-3">🎁 Recursos gratuitos</p>
-        <h2 className="font-display text-2xl sm:text-3xl text-bone mb-10">
-          Empezá sin costo
+      {/* RECURSOS GRATUITOS — bloque secundario, más chico y discreto que el curso */}
+      <section id="recursos" className="max-w-6xl mx-auto px-6 pb-20">
+        <p className="eyebrow mb-3 text-bone/50">🎁 Recursos gratuitos</p>
+        <h2 className="font-display text-lg sm:text-xl text-bone/80 mb-6">
+          Para ir probando, sin costo
         </h2>
-        <div className="grid md:grid-cols-3 gap-6 mb-24">
+
+        {/* Masterclass gratuita — antes era una tarjeta grande, ahora un banner chico dentro del bloque secundario */}
+        <Link
+          href="/masterclass"
+          className="card-alt rounded-xl p-4 grid sm:grid-cols-[auto_1fr] gap-4 items-center hover:border-magenta/40 transition-colors mb-6"
+        >
+          <Image
+            src="/images/masterclass/invite-flyer.jpg"
+            alt="Masterclass gratuita: Analizá un CV con IA en segundos"
+            width={80}
+            height={100}
+            className="w-14 h-auto rounded-md object-cover mx-auto sm:mx-0"
+          />
+          <div>
+            <span className="inline-block text-[10px] font-semibold bg-magenta/80 text-white px-2 py-0.5 rounded-full mb-1.5">
+              GRABACIÓN · GRATIS
+            </span>
+            <h3 className="font-display text-base text-bone mb-0.5">
+              Analizá un CV con IA en segundos
+            </h3>
+            <span className="text-magenta text-xs font-semibold">
+              Ver la grabación gratis →
+            </span>
+          </div>
+        </Link>
+
+        <div className="grid md:grid-cols-3 gap-4 mb-12">
           {freeResources.map((r) => (
-            <div key={r.slug} className="card-alt rounded-xl p-6 flex flex-col">
+            <div key={r.slug} className="card-alt rounded-xl p-5 flex flex-col">
               <span className="eyebrow">{r.kind}</span>
-              <h3 className="font-display text-lg text-bone mt-2 mb-2">
+              <h3 className="font-display text-base text-bone mt-2 mb-1.5">
                 {r.title}
               </h3>
-              <p className="text-bone/60 text-sm mb-6">{r.description}</p>
+              <p className="text-bone/60 text-xs mb-4">{r.description}</p>
               <div className="mt-auto">
                 <FreeResourceDownloadButton resource={r} />
               </div>
@@ -143,11 +138,11 @@ export default function Home() {
         </div>
 
         {/* PAGOS */}
-        <p className="eyebrow mb-3">📖 Ebooks y recursos descargables</p>
-        <h2 className="font-display text-2xl sm:text-3xl text-bone mb-10">
+        <p className="eyebrow mb-2 text-bone/50">📖 Ebooks y recursos descargables</p>
+        <h2 className="font-display text-lg sm:text-xl text-bone/80 mb-6">
           Comprá, descargá y aplicá desde hoy
         </h2>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-4">
           {paidResources.map((r) => (
             <div
               key={r.slug}
