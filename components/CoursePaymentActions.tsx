@@ -21,6 +21,14 @@ type AppliedCoupon = { code: string; percentOff: number };
 // vencer). Solo transferencia/Payoneer, nunca Mercado Pago.
 const BUNDLE_DISCOUNT_PERCENT = 15;
 
+// Nombre corto de cada addon para el mensaje de ahorro ("...llevando el
+// curso + el Kit juntos"), en vez del título largo completo del producto.
+const ADDON_SHORT_NAMES: Record<string, string> = {
+  "kit-12-prompts-seleccion": "el Kit",
+  "basta-de-filtrar-a-mano": "la Guía",
+  "combo-kit-y-guia": "el Combo",
+};
+
 // Orden pensado para no perder gente en el camino: primero elige CÓMO
 // quiere pagar (con los precios ya a la vista), recién ahí deja su mail —
 // nada de crear cuenta ni poner contraseña para poder pagar. La cuenta se
@@ -188,12 +196,32 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
   const addon = addonSlug ? getPaidResourceBySlug(addonSlug) : undefined;
   const addonTransferenciaARS = addon ? addon.priceARSTransferencia ?? addon.priceARS : 0;
   const addonUSD = addon?.priceUSD ?? 0;
-  const bundleTransferenciaARS = addon
+  const rawBundleTransferenciaARS = addon
     ? applyDiscount(transferenciaARS + addonTransferenciaARS, BUNDLE_DISCOUNT_PERCENT)
     : transferenciaARS;
-  const bundlePayoneerUSD = addon
+  const rawBundlePayoneerUSD = addon
     ? applyDiscount(payoneerUSD + addonUSD, BUNDLE_DISCOUNT_PERCENT)
     : payoneerUSD;
+
+  // Resguardo: el combo nunca puede salir más barato que el curso solo. Si
+  // por algún cambio futuro en los precios eso pasara, no se publica ese
+  // número — se avisa como error en vez de mostrar un precio incorrecto.
+  const bundleErrorARS = !!addon && rawBundleTransferenciaARS < transferenciaARS;
+  const bundleErrorUSD = !!addon && !!course.payoneerLink && rawBundlePayoneerUSD < payoneerUSD;
+  const bundleTransferenciaARS = bundleErrorARS ? transferenciaARS : rawBundleTransferenciaARS;
+  const bundlePayoneerUSD = bundleErrorUSD ? payoneerUSD : rawBundlePayoneerUSD;
+
+  // Ahorro respecto de pagar los dos productos por separado, a precio de
+  // lista (el mismo que cobra Mercado Pago, sin ningún descuento) — se
+  // muestra siempre en moneda, nunca en porcentaje.
+  const bundleSavingsARS =
+    addon && !bundleErrorARS
+      ? (course.priceARS ?? 0) + (addon.priceARS ?? 0) - bundleTransferenciaARS
+      : 0;
+  const bundleSavingsUSD =
+    addon && !bundleErrorUSD
+      ? (course.priceUSDRegular ?? 0) + (addon.priceUSD ?? 0) - bundlePayoneerUSD
+      : 0;
 
   function handleContactSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -331,12 +359,17 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
               </button>
             ))}
           </div>
-          {addon && (
+          {addon && (method === "payoneer" ? bundleErrorUSD : bundleErrorARS) && (
+            <p className="text-xs text-magenta mt-2">
+              ⚠️ No se pudo calcular el precio del combo con seguridad — escribinos por WhatsApp
+              antes de continuar.
+            </p>
+          )}
+          {addon && !(method === "payoneer" ? bundleErrorUSD : bundleErrorARS) && (
             <p className="text-xs text-sage mt-2">
-              ✅ Precio con descuento por llevar el curso + {addon.title} juntos:{" "}
-              {method === "payoneer"
-                ? `USD ${bundlePayoneerUSD}`
-                : `$${bundleTransferenciaARS.toLocaleString("es-AR")} ARS`}
+              ✅ Ahorrás{" "}
+              {method === "payoneer" ? `USD ${bundleSavingsUSD}` : `$${bundleSavingsARS.toLocaleString("es-AR")}`}
+              {" "}llevando el curso + {ADDON_SHORT_NAMES[addon.slug] ?? addon.title} juntos.
             </p>
           )}
         </div>
@@ -399,38 +432,61 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
         </div>
       )}
 
-      {method === "payoneer" && buyer && course.payoneerLink && (
+      {method === "payoneer" && buyer && (course.payoneerLink || addon) && (
         <div className="card-alt rounded-lg p-4 mb-4 text-sm text-bone/70">
-          {(appliedCoupon || addon) && (
-            <p className="text-xs text-magenta mb-3">
-              ⚠️ Este link de Payoneer cobra el precio de lista en USD — todavía no puede aplicar
-              el cupón ni el combo automáticamente. Pagá con el link y avisanos por WhatsApp con tu
-              cupón o el combo elegido: te devolvemos la diferencia o la descontamos de tu próxima
-              compra.
-            </p>
+          {addon && !addon.payoneerLinkWithCourse ? (
+            // Todavía no existe un link de Payoneer específico para este
+            // combo (curso + este recurso) — se completa
+            // `payoneerLinkWithCourse` en lib/resources.ts apenas esté
+            // creado. Mientras tanto, se coordina el pago a mano.
+            <>
+              <p className="text-xs text-bone/60 mb-3">
+                Todavía no tenemos armado el link de Payoneer para este combo puntual. Escribinos y
+                coordinamos el pago en USD directamente por WhatsApp.
+              </p>
+              <button
+                type="button"
+                onClick={() => confirmManual("payoneer")}
+                className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors"
+              >
+                Escribime por WhatsApp para coordinar el pago en USD →
+              </button>
+            </>
+          ) : (
+            course.payoneerLink && (
+              <>
+                {(appliedCoupon || (addon && !addon.payoneerLinkWithCourse)) && (
+                  <p className="text-xs text-magenta mb-3">
+                    ⚠️ Este link de Payoneer cobra el precio de lista en USD — todavía no puede
+                    aplicar el cupón automáticamente. Pagá con el link y avisanos por WhatsApp con
+                    tu cupón: te devolvemos la diferencia o la descontamos de tu próxima compra.
+                  </p>
+                )}
+                <a
+                  href={addon?.payoneerLinkWithCourse ?? course.payoneerLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-cta w-full inline-block text-center bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors"
+                >
+                  Pagar con Payoneer (USD) →
+                </a>
+                <p className="mt-3 text-xs text-bone/50">
+                  Una vez pagado, enviá el comprobante por WhatsApp o a{" "}
+                  <a href="mailto:hola@rivaraconsultora.com.ar" className="text-magenta hover:underline">
+                    hola@rivaraconsultora.com.ar
+                  </a>{" "}
+                  para confirmar tu lugar.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => confirmManual("payoneer")}
+                  className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors mt-3"
+                >
+                  Confirmar inscripción →
+                </button>
+              </>
+            )
           )}
-          <a
-            href={course.payoneerLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-cta w-full inline-block text-center bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors"
-          >
-            Pagar con Payoneer (USD) →
-          </a>
-          <p className="mt-3 text-xs text-bone/50">
-            Una vez pagado, enviá el comprobante por WhatsApp o a{" "}
-            <a href="mailto:hola@rivaraconsultora.com.ar" className="text-magenta hover:underline">
-              hola@rivaraconsultora.com.ar
-            </a>{" "}
-            para confirmar tu lugar.
-          </p>
-          <button
-            type="button"
-            onClick={() => confirmManual("payoneer")}
-            className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors mt-3"
-          >
-            Confirmar inscripción →
-          </button>
         </div>
       )}
     </div>
