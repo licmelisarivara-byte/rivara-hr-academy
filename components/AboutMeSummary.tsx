@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import ProfessionalRecommendations from "./ProfessionalRecommendations";
 
 export default function AboutMeSummary() {
   const [expanded, setExpanded] = useState(false);
@@ -57,6 +58,7 @@ export default function AboutMeSummary() {
           </button>
         </div>
       </div>
+      <ProfessionalRecommendations />
     </div>
   );
 }
