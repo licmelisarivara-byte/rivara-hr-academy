@@ -6,15 +6,16 @@ import { getCoupon } from "@/lib/coupons";
 import { applyDiscount } from "@/lib/discount";
 
 // Igual que /api/manual-purchase, pero para el combo curso + recurso pago:
-// el curso se cobra tal cual (con cupón si corresponde, sin descontarlo
-// una segunda vez) y al recurso se le aplica 15% sobre su precio de
-// lista, en reemplazo de su 10% individual (no se acumulan) — solo
-// transferencia/Payoneer. Se insertan DOS filas en `compras` (una
-// "course", una "resource") que comparten `bundle_group_id`, para no
-// tener que agregar un tercer valor de `kind` ni tocar el resto del
-// sistema (dashboard, entrega, etc.) — ver
-// app/api/admin/approve-purchase/route.ts, que aprueba y entrega las dos
-// filas juntas cuando comparten ese id.
+// el curso se cobra tal cual (con cupón si corresponde — nunca por
+// Mercado Pago, que no acepta cupones — sin descontarlo una segunda vez)
+// y al recurso se le aplica un % sobre su precio de lista, en reemplazo
+// de su 10% individual (no se acumulan): 15% por transferencia/Payoneer,
+// 5% por Mercado Pago (más chico porque ahí el curso no tiene ningún
+// descuento). Se insertan DOS filas en `compras` (una "course", una
+// "resource") que comparten `bundle_group_id`, para no tener que agregar
+// un tercer valor de `kind` ni tocar el resto del sistema (dashboard,
+// entrega, etc.) — ver app/api/admin/approve-purchase/route.ts, que
+// aprueba y entrega las dos filas juntas cuando comparten ese id.
 export async function POST(req: NextRequest) {
   if (!supabaseAdmin) {
     return NextResponse.json({ error: "not_configured" }, { status: 501 });
@@ -22,7 +23,7 @@ export async function POST(req: NextRequest) {
 
   const { courseSlug, resourceSlug, buyerEmail, buyerName, buyerPhone, method, couponCode } =
     await req.json();
-  if (method !== "transferencia" && method !== "payoneer") {
+  if (method !== "transferencia" && method !== "payoneer" && method !== "mercadopago") {
     return NextResponse.json({ error: "invalid_method" }, { status: 400 });
   }
 
@@ -32,20 +33,26 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
 
-  const coupon = getCoupon(couponCode, { courseSlug: course.slug });
+  // Mercado Pago nunca acepta cupones ni descuentos en el curso — se
+  // cobra siempre precio de lista, igual que en el resto del sitio.
+  const coupon = method === "mercadopago" ? null : getCoupon(couponCode, { courseSlug: course.slug });
   const courseAmount =
     method === "payoneer"
       ? applyDiscount(getPayoneerAmountUSD(course), coupon?.percentOff)
+      : method === "mercadopago"
+      ? course.priceARS ?? 0
       : applyDiscount(getTransferenciaAmountARS(course), coupon?.percentOff);
   // Precio de LISTA del recurso (no el de transferencia individual): el
-  // 15% del combo reemplaza ese 10%, no se suma a él.
+  // % del combo reemplaza ese 10%, no se suma a él.
   const resourceAmount = method === "payoneer" ? resource.priceUSD : resource.priceARS;
+  const addonDiscountPercent = method === "mercadopago" ? 5 : 15;
 
-  // El curso no se toca — se suma tal cual, con o sin cupón. Solo el
-  // recurso se descuenta un 15% adicional, permanente, sin fecha de
-  // vencimiento (a diferencia del cupón del curso, que sí puede vencer).
+  // El curso no se toca — se suma tal cual (con cupón si corresponde).
+  // Solo el recurso se descuenta un % adicional, permanente, sin fecha
+  // de vencimiento (a diferencia del cupón del curso, que sí puede
+  // vencer).
   const bundleCourseAmount = courseAmount;
-  const bundleResourceAmount = applyDiscount(resourceAmount, 15);
+  const bundleResourceAmount = applyDiscount(resourceAmount, addonDiscountPercent);
 
   const currency = method === "payoneer" ? "USD" : "ARS";
   const bundleGroupId = crypto.randomUUID();

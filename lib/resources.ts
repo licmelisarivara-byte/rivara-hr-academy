@@ -55,6 +55,7 @@ export type PaidResource = {
   mpPaymentLink?: string; // link de pago fijo de Mercado Pago (mientras la API de Checkout Pro esté bloqueada)
   payoneerLink?: string; // link de pago en USD; Payoneer exige mínimo USD 20 por link
   payoneerLinkWithCourse?: string; // link de Payoneer específico para el combo "curso + este recurso" (components/CoursePaymentActions.tsx); sin cargar todavía — mientras no exista, se ofrece un fallback de WhatsApp
+  mpPaymentLinkWithCourse?: string; // link de Mercado Pago específico para el combo "curso + este recurso"; mismo criterio que payoneerLinkWithCourse — sin cargar todavía, fallback a WhatsApp mientras tanto
 };
 
 export const paidResources: PaidResource[] = [

@@ -16,12 +16,14 @@ type Method = "" | "transferencia" | "mercadopago" | "payoneer";
 type Buyer = { email: string; phone: string };
 type AppliedCoupon = { code: string; percentOff: number };
 
-// 15% sobre el PRECIO DE LISTA del addon elegido — reemplaza su
-// descuento individual del 10% (no se acumulan). El precio del curso no
-// se toca: se suma tal cual, con o sin cupón, para no descontarlo dos
-// veces. Permanente, sin fecha de vencimiento. Solo transferencia/
-// Payoneer, nunca Mercado Pago.
+// % sobre el PRECIO DE LISTA del addon elegido — reemplaza su descuento
+// individual del 10% (no se acumulan). El precio del curso no se toca:
+// se suma tal cual, con o sin cupón (nunca en Mercado Pago, que no
+// acepta cupones), para no descontarlo dos veces. Permanente, sin fecha
+// de vencimiento. Por transferencia/Payoneer el addon baja un 15%; por
+// Mercado Pago solo un 5% (el curso ahí no tiene ningún descuento).
 const BUNDLE_DISCOUNT_PERCENT = 15;
+const MP_BUNDLE_DISCOUNT_PERCENT = 5;
 
 // Nombre corto de cada addon para el mensaje de ahorro ("...llevando el
 // curso + el Kit juntos"), en vez del título largo completo del producto.
@@ -114,8 +116,10 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
   // un recurso pago (combo), pega a la ruta de combo en vez de la normal.
   useEffect(() => {
     if (!buyer) return;
-    if (method !== "transferencia" && method !== "payoneer") return;
     if (addonSlug) {
+      // El combo se ofrece con los 3 métodos (sin addon, Mercado Pago
+      // sigue su propio flujo dinámico vía /api/checkout más abajo).
+      if (method !== "transferencia" && method !== "payoneer" && method !== "mercadopago") return;
       fetch("/api/manual-purchase-bundle", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -132,6 +136,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
       });
       return;
     }
+    if (method !== "transferencia" && method !== "payoneer") return;
     fetch("/api/manual-purchase", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -193,22 +198,27 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
 
   // Combo curso + recurso pago (Kit/Guía/Combo de ebooks): el curso se
   // suma tal cual (con cupón si corresponde, sin ningún % adicional — no
-  // se descuenta dos veces), y al addon se le aplica un 15% sobre su
-  // precio de lista, EN REEMPLAZO de su 10% individual (no se acumulan)
-  // — solo transferencia/Payoneer.
+  // se descuenta dos veces), y al addon se le aplica un % sobre su
+  // precio de lista, EN REEMPLAZO de su 10% individual (no se acumulan):
+  // 15% por transferencia/Payoneer, 5% por Mercado Pago.
   const addon = addonSlug ? getPaidResourceBySlug(addonSlug) : undefined;
+  const mpCourseARS = course.priceARS ?? 0; // Mercado Pago nunca tiene cupón ni descuento en el curso
   const addonBundleARS = addon ? applyDiscount(addon.priceARS, BUNDLE_DISCOUNT_PERCENT) : 0;
   const addonBundleUSD = addon ? applyDiscount(addon.priceUSD, BUNDLE_DISCOUNT_PERCENT) : 0;
+  const addonBundleMP = addon ? applyDiscount(addon.priceARS, MP_BUNDLE_DISCOUNT_PERCENT) : 0;
   const rawBundleTransferenciaARS = addon ? transferenciaARS + addonBundleARS : transferenciaARS;
   const rawBundlePayoneerUSD = addon ? payoneerUSD + addonBundleUSD : payoneerUSD;
+  const rawBundleMercadoPagoARS = addon ? mpCourseARS + addonBundleMP : mpCourseARS;
 
   // Resguardo: el combo nunca puede salir más barato que el curso solo. Si
   // por algún cambio futuro en los precios eso pasara, no se publica ese
   // número — se avisa como error en vez de mostrar un precio incorrecto.
   const bundleErrorARS = !!addon && rawBundleTransferenciaARS < transferenciaARS;
   const bundleErrorUSD = !!addon && !!course.payoneerLink && rawBundlePayoneerUSD < payoneerUSD;
+  const bundleErrorMP = !!addon && rawBundleMercadoPagoARS < mpCourseARS;
   const bundleTransferenciaARS = bundleErrorARS ? transferenciaARS : rawBundleTransferenciaARS;
   const bundlePayoneerUSD = bundleErrorUSD ? payoneerUSD : rawBundlePayoneerUSD;
+  const bundleMercadoPagoARS = bundleErrorMP ? mpCourseARS : rawBundleMercadoPagoARS;
 
   // Ahorro respecto de pagar los dos productos por separado, a precio de
   // lista (el mismo que cobra Mercado Pago, sin ningún descuento) — se
@@ -221,27 +231,32 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
     addon && !bundleErrorUSD
       ? (course.priceUSDRegular ?? 0) + (addon.priceUSD ?? 0) - bundlePayoneerUSD
       : 0;
+  const bundleSavingsMP =
+    addon && !bundleErrorMP ? mpCourseARS + (addon.priceARS ?? 0) - bundleMercadoPagoARS : 0;
 
   function handleContactSubmit(e: React.FormEvent) {
     e.preventDefault();
     setContactSubmitted(true);
   }
 
-  function confirmManual(m: "transferencia" | "payoneer") {
+  function confirmManual(m: "transferencia" | "payoneer" | "mercadopago") {
     (window as any).gtag?.("event", "generate_lead", {
       event_category: "curso",
       event_label: course.slug,
       payment_method: m,
     });
-    const label = m === "transferencia" ? "Transferencia bancaria" : "Payoneer";
+    const label =
+      m === "transferencia" ? "Transferencia bancaria" : m === "payoneer" ? "Payoneer" : "Mercado Pago";
     const couponLine = appliedCoupon
       ? `\n🎟️ Cupón: ${appliedCoupon.code} (${appliedCoupon.percentOff}% off)`
       : "";
-    const comboLine = addon
-      ? `\n📦 Combo: + ${addon.title}\n💰 Total con combo: ${
-          m === "payoneer" ? `USD ${bundlePayoneerUSD}` : `$${bundleTransferenciaARS.toLocaleString("es-AR")} ARS`
-        }`
-      : "";
+    const comboAmount =
+      m === "payoneer"
+        ? `USD ${bundlePayoneerUSD}`
+        : m === "mercadopago"
+        ? `$${bundleMercadoPagoARS.toLocaleString("es-AR")} ARS`
+        : `$${bundleTransferenciaARS.toLocaleString("es-AR")} ARS`;
+    const comboLine = addon ? `\n📦 Combo: + ${addon.title}\n💰 Total con combo: ${comboAmount}` : "";
     const phoneLine = buyer?.phone ? `\n📱 Celular: ${buyer.phone}` : "";
     const message = encodeURIComponent(
       `Hola Melisa 👋\n\nQuiero inscribirme al curso "${course.title}" de RIVARA HR Academy.\n\n📧 Email: ${buyer?.email}${phoneLine}\n💳 Forma de pago: ${label}${couponLine}${comboLine}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
@@ -317,62 +332,70 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
                 : "border-black/10 bg-panel/50 text-bone/70 hover:border-magenta/40"
             }`}
           >
-            Mercado Pago — ${(course.priceARS ?? 0).toLocaleString("es-AR")} ARS (sin descuento)
+            Mercado Pago — ${bundleMercadoPagoARS.toLocaleString("es-AR")} ARS
+            {!addon && " (sin descuento)"}
           </button>
         </div>
       </div>
 
-      {(method === "transferencia" || method === "payoneer") && (
-        <div className="mb-4">
-          <label className="text-sm text-bone/60 block mb-2">
-            Sumá también (opcional)
-          </label>
-          <div className="space-y-2" role="radiogroup" aria-label="Sumá también">
-            <button
-              type="button"
-              role="radio"
-              aria-checked={addonSlug === ""}
-              onClick={() => setAddonSlug("")}
-              className={`w-full text-left rounded-lg border px-4 py-2.5 text-sm transition-colors ${
-                addonSlug === ""
-                  ? "border-magenta bg-panel text-bone"
-                  : "border-black/10 bg-panel/50 text-bone/70 hover:border-magenta/40"
-              }`}
-            >
-              Ninguno
-            </button>
-            {paidResources.map((r) => (
+      {(method === "transferencia" || method === "payoneer" || method === "mercadopago") && (() => {
+        const addonPercent = method === "mercadopago" ? MP_BUNDLE_DISCOUNT_PERCENT : BUNDLE_DISCOUNT_PERCENT;
+        const activeError = method === "payoneer" ? bundleErrorUSD : method === "mercadopago" ? bundleErrorMP : bundleErrorARS;
+        const activeSavingsLabel =
+          method === "payoneer"
+            ? `USD ${bundleSavingsUSD}`
+            : `$${(method === "mercadopago" ? bundleSavingsMP : bundleSavingsARS).toLocaleString("es-AR")}`;
+        return (
+          <div className="mb-4">
+            <label className="text-sm text-bone/60 block mb-2">
+              Sumá también (opcional)
+            </label>
+            <div className="space-y-2" role="radiogroup" aria-label="Sumá también">
               <button
-                key={r.slug}
                 type="button"
                 role="radio"
-                aria-checked={addonSlug === r.slug}
-                onClick={() => setAddonSlug(r.slug)}
+                aria-checked={addonSlug === ""}
+                onClick={() => setAddonSlug("")}
                 className={`w-full text-left rounded-lg border px-4 py-2.5 text-sm transition-colors ${
-                  addonSlug === r.slug
+                  addonSlug === ""
                     ? "border-magenta bg-panel text-bone"
                     : "border-black/10 bg-panel/50 text-bone/70 hover:border-magenta/40"
                 }`}
               >
-                {r.title} — ${applyDiscount(r.priceARS, BUNDLE_DISCOUNT_PERCENT).toLocaleString("es-AR")}
+                Ninguno
               </button>
-            ))}
+              {paidResources.map((r) => (
+                <button
+                  key={r.slug}
+                  type="button"
+                  role="radio"
+                  aria-checked={addonSlug === r.slug}
+                  onClick={() => setAddonSlug(r.slug)}
+                  className={`w-full text-left rounded-lg border px-4 py-2.5 text-sm transition-colors ${
+                    addonSlug === r.slug
+                      ? "border-magenta bg-panel text-bone"
+                      : "border-black/10 bg-panel/50 text-bone/70 hover:border-magenta/40"
+                  }`}
+                >
+                  {r.title} — ${applyDiscount(r.priceARS, addonPercent).toLocaleString("es-AR")}
+                </button>
+              ))}
+            </div>
+            {addon && activeError && (
+              <p className="text-xs text-magenta mt-2">
+                ⚠️ No se pudo calcular el precio del combo con seguridad — escribinos por WhatsApp
+                antes de continuar.
+              </p>
+            )}
+            {addon && !activeError && (
+              <p className="text-xs text-sage mt-2">
+                ✅ Ahorrás {activeSavingsLabel} llevando el curso + {ADDON_SHORT_NAMES[addon.slug] ?? addon.title}{" "}
+                juntos.
+              </p>
+            )}
           </div>
-          {addon && (method === "payoneer" ? bundleErrorUSD : bundleErrorARS) && (
-            <p className="text-xs text-magenta mt-2">
-              ⚠️ No se pudo calcular el precio del combo con seguridad — escribinos por WhatsApp
-              antes de continuar.
-            </p>
-          )}
-          {addon && !(method === "payoneer" ? bundleErrorUSD : bundleErrorARS) && (
-            <p className="text-xs text-sage mt-2">
-              ✅ Ahorrás{" "}
-              {method === "payoneer" ? `USD ${bundleSavingsUSD}` : `$${bundleSavingsARS.toLocaleString("es-AR")}`}
-              {" "}llevando el curso + {ADDON_SHORT_NAMES[addon.slug] ?? addon.title} juntos.
-            </p>
-          )}
-        </div>
-      )}
+        );
+      })()}
 
       {method && !buyer && (
         <form onSubmit={handleContactSubmit} className="card-alt rounded-lg p-4 mb-4 space-y-3">
@@ -405,7 +428,42 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
         </form>
       )}
 
-      {method === "mercadopago" && buyer && <CheckoutButton course={course} buyerEmail={buyer.email} />}
+      {method === "mercadopago" && buyer && !addon && (
+        <CheckoutButton course={course} buyerEmail={buyer.email} />
+      )}
+
+      {method === "mercadopago" && buyer && addon && (
+        <div className="card-alt rounded-lg p-4 mb-4 text-sm text-bone/70">
+          {addon.mpPaymentLinkWithCourse ? (
+            <a
+              href={addon.mpPaymentLinkWithCourse}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-cta w-full inline-block text-center bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors"
+            >
+              Pagar con Mercado Pago →
+            </a>
+          ) : (
+            // Todavía no existe un link de Mercado Pago específico para
+            // este combo (curso + este recurso) — se completa
+            // `mpPaymentLinkWithCourse` en lib/resources.ts apenas esté
+            // creado. Mientras tanto, se coordina el pago a mano.
+            <>
+              <p className="text-xs text-bone/60 mb-3">
+                Todavía no tenemos armado el link de Mercado Pago para este combo puntual. Escribinos
+                y coordinamos el pago directamente por WhatsApp.
+              </p>
+              <button
+                type="button"
+                onClick={() => confirmManual("mercadopago")}
+                className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors"
+              >
+                Escribime por WhatsApp para coordinar el pago →
+              </button>
+            </>
+          )}
+        </div>
+      )}
 
       {method === "transferencia" && buyer && course.bankDetails && (
         <div className="card-alt rounded-lg p-4 mb-4 text-sm text-bone/70">
