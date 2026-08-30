@@ -196,15 +196,28 @@ export default function Home() {
                 <p className="text-sage text-xs font-semibold mb-3">{r.benefit}</p>
               )}
               <div className="mt-auto">
-                <div className="flex items-baseline gap-2 mb-1">
+                <div className="mb-1">
+                  {r.priceARSTransferencia && (
+                    <span className="text-bone/40 line-through text-sm mr-2">
+                      {formatARS(r.priceARS)}
+                    </span>
+                  )}
                   <span className="font-display text-2xl text-bone">
-                    {formatARS(r.priceARS)}
+                    {formatARS(r.priceARSTransferencia ?? r.priceARS)}
                   </span>
-                  <span className="text-bone/40 text-xs">ARS</span>
+                  <span className="text-bone/40 text-xs ml-1">ARS</span>
                 </div>
+                {r.priceARSTransferencia && (
+                  <div className="text-bone/50 text-xs mb-1">
+                    Por transferencia{r.payoneerLink ? " o Payoneer" : ""} · Mercado Pago:{" "}
+                    {formatARS(r.priceARS)} (sin descuento)
+                  </div>
+                )}
                 {r.savingsARS && (
-                  <div className="text-magenta text-xs mb-3">
-                    Ahorrás {formatARS(r.savingsARS)}
+                  <div className="mb-2">
+                    <span className="inline-block text-xs font-semibold bg-magenta text-white px-3 py-1 rounded-full">
+                      Ahorrás {formatARS(r.savingsARS)}
+                    </span>
                   </div>
                 )}
                 <div className={r.savingsARS ? "" : "mt-3"}>

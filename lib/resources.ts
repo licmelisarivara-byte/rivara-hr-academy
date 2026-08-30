@@ -44,7 +44,8 @@ export type PaidResource = {
   kind: string;
   description: string;
   benefit?: string; // línea corta en clave de beneficio, mostrada en la card de la home
-  priceARS: number;
+  priceARS: number; // precio de lista, el que cobra Mercado Pago (sin descuento)
+  priceARSTransferencia?: number; // precio con descuento permanente por transferencia o Payoneer — política fija, sin fecha de vencimiento
   priceUSD: number;
   savingsARS?: number;
   isCombo?: boolean;
@@ -64,6 +65,7 @@ export const paidResources: PaidResource[] = [
       "12 prompts listos para usar en atracción de talento, preselección, entrevistas y post-entrevista. Compatible con Claude, ChatGPT, Gemini, Copilot y NotebookLM.",
     benefit: "Ahorrá horas redactando. 12 prompts listos para cada etapa del proceso.",
     priceARS: 15000,
+    priceARSTransferencia: 13500,
     priceUSD: 12,
     fileUrl: "/downloads/kit-12-prompts-seleccion.pdf",
     image: "/images/covers/kit-12-prompts.png",
@@ -77,6 +79,7 @@ export const paidResources: PaidResource[] = [
       "Guía práctica de automatización de reclutamiento para PyMEs: qué automatizar, cómo elegir un ATS, plantillas listas para usar y un plan de implementación de 5 semanas.",
     benefit: "Guía paso a paso para dejar de filtrar a mano: qué automatizar y cómo armar tu ATS en 5 semanas.",
     priceARS: 22000,
+    priceARSTransferencia: 19800,
     priceUSD: 18,
     fileUrl: "/downloads/guia-automatizacion-pymes.pdf",
     image: "/images/covers/guia-pymes.png",
@@ -89,6 +92,7 @@ export const paidResources: PaidResource[] = [
     description: "Llevate los dos recursos juntos y ahorrás.",
     benefit: "Los dos recursos juntos, para no arrancar de cero en nada.",
     priceARS: 30000,
+    priceARSTransferencia: 27000,
     priceUSD: 25,
     savingsARS: 7000,
     isCombo: true,

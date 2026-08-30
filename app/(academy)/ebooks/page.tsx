@@ -64,21 +64,32 @@ export default function EbooksPage({
             <p className="text-bone/60 text-sm mb-5">{r.description}</p>
 
             <div className="mt-auto">
-              <div className="flex items-baseline gap-2 mb-1">
-                <span className="font-display text-2xl text-bone">
-                  {formatARS(r.priceARS)}
-                </span>
-                <span className="text-bone/40 text-xs">ARS</span>
-              </div>
-              <div className="text-bone/50 text-xs mb-1">
-                USD {r.priceUSD}
-                {!r.payoneerLink && (
-                  <span className="text-bone/40"> (solo referencia, se cobra en ARS)</span>
+              <div className="mb-1">
+                {r.priceARSTransferencia && (
+                  <span className="text-bone/40 line-through text-sm mr-2">
+                    {formatARS(r.priceARS)}
+                  </span>
                 )}
+                <span className="font-display text-2xl text-bone">
+                  {formatARS(r.priceARSTransferencia ?? r.priceARS)}
+                </span>
+                <span className="text-bone/40 text-xs ml-1">ARS</span>
+              </div>
+              {r.priceARSTransferencia && (
+                <div className="text-bone/50 text-xs mb-1">
+                  Por transferencia{r.payoneerLink ? " o Payoneer" : ""} · Mercado Pago:{" "}
+                  {formatARS(r.priceARS)} (sin descuento)
+                </div>
+              )}
+              <div className="text-bone/40 text-xs mb-1">
+                USD {r.priceUSD}
+                {!r.payoneerLink && " (solo referencia, se cobra en ARS)"}
               </div>
               {r.savingsARS && (
-                <div className="text-magenta text-xs mb-3">
-                  Ahorrás {formatARS(r.savingsARS)}
+                <div className="mb-2">
+                  <span className="inline-block text-xs font-semibold bg-magenta text-white px-3 py-1 rounded-full">
+                    Ahorrás {formatARS(r.savingsARS)}
+                  </span>
                 </div>
               )}
               <div className={r.savingsARS ? "" : "mt-3"}>

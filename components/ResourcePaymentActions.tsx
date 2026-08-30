@@ -95,8 +95,13 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
           className="w-full rounded-lg bg-panel border border-black/10 px-3 py-2 text-sm text-bone focus:border-magenta outline-none"
         >
           <option value="">¿Cómo querés pagar?</option>
-          <option value="mercadopago">Mercado Pago — ${resource.priceARS.toLocaleString("es-AR")} ARS</option>
-          <option value="transferencia">Transferencia bancaria — ${resource.priceARS.toLocaleString("es-AR")} ARS</option>
+          <option value="mercadopago">
+            Mercado Pago — ${resource.priceARS.toLocaleString("es-AR")} ARS
+          </option>
+          <option value="transferencia">
+            Transferencia bancaria — $
+            {(resource.priceARSTransferencia ?? resource.priceARS).toLocaleString("es-AR")} ARS
+          </option>
           {resource.payoneerLink && (
             <option value="payoneer">Payoneer — USD {resource.priceUSD}</option>
           )}
@@ -164,6 +169,13 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
 
       {method === "payoneer" && buyer && resource.payoneerLink && (
         <div className="card-alt rounded-lg p-4 text-sm text-bone/70">
+          {resource.priceARSTransferencia && (
+            <p className="text-xs text-magenta mb-3">
+              ⚠️ Este link de Payoneer todavía cobra el precio de lista en USD — no aplica el
+              descuento por transferencia automáticamente. Pagá con el link y avisanos por
+              WhatsApp: te devolvemos la diferencia o la descontamos de tu próxima compra.
+            </p>
+          )}
           <a
             href={resource.payoneerLink}
             target="_blank"
