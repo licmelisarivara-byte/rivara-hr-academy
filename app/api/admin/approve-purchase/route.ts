@@ -7,8 +7,12 @@ import { deliverCourseAccess, deliverResource } from "@/lib/deliverPurchase";
 // de bienvenida que ya manda el webhook automático de MP, para que ambos
 // caminos de pago terminen en exactamente el mismo lugar.
 //
+// Si la fila es parte de un combo (bundle_group_id, ver
+// /api/manual-purchase-bundle), aprobar CUALQUIERA de las dos filas
+// vinculadas aprueba y entrega las dos — no hace falta llamar dos veces.
+//
 // Uso: POST con header "x-admin-secret" = ADMIN_SECRET y body:
-//   { "id": "<uuid de la fila en compras>", "amount"?: <monto real confirmado> }
+//   { "id": "<uuid de la fila en compras>", "amount"?: <monto real confirmado, solo para esa fila> }
 export async function POST(req: NextRequest) {
   const adminSecret = process.env.ADMIN_SECRET;
   const providedSecret = req.headers.get("x-admin-secret");
@@ -33,31 +37,41 @@ export async function POST(req: NextRequest) {
   if (!purchase) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
-  if (purchase.status === "approved" && purchase.delivered_at) {
-    return NextResponse.json({ ok: true, skipped: "already_delivered" });
-  }
 
-  const updates: Record<string, unknown> = {
-    status: "approved",
-    paid_at: purchase.paid_at || new Date().toISOString(),
-  };
-  if (typeof amount === "number") {
-    updates.amount = amount;
-  }
-
-  await supabaseAdmin.from("compras").update(updates).eq("id", id);
-
-  if (!purchase.delivered_at && purchase.buyer_email) {
-    if (purchase.kind === "course") {
-      await deliverCourseAccess(purchase.resource_slug, purchase.buyer_email);
-    } else {
-      await deliverResource(purchase.resource_slug, purchase.buyer_email);
-    }
-    await supabaseAdmin
+  let group = [purchase];
+  if (purchase.bundle_group_id) {
+    const { data: siblings } = await supabaseAdmin
       .from("compras")
-      .update({ delivered_at: new Date().toISOString() })
-      .eq("id", id);
+      .select("*")
+      .eq("bundle_group_id", purchase.bundle_group_id)
+      .neq("id", id);
+    if (siblings) group = [...group, ...siblings];
   }
 
-  return NextResponse.json({ ok: true });
+  for (const row of group) {
+    if (row.status === "approved" && row.delivered_at) continue;
+
+    const updates: Record<string, unknown> = {
+      status: "approved",
+      paid_at: row.paid_at || new Date().toISOString(),
+    };
+    if (row.id === id && typeof amount === "number") {
+      updates.amount = amount;
+    }
+    await supabaseAdmin.from("compras").update(updates).eq("id", row.id);
+
+    if (!row.delivered_at && row.buyer_email) {
+      if (row.kind === "course") {
+        await deliverCourseAccess(row.resource_slug, row.buyer_email);
+      } else {
+        await deliverResource(row.resource_slug, row.buyer_email);
+      }
+      await supabaseAdmin
+        .from("compras")
+        .update({ delivered_at: new Date().toISOString() })
+        .eq("id", row.id);
+    }
+  }
+
+  return NextResponse.json({ ok: true, processed: group.length });
 }

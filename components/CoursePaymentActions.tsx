@@ -10,10 +10,16 @@ import {
   getPayoneerAmountUSD,
   type Course,
 } from "@/lib/courses";
+import { paidResources, getPaidResourceBySlug } from "@/lib/resources";
 
 type Method = "" | "transferencia" | "mercadopago" | "payoneer";
 type Buyer = { email: string; phone: string };
 type AppliedCoupon = { code: string; percentOff: number };
+
+// 15% adicional sobre la suma del curso + el recurso elegido — permanente,
+// sin fecha de vencimiento (a diferencia del cupón del curso, que sí puede
+// vencer). Solo transferencia/Payoneer, nunca Mercado Pago.
+const BUNDLE_DISCOUNT_PERCENT = 15;
 
 // Orden pensado para no perder gente en el camino: primero elige CÓMO
 // quiere pagar (con los precios ya a la vista), recién ahí deja su mail —
@@ -29,6 +35,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
   const [couponInput, setCouponInput] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
   const [couponInvalid, setCouponInvalid] = useState(false);
+  const [addonSlug, setAddonSlug] = useState("");
 
   // El código y el % de descuento nunca viajan en el bundle de JS (no se
   // importa lib/coupons acá) — se valida contra /api/coupon, que solo
@@ -93,10 +100,28 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
 
   // Apenas conocemos el mail (ya sea porque estaba logueado o porque recién
   // completó el formulario) Y eligió un método manual, registramos la
-  // intención de compra — aunque después no confirme nada.
+  // intención de compra — aunque después no confirme nada. Si eligió sumar
+  // un recurso pago (combo), pega a la ruta de combo en vez de la normal.
   useEffect(() => {
     if (!buyer) return;
     if (method !== "transferencia" && method !== "payoneer") return;
+    if (addonSlug) {
+      fetch("/api/manual-purchase-bundle", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          courseSlug: course.slug,
+          resourceSlug: addonSlug,
+          method,
+          buyerEmail: buyer.email,
+          buyerPhone: buyer.phone,
+          couponCode: appliedCoupon?.code,
+        }),
+      }).catch(() => {
+        // No bloqueamos la UI si esto falla; Melisa igual recibe el WhatsApp/mail.
+      });
+      return;
+    }
     fetch("/api/manual-purchase", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -112,7 +137,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
       // No bloqueamos la UI si esto falla; Melisa igual recibe el WhatsApp/mail.
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [buyer, method]);
+  }, [buyer, method, addonSlug]);
 
   if (course.comingSoon) {
     return (
@@ -156,6 +181,20 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
   const transferenciaARS = applyDiscount(getTransferenciaAmountARS(course), appliedCoupon?.percentOff);
   const payoneerUSD = applyDiscount(getPayoneerAmountUSD(course), appliedCoupon?.percentOff);
 
+  // Combo curso + recurso pago (Kit/Guía/Combo de ebooks): se suma el
+  // precio del curso (ya con cupón, si corresponde) al precio del recurso
+  // (ya con su 10% permanente por transferencia) y se le aplica un 15%
+  // adicional sobre esa suma — solo transferencia/Payoneer.
+  const addon = addonSlug ? getPaidResourceBySlug(addonSlug) : undefined;
+  const addonTransferenciaARS = addon ? addon.priceARSTransferencia ?? addon.priceARS : 0;
+  const addonUSD = addon?.priceUSD ?? 0;
+  const bundleTransferenciaARS = addon
+    ? applyDiscount(transferenciaARS + addonTransferenciaARS, BUNDLE_DISCOUNT_PERCENT)
+    : transferenciaARS;
+  const bundlePayoneerUSD = addon
+    ? applyDiscount(payoneerUSD + addonUSD, BUNDLE_DISCOUNT_PERCENT)
+    : payoneerUSD;
+
   function handleContactSubmit(e: React.FormEvent) {
     e.preventDefault();
     setContactSubmitted(true);
@@ -171,9 +210,14 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
     const couponLine = appliedCoupon
       ? `\n🎟️ Cupón: ${appliedCoupon.code} (${appliedCoupon.percentOff}% off)`
       : "";
+    const comboLine = addon
+      ? `\n📦 Combo: + ${addon.title}\n💰 Total con combo (${BUNDLE_DISCOUNT_PERCENT}% off adicional): ${
+          m === "payoneer" ? `USD ${bundlePayoneerUSD}` : `$${bundleTransferenciaARS.toLocaleString("es-AR")} ARS`
+        }`
+      : "";
     const phoneLine = buyer?.phone ? `\n📱 Celular: ${buyer.phone}` : "";
     const message = encodeURIComponent(
-      `Hola Melisa 👋\n\nQuiero inscribirme al curso "${course.title}" de RIVARA HR Academy.\n\n📧 Email: ${buyer?.email}${phoneLine}\n💳 Forma de pago: ${label}${couponLine}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
+      `Hola Melisa 👋\n\nQuiero inscribirme al curso "${course.title}" de RIVARA HR Academy.\n\n📧 Email: ${buyer?.email}${phoneLine}\n💳 Forma de pago: ${label}${couponLine}${comboLine}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
     );
     window.open(`https://wa.me/5491123912820?text=${message}`, "_blank");
     router.push("/");
@@ -218,7 +262,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
                 : "border-black/10 bg-panel/50 text-bone/70 hover:border-magenta/40"
             }`}
           >
-            Transferencia bancaria — ${transferenciaARS.toLocaleString("es-AR")} ARS
+            Transferencia bancaria — ${bundleTransferenciaARS.toLocaleString("es-AR")} ARS
           </button>
           {course.payoneerLink && (
             <button
@@ -232,7 +276,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
                   : "border-black/10 bg-panel/50 text-bone/70 hover:border-magenta/40"
               }`}
             >
-              Payoneer — USD {payoneerUSD}
+              Payoneer — USD {bundlePayoneerUSD}
             </button>
           )}
           <button
@@ -250,6 +294,53 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
           </button>
         </div>
       </div>
+
+      {(method === "transferencia" || method === "payoneer") && (
+        <div className="mb-4">
+          <label className="text-sm text-bone/60 block mb-2">
+            Sumá también (opcional)
+          </label>
+          <div className="space-y-2" role="radiogroup" aria-label="Sumá también">
+            <button
+              type="button"
+              role="radio"
+              aria-checked={addonSlug === ""}
+              onClick={() => setAddonSlug("")}
+              className={`w-full text-left rounded-lg border px-4 py-2.5 text-sm transition-colors ${
+                addonSlug === ""
+                  ? "border-magenta bg-panel text-bone"
+                  : "border-black/10 bg-panel/50 text-bone/70 hover:border-magenta/40"
+              }`}
+            >
+              Ninguno
+            </button>
+            {paidResources.map((r) => (
+              <button
+                key={r.slug}
+                type="button"
+                role="radio"
+                aria-checked={addonSlug === r.slug}
+                onClick={() => setAddonSlug(r.slug)}
+                className={`w-full text-left rounded-lg border px-4 py-2.5 text-sm transition-colors ${
+                  addonSlug === r.slug
+                    ? "border-magenta bg-panel text-bone"
+                    : "border-black/10 bg-panel/50 text-bone/70 hover:border-magenta/40"
+                }`}
+              >
+                {r.title} — ${(r.priceARSTransferencia ?? r.priceARS).toLocaleString("es-AR")}
+              </button>
+            ))}
+          </div>
+          {addon && (
+            <p className="text-xs text-sage mt-2">
+              ✅ Precio con descuento por llevar el curso + {addon.title} juntos:{" "}
+              {method === "payoneer"
+                ? `USD ${bundlePayoneerUSD}`
+                : `$${bundleTransferenciaARS.toLocaleString("es-AR")} ARS`}
+            </p>
+          )}
+        </div>
+      )}
 
       {method && !buyer && (
         <form onSubmit={handleContactSubmit} className="card-alt rounded-lg p-4 mb-4 space-y-3">
@@ -310,11 +401,12 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
 
       {method === "payoneer" && buyer && course.payoneerLink && (
         <div className="card-alt rounded-lg p-4 mb-4 text-sm text-bone/70">
-          {appliedCoupon && (
+          {(appliedCoupon || addon) && (
             <p className="text-xs text-magenta mb-3">
               ⚠️ Este link de Payoneer cobra el precio de lista en USD — todavía no puede aplicar
-              el cupón automáticamente. Pagá con el link y avisanos por WhatsApp con tu cupón: te
-              devolvemos la diferencia o la descontamos de tu próxima compra.
+              el cupón ni el combo automáticamente. Pagá con el link y avisanos por WhatsApp con tu
+              cupón o el combo elegido: te devolvemos la diferencia o la descontamos de tu próxima
+              compra.
             </p>
           )}
           <a
