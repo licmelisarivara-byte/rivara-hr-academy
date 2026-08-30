@@ -13,6 +13,7 @@ export type Course = {
   modules: {
     title: string;
     benefit?: string; // título en clave de beneficio, mostrado arriba de `title` en la página del curso (ver app/(academy)/cursos/[slug]/page.tsx)
+    icon?: string; // emoji simple mostrado junto al título en el acordeón de contenido, elegido según el tema real del módulo
     items: string[];
     recordingVideoId?: string; // YouTube ID no listado de la grabación de esa clase, se completa después de dictarla
     recordingStartSeconds?: number; // si el módulo arranca a mitad de un video compartido con otro módulo (ej: el cierre del módulo anterior queda al principio)
@@ -21,6 +22,9 @@ export type Course = {
   }[];
   image?: string; // portada en /public/images
   outcomes?: string[];
+  pageH1?: string; // texto del <h1> en la página del curso, si difiere de `title` (que se usa en otros lugares: card de home, WhatsApp, etc.)
+  seoTitle?: string; // title tag de la página del curso, si difiere de `title`
+  seoDescription?: string; // meta description de la página del curso, si difiere de `description`
   price: string; // texto mostrado en pantalla
   priceARS?: number; // monto real que se cobra por Mercado Pago (nunca tiene descuento)
   priceNote?: string;
@@ -60,6 +64,7 @@ export const courses: Course[] = [
     modules: [
       {
         title: "Módulo 1 (11 de agosto) — Tu asistente de selección con IA",
+        icon: "🤖",
         items: [
           "Introducción a Claude y sus ventajas frente a otras IAs",
           "Manejo de tokens y límites de uso",
@@ -85,6 +90,7 @@ export const courses: Course[] = [
       },
       {
         title: "Módulo 2 (18 de agosto) — Tu propio ATS con IA",
+        icon: "🗂️",
         items: [
           "Precios de las plataformas (Botpress y Lovable)",
           "Diseño de tu ATS en Claude",
@@ -179,12 +185,14 @@ export const courses: Course[] = [
     modules: [
       {
         title: "Bienvenida",
+        icon: "👋",
         items: ["Presentación del curso"],
         recordingVideoId: "Uolt_JCNOOM",
       },
       {
         title: "Módulo 1",
         benefit: "Escribile bien a Claude desde el primer prompt",
+        icon: "✍️",
         items: ["Fundamentos: cómo piensa Claude y cómo escribirle bien"],
         recordingVideoId: "tva0e-JLfUs",
         materials: [
@@ -197,6 +205,7 @@ export const courses: Course[] = [
       {
         title: "Módulo 2",
         benefit: "Analizá CVs en segundos, con criterio consistente",
+        icon: "🔍",
         items: ["Análisis de CVs con el prompt maestro"],
         recordingVideoId: "DEai1Icm7AM",
         materials: [
@@ -225,6 +234,7 @@ export const courses: Course[] = [
       {
         title: "Módulo 3",
         benefit: "Llegá a cada entrevista con las preguntas justas",
+        icon: "🎤",
         items: ["Preguntas STAR y guías de entrevista"],
         recordingVideoId: "m-Vqeg2qSB4",
         materials: [
@@ -237,6 +247,7 @@ export const courses: Course[] = [
       {
         title: "Módulo 4",
         benefit: "Armá la terna sin dudar entre candidatos parecidos",
+        icon: "⚖️",
         items: ["Comparar candidatos y armar la terna"],
         recordingVideoId: "QCExLmdFLjY",
         materials: [
@@ -257,6 +268,7 @@ export const courses: Course[] = [
       {
         title: "Módulo 5",
         benefit: "Comunicá tus decisiones con informes profesionales",
+        icon: "📊",
         items: ["Informes ejecutivos y comunicación con el cliente"],
         recordingVideoId: "RyRDNLEcarg",
         materials: [
@@ -281,6 +293,7 @@ export const courses: Course[] = [
       {
         title: "Módulo 6",
         benefit: "Dejá de repetir el mismo prompt cada vez",
+        icon: "⚙️",
         items: ["Armar tu propio Proyecto de Claude para no repetir el prompt cada vez"],
         recordingVideoId: "wB0W6jSYvR8",
         triggersCertificate: true,
@@ -294,6 +307,7 @@ export const courses: Course[] = [
       {
         title: "Módulo Bonus",
         benefit: "Atraé mejores candidatos antes de que lleguen los CVs",
+        icon: "🧲",
         items: ["Atracción de talento: antes de que lleguen los CVs"],
         recordingVideoId: "fvOezdtGWCo",
         materials: [
@@ -304,6 +318,10 @@ export const courses: Course[] = [
         ],
       },
     ],
+    pageH1: "Claude para Selección: Curso para Recruiters",
+    seoTitle: "Curso de Claude para Selección de Personal",
+    seoDescription:
+      "Aprendé a usar Claude para analizar CVs, generar preguntas STAR y automatizar informes. Curso grabado de 7 módulos para recruiters.",
     outcomes: [
       "Prompts maestros para analizar CVs, armar preguntas STAR y comparar candidatos",
       "Tu propio Proyecto de Claude configurado, para no repetir el prompt cada vez",
@@ -339,6 +357,17 @@ export const courses: Course[] = [
 
 export function getCourseBySlug(slug: string) {
   return courses.find((c) => c.slug === slug);
+}
+
+// Ancla estable por módulo, para el menú "Ir a:" y el acordeón de
+// contenido — sin acentos ni espacios, así funciona como #id de HTML.
+export function moduleAnchor(title: string): string {
+  return title
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 }
 
 export function isEarlyBird(course: Course): boolean {

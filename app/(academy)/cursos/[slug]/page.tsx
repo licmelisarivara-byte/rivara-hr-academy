@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { courses, getCourseBySlug, getCoursePriceSummary } from "@/lib/courses";
+import Link from "next/link";
+import { courses, getCourseBySlug, moduleAnchor } from "@/lib/courses";
+import { paidResources } from "@/lib/resources";
 import CoursePaymentActions from "@/components/CoursePaymentActions";
+import ModuleAccordion from "@/components/ModuleAccordion";
+import AboutMeSummary from "@/components/AboutMeSummary";
 import Testimonials from "@/components/Testimonials";
 
 export function generateStaticParams() {
@@ -12,21 +16,10 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   const course = getCourseBySlug(params.slug);
   if (!course) return {};
   return {
-    title: course.title,
-    description: course.description,
+    title: course.seoTitle ?? course.title,
+    description: course.seoDescription ?? course.description,
     openGraph: course.image ? { images: [{ url: course.image }] } : undefined,
   };
-}
-
-// Ancla estable por módulo, para el menú "Ir a:" de abajo — sin acentos
-// ni espacios, así funciona como #id de HTML.
-function moduleAnchor(title: string): string {
-  return title
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
 }
 
 export default function CourseDetailPage({ params }: { params: { slug: string } }) {
@@ -57,7 +50,7 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-16">
+    <div className="max-w-4xl mx-auto px-6 pt-16 pb-28 sm:pb-16">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
@@ -69,8 +62,28 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
       )}
 
       <p className="eyebrow mb-4">{course.format}</p>
-      <h1 className="font-display text-3xl sm:text-4xl text-bone mb-4">{course.title}</h1>
-      <p className="text-bone/70 text-lg mb-8">{course.description}</p>
+      <h1 className="font-display text-3xl sm:text-4xl text-bone mb-4">
+        {course.pageH1 ?? course.title}
+      </h1>
+      <p className="text-bone/70 text-lg mb-6">{course.description}</p>
+
+      {/* PRECIO Y CTA — visibles sin scrollear, arriba de todo lo demás */}
+      <div className="card rounded-xl p-5 sm:p-6 mb-10 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <div className="text-2xl sm:text-3xl font-display text-bone">{course.price}</div>
+          {course.priceNote && (
+            <div className="text-sm text-bone/50 mt-1">{course.priceNote}</div>
+          )}
+        </div>
+        <a
+          href="#comprar"
+          className="btn-cta inline-block bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors whitespace-nowrap"
+        >
+          Inscribirme ahora →
+        </a>
+      </div>
+
+      {course.slug === "claude-para-seleccion" && <AboutMeSummary />}
 
       {course.modules.length > 3 && (
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-bone/50 mb-8">
@@ -106,6 +119,14 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
               </li>
             ))}
           </ul>
+          <div className="mt-8 text-center">
+            <a
+              href="#comprar"
+              className="btn-cta inline-block bg-magenta text-white px-8 py-3.5 rounded-full hover:bg-magentaSoft transition-colors"
+            >
+              Quiero inscribirme →
+            </a>
+          </div>
         </div>
       )}
 
@@ -121,12 +142,15 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
 
       {/* FORMAS DE PAGO */}
       {course.paymentOptions ? (
-        <div className="card rounded-xl p-6 sm:p-8 mb-10">
+        <div id="comprar" className="card rounded-xl p-6 sm:p-8 mb-10 scroll-mt-24">
           <h2 className="font-display text-xl text-bone mb-4">Formas de pago</h2>
           <CoursePaymentActions course={course} />
         </div>
       ) : (
-        <div className="card rounded-xl p-6 mb-10 flex flex-wrap items-center justify-between gap-4">
+        <div
+          id="comprar"
+          className="card rounded-xl p-6 mb-10 flex flex-wrap items-center justify-between gap-4 scroll-mt-24"
+        >
           <div>
             <div className="text-2xl font-display text-bone">{course.price}</div>
             {course.priceNote && (
@@ -138,61 +162,11 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
       )}
 
       <h2 className="font-display text-2xl text-bone mb-6">Contenido</h2>
-      <div className="space-y-6 mb-10">
-        {course.modules.map((m) => (
-          <div
-            key={m.title}
-            id={moduleAnchor(m.title)}
-            className="card-alt rounded-xl p-6 scroll-mt-24"
-          >
-            {m.benefit && (
-              <p className="text-magenta text-sm font-semibold mb-1">{m.benefit}</p>
-            )}
-            <h3 className="font-semibold text-bone mb-3">{m.title}</h3>
-            <ul className="space-y-1.5 text-sm text-bone/70 list-disc list-inside">
-              {m.items.map((it) => (
-                <li key={it}>{it}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
+      <div className="mb-10">
+        <ModuleAccordion modules={course.modules} />
       </div>
 
-      {course.slug === "claude-para-seleccion" && (
-        <>
-          <Testimonials />
-
-          <div className="mb-10">
-            <h2 className="font-display text-2xl text-bone mb-6">Sobre mí</h2>
-            <div className="card-alt rounded-xl p-6 text-sm text-bone/70 space-y-4">
-              <p>
-                Soy Melisa Rivara, Licenciada en Recursos Humanos (2019) y estudiante de
-                Psicología. Antes de dedicarme a selección, pasé por varios roles que hoy se
-                notan en cómo trabajo: 4 años como vendedora de seguros, 3 años en una
-                importadora de calzado haciendo administración de ventas — carga de pedidos,
-                facturación, notas de crédito, control de logística, y trato directo con
-                vendedores mayoristas y clientes — donde además armé desde cero el organigrama,
-                la descripción de mi puesto y los manuales de procedimiento que no existían, 5
-                años en operaciones de cliente en una multinacional donde empecé a dar mis
-                primeras capacitaciones internas, y un tiempo en emprendimientos digitales
-                propios haciendo community management y marketing.
-              </p>
-              <p>
-                Hace un año y medio me especialicé en selección de personal — y ahí fue cuando
-                empecé a aplicar Claude a mis propios procesos, no como demo para vender un
-                curso, sino porque necesitaba filtrar más rápido sin bajar la calidad de mis
-                ternas.
-              </p>
-              <p>
-                Fundé RIVARA Consultora y RIVARA HR Academy para compartir ese método con
-                colegas de RRHH: no vengo a venderte una promesa de IA genérica, vengo de armar
-                organigramas, dar capacitaciones y hacer selección real, y te enseño lo que uso
-                yo, todas las semanas, en búsquedas reales.
-              </p>
-            </div>
-          </div>
-        </>
-      )}
+      {course.slug === "claude-para-seleccion" && <Testimonials />}
 
       {course.faqs && (
         <div>
@@ -207,6 +181,45 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
           </div>
         </div>
       )}
+
+      {course.slug === "claude-para-seleccion" && (
+        <div className="mt-12">
+          <h2 className="font-display text-2xl text-bone mb-6">También te puede interesar</h2>
+          <div className="grid sm:grid-cols-3 gap-4">
+            <Link
+              href="/masterclass"
+              className="card-alt rounded-xl p-5 hover:border-magenta/40 transition-colors border border-transparent"
+            >
+              <span className="text-xl">🎥</span>
+              <p className="font-semibold text-bone text-sm mt-2 mb-1">
+                Masterclass grabada gratis
+              </p>
+              <p className="text-magenta text-xs font-semibold">Ver la grabación →</p>
+            </Link>
+            {paidResources.map((r) => (
+              <Link
+                key={r.slug}
+                href="/ebooks"
+                className="card-alt rounded-xl p-5 hover:border-magenta/40 transition-colors border border-transparent"
+              >
+                <span className="text-xl">⬇️</span>
+                <p className="font-semibold text-bone text-sm mt-2 mb-1">{r.title}</p>
+                <p className="text-magenta text-xs font-semibold">Ver el recurso →</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* CTA fijo en mobile: se mantiene visible al hacer scroll */}
+      <div className="sm:hidden fixed bottom-0 inset-x-0 z-50 bg-ink/95 backdrop-blur border-t border-black/10 px-4 py-3">
+        <a
+          href="#comprar"
+          className="btn-cta block w-full text-center bg-magenta text-white px-6 py-3 rounded-full hover:bg-magentaSoft transition-colors"
+        >
+          Inscribirme ahora →
+        </a>
+      </div>
     </div>
   );
 }
