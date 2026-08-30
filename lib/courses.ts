@@ -15,6 +15,7 @@ export type Course = {
     benefit?: string; // título en clave de beneficio, mostrado arriba de `title` en la página del curso (ver app/(academy)/cursos/[slug]/page.tsx)
     icon?: string; // emoji simple mostrado junto al título en el acordeón de contenido, elegido según el tema real del módulo
     items: string[];
+    takeaways?: string[]; // bullets de "Lo que te llevás", extraídos tal cual del guión real — no resumir
     recordingVideoId?: string; // YouTube ID no listado de la grabación de esa clase, se completa después de dictarla
     recordingStartSeconds?: number; // si el módulo arranca a mitad de un video compartido con otro módulo (ej: el cierre del módulo anterior queda al principio)
     materials?: { title: string; url: string }[]; // PDFs y otros materiales de ESTA clase puntual, se muestran debajo de su video en el dashboard
@@ -179,9 +180,9 @@ export const courses: Course[] = [
     format: "Grabado",
     image: "/images/covers/curso-claude-seleccion.svg",
     tagline:
-      "7 módulos grabados para incorporar Claude a tu día a día de selección, a tu ritmo.",
+      "6 módulos + 1 bonus grabados para incorporar Claude a tu día a día de selección, a tu ritmo.",
     description:
-      "Curso grabado de 7 módulos (~2.5 horas en total) para aprender a usar Claude en cada etapa del proceso de selección: desde el análisis de CVs hasta el informe ejecutivo post-entrevista.",
+      "Curso grabado de 6 módulos + 1 bonus (2h10 de contenido) para aprender a usar Claude en cada etapa del proceso de selección: desde el análisis de CVs hasta el informe ejecutivo post-entrevista.",
     modules: [
       {
         title: "Bienvenida",
@@ -194,6 +195,11 @@ export const courses: Course[] = [
         benefit: "Escribile bien a Claude desde el primer prompt",
         icon: "✍️",
         items: ["Fundamentos: cómo piensa Claude y cómo escribirle bien"],
+        takeaways: [
+          "Criterio para elegir herramienta según la tarea",
+          "las 3 herramientas configuradas con privacidad correcta",
+          "plantilla ROL+CONTEXTO+TAREA+FORMATO",
+        ],
         recordingVideoId: "tva0e-JLfUs",
         materials: [
           {
@@ -207,6 +213,11 @@ export const courses: Course[] = [
         benefit: "Analizá CVs en segundos, con criterio consistente",
         icon: "🔍",
         items: ["Análisis de CVs con el prompt maestro"],
+        takeaways: [
+          "Prompt maestro de análisis de CV listo para copiar",
+          "prompt de comparativa múltiple",
+          "checklist de qué sí y qué no delegar en la IA",
+        ],
         recordingVideoId: "DEai1Icm7AM",
         materials: [
           {
@@ -236,6 +247,10 @@ export const courses: Course[] = [
         benefit: "Llegá a cada entrevista con las preguntas justas",
         icon: "🎤",
         items: ["Preguntas STAR y guías de entrevista"],
+        takeaways: [
+          "Banco de 8 preguntas STAR por seniority",
+          "prompt de guía completa por competencias",
+        ],
         recordingVideoId: "m-Vqeg2qSB4",
         materials: [
           {
@@ -249,6 +264,11 @@ export const courses: Course[] = [
         benefit: "Armá la terna sin dudar entre candidatos parecidos",
         icon: "⚖️",
         items: ["Comparar candidatos y armar la terna"],
+        takeaways: [
+          "Prompt de comparativa múltiple",
+          "prompt de ajuste de tabla a terna final",
+          "criterio para no elegir solo por el score más alto",
+        ],
         recordingVideoId: "QCExLmdFLjY",
         materials: [
           {
@@ -270,6 +290,9 @@ export const courses: Course[] = [
         benefit: "Comunicá tus decisiones con informes profesionales",
         icon: "📊",
         items: ["Informes ejecutivos y comunicación con el cliente"],
+        takeaways: [
+          "3 plantillas listas: resumen post-entrevista, email al candidato, informe al hiring manager",
+        ],
         recordingVideoId: "RyRDNLEcarg",
         materials: [
           {
@@ -295,6 +318,10 @@ export const courses: Course[] = [
         benefit: "Dejá de repetir el mismo prompt cada vez",
         icon: "⚙️",
         items: ["Armar tu propio Proyecto de Claude para no repetir el prompt cada vez"],
+        takeaways: [
+          "Setup de tu Project configurado con tu metodología",
+          "prompt maestro para Projects",
+        ],
         recordingVideoId: "wB0W6jSYvR8",
         triggersCertificate: true,
         materials: [
@@ -309,6 +336,11 @@ export const courses: Course[] = [
         benefit: "Atraé mejores candidatos antes de que lleguen los CVs",
         icon: "🧲",
         items: ["Atracción de talento: antes de que lleguen los CVs"],
+        takeaways: [
+          "Prompt de aviso de empleo",
+          "prompt de post de LinkedIn",
+          "prompt de descripción interna del puesto",
+        ],
         recordingVideoId: "fvOezdtGWCo",
         materials: [
           {
@@ -321,13 +353,13 @@ export const courses: Course[] = [
     pageH1: "Claude para Selección: Curso para Recruiters",
     seoTitle: "Curso de Claude para Selección de Personal",
     seoDescription:
-      "Aprendé a usar Claude para analizar CVs, generar preguntas STAR y automatizar informes. Curso grabado de 7 módulos para recruiters.",
+      "Aprendé a usar Claude para analizar CVs, generar preguntas STAR y automatizar informes. Curso grabado de 6 módulos + 1 bonus para recruiters.",
     outcomes: [
       "Prompts maestros para analizar CVs, armar preguntas STAR y comparar candidatos",
       "Tu propio Proyecto de Claude configurado, para no repetir el prompt cada vez",
       "Informes ejecutivos automáticos para comunicar decisiones de selección",
       "Estrategias de atracción de talento con IA, antes de recibir postulaciones",
-      "7 módulos grabados (~2.5 horas) para ver a tu ritmo, con acceso ilimitado",
+      "6 módulos + 1 bonus grabados (2h10 de contenido) para ver a tu ritmo, con acceso ilimitado",
       "Certificado de finalización",
     ],
     price: "$70.000 ARS",

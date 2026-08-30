@@ -130,16 +130,6 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
         </div>
       )}
 
-      {course.slug === "claude-para-seleccion" && (
-        <div className="card rounded-xl p-6 mb-10 border border-magenta/30">
-          <p className="text-sm text-bone/80">
-            Con el kit de prompts gratis empezás a probar. Con el curso aprendés a aplicar IA con
-            criterio profesional, a interpretar resultados y a adaptarlo a distintos perfiles. Eso
-            no viene en un PDF.
-          </p>
-        </div>
-      )}
-
       {/* FORMAS DE PAGO */}
       {course.paymentOptions ? (
         <div id="comprar" className="card rounded-xl p-6 sm:p-8 mb-10 scroll-mt-24">

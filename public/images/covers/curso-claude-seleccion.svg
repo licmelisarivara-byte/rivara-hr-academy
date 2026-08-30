@@ -17,7 +17,7 @@
     <text x="938" y="190" font-family="Arial, sans-serif" font-size="46" font-weight="800" fill="#ffffff" text-anchor="middle">R</text>
 
     <!-- eyebrow -->
-    <text x="108" y="705" font-family="Arial, sans-serif" font-size="28" font-weight="800" fill="#8a8a92" letter-spacing="3">6 MÓDULOS · A TU RITMO</text>
+    <text x="108" y="705" font-family="Arial, sans-serif" font-size="24" font-weight="800" fill="#8a8a92" letter-spacing="2">6 MÓDULOS + 1 BONUS · A TU RITMO</text>
 
     <!-- title -->
     <text x="104" y="822" font-family="Arial, sans-serif" font-size="88" font-weight="800" fill="#ffffff">Claude para</text>

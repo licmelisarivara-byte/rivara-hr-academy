@@ -8,6 +8,7 @@ type ModuleItem = {
   benefit?: string;
   icon?: string;
   items: string[];
+  takeaways?: string[];
 };
 
 export default function ModuleAccordion({ modules }: { modules: ModuleItem[] }) {
@@ -60,6 +61,18 @@ export default function ModuleAccordion({ modules }: { modules: ModuleItem[] }) 
                     <li key={it}>{it}</li>
                   ))}
                 </ul>
+                {m.takeaways && m.takeaways.length > 0 && (
+                  <div className="mt-4 pt-4 border-t border-black/5">
+                    <p className="text-xs font-semibold text-bone/50 uppercase tracking-wide mb-1.5">
+                      Lo que te llevás
+                    </p>
+                    <ul className="space-y-1.5 text-sm text-bone/70 list-disc list-inside">
+                      {m.takeaways.map((t) => (
+                        <li key={t}>{t}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             )}
           </div>

@@ -17,7 +17,7 @@ const featuredCourse = getCourseBySlug("claude-para-seleccion")!;
 export const metadata: Metadata = {
   title: "Curso de Claude para RRHH",
   description:
-    "Curso grabado de 7 módulos para recruiters. Aprendé a usar Claude para filtrar CVs, generar preguntas STAR y automatizar tu proceso de selección.",
+    "Curso grabado de 6 módulos + 1 bonus para recruiters. Aprendé a usar Claude para filtrar CVs, generar preguntas STAR y automatizar tu proceso de selección.",
 };
 
 export default function Home() {
@@ -37,8 +37,8 @@ export default function Home() {
               Aprendé a usar Claude en tu proceso de selección
             </h1>
             <p className="text-white/70 text-lg max-w-xl mb-8">
-              Curso grabado de 7 módulos para recruiters que quieren aplicar
-              IA sin tecnicismos, a tu ritmo.
+              Curso grabado de 6 módulos + 1 bonus para recruiters que quieren
+              aplicar IA sin tecnicismos, a tu ritmo.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link
@@ -98,7 +98,7 @@ export default function Home() {
               <p className="text-xs text-bone/50">Paula G. — Reseña de Google</p>
             </div>
             <div className="detail-text flex flex-col gap-2 mb-4">
-              <span>🎥 7 módulos grabados · A tu ritmo</span>
+              <span>🎥 6 módulos + 1 bonus · A tu ritmo</span>
             </div>
             <Link
               href={`/cursos/${featuredCourse.slug}`}
