@@ -73,13 +73,13 @@ export default function MasterclassForm({
               🏆 Pedí tu certificado de participación
             </a>
             <a
-              href="/cursos/de-cero-a-tu-asistente"
+              href="/cursos/claude-para-seleccion"
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-lg bg-panel border border-black/10 px-4 py-3 text-bone hover:border-magenta transition-colors"
             >
-              🎓 Sumate al curso completo — arranca el martes 11/8, con{" "}
-              <strong>25% off</strong> hasta el domingo 9/8
+              🎓 Sumate al curso Claude para Selección — con{" "}
+              <strong>25% off</strong> con el cupón CLAUDE25
             </a>
             <a
               href="https://www.youtube.com/@rivarahracademy"

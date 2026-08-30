@@ -16,13 +16,14 @@ export type Coupon = {
   activeFrom?: string; // ISO datetime; antes de esto el cupón no es válido
   activeUntil?: string; // ISO datetime; después de esto el cupón no es válido
   courses?: string[]; // si está definido, el cupón solo vale para estos slugs de curso (sin definir = todos)
+  resources?: string[]; // si está definido, el cupón solo vale para estos slugs de recurso pago (sin definir = todos)
 };
 
 export const COUPONS: Coupon[] = [
   {
     code: "DESCARGA5",
     percentOff: 5,
-    description: "5% off en cursos, por descargar un recurso gratis",
+    description: "5% off en cursos o recursos pagos, por descargar un recurso gratis",
   },
   {
     code: "BOT",
@@ -47,12 +48,13 @@ export const COUPONS: Coupon[] = [
   },
 ];
 
-// courseSlug: si se pasa, el cupón solo es válido cuando aplica a ESE curso
-// (ver Coupon.courses arriba) — evita que un cupón pensado para un curso
-// puntual (ej: CLAUDE25) se cuele en el checkout de otro curso distinto.
+// courseSlug/resourceSlug: si se pasa uno, el cupón solo es válido cuando
+// aplica a ESE curso/recurso (ver Coupon.courses/resources arriba) — evita
+// que un cupón pensado para un curso puntual (ej: CLAUDE25) se cuele en el
+// checkout de otro curso, o de un recurso pago, distinto.
 export function getCoupon(
   code: string | null | undefined,
-  courseSlug?: string
+  target?: { courseSlug?: string; resourceSlug?: string }
 ): Coupon | null {
   if (!code) return null;
   const coupon = COUPONS.find((c) => c.code === code.trim().toUpperCase());
@@ -60,6 +62,9 @@ export function getCoupon(
   const now = Date.now();
   if (coupon.activeFrom && now < new Date(coupon.activeFrom).getTime()) return null;
   if (coupon.activeUntil && now > new Date(coupon.activeUntil).getTime()) return null;
+  const courseSlug = target?.courseSlug;
+  const resourceSlug = target?.resourceSlug;
   if (coupon.courses && (!courseSlug || !coupon.courses.includes(courseSlug))) return null;
+  if (coupon.resources && (!resourceSlug || !coupon.resources.includes(resourceSlug))) return null;
   return coupon;
 }

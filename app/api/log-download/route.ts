@@ -7,7 +7,8 @@ import { COUPONS } from "@/lib/coupons";
 // el reporte diario (a diferencia de compras/eventos, acá no hay "alta"
 // explícita: es solo un log de fire-and-forget disparado al descargar). De
 // paso, avisa a Melisa por mail y le manda un agradecimiento a quien
-// descargó, con un cupón para el curso como próximo paso.
+// descargó, con un cupón para el curso o los recursos pagos como próximo
+// paso.
 export async function POST(req: NextRequest) {
   if (!supabaseAdmin) {
     return NextResponse.json({ error: "not_configured" }, { status: 501 });
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
   const resource = getFreeResourceBySlug(resourceSlug);
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL || "https://hracademy.rivaraconsultora.com.ar";
-  const coupon = COUPONS[0];
+  const coupon = COUPONS.find((c) => c.code === "DESCARGA5")!;
 
   if (apiKey && resource && buyerEmail) {
     const firstName = (buyerName || "").split(" ")[0] || "";
@@ -48,9 +49,10 @@ export async function POST(req: NextRequest) {
           <p>Hola${firstName ? ` ${firstName}` : ""},</p>
           <p>¡Gracias por descargar <strong>${resource.title}</strong>! Ya la tenés lista, y si por algo no llegó a bajarse, la volvés a tener acá:</p>
           ${resource.fileUrl ? `<p><a href="${siteUrl}${resource.fileUrl}">${siteUrl}${resource.fileUrl}</a></p>` : ""}
-          <p>Si querés ir más en profundidad, tenemos el curso "Creá tu propio Asistente de Selección con IA + ATS" y otros recursos pagos con contenido más completo.</p>
-          <p>Como ya diste este primer paso, te dejamos un <strong>${coupon.percentOff}% off</strong> extra en el curso con el cupón <strong>${coupon.code}</strong>:</p>
-          <p><a href="${siteUrl}/cursos">${siteUrl}/cursos</a></p>
+          <p>Si querés ir más en profundidad, tenemos el curso <strong>Claude para Selección</strong> y otros recursos pagos con contenido más completo.</p>
+          <p>Como ya diste este primer paso, te dejamos un <strong>${coupon.percentOff}% off</strong> extra en el curso o en los recursos pagos (Kit de Prompts, Guía o Combo) con el cupón <strong>${coupon.code}</strong>:</p>
+          <p><a href="${siteUrl}/cursos/claude-para-seleccion">${siteUrl}/cursos/claude-para-seleccion</a></p>
+          <p><a href="${siteUrl}/ebooks">${siteUrl}/ebooks</a></p>
           <p>Cualquier duda, escribinos por WhatsApp: https://wa.me/5491123912820</p>
         `,
       }),

@@ -9,8 +9,9 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   const code = typeof body?.code === "string" ? body.code : null;
   const courseSlug = typeof body?.courseSlug === "string" ? body.courseSlug : undefined;
+  const resourceSlug = typeof body?.resourceSlug === "string" ? body.resourceSlug : undefined;
 
-  const coupon = getCoupon(code, courseSlug);
+  const coupon = getCoupon(code, { courseSlug, resourceSlug });
   if (!coupon) {
     return NextResponse.json({ valid: false });
   }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCourseBySlug, getTransferenciaAmountARS, getPayoneerAmountUSD } from "@/lib/courses";
+import { getCourseBySlug, getTransferenciaAmountARS, getPayoneerAmountUSD, type Course } from "@/lib/courses";
 import { getPaidResourceBySlug } from "@/lib/resources";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { getCoupon } from "@/lib/coupons";
@@ -29,21 +29,27 @@ export async function POST(req: NextRequest) {
 
   // Monto real según el método (antes acá siempre se usaba el precio de
   // Mercado Pago sin descuento, aunque fuera transferencia o Payoneer en
-  // pleno early bird). El cupón aplica a transferencia y Payoneer por igual
-  // — Mercado Pago sigue siempre sin descuento (link/preferencia a precio
-  // de lista), a propósito.
+  // pleno early bird/con el descuento permanente de los recursos). El
+  // cupón aplica a transferencia y Payoneer por igual — Mercado Pago
+  // sigue siempre sin descuento (link/preferencia a precio de lista), a
+  // propósito.
   const coupon =
-    kind === "course" ? getCoupon(couponCode, (item as ReturnType<typeof getCourseBySlug>)!.slug) : null;
+    kind === "course"
+      ? getCoupon(couponCode, { courseSlug: item.slug })
+      : getCoupon(couponCode, { resourceSlug: item.slug });
   let amount: number;
   if (kind === "course") {
-    const course = item as ReturnType<typeof getCourseBySlug>;
+    const course = item as Course;
     amount =
       method === "payoneer"
-        ? applyDiscount(getPayoneerAmountUSD(course!), coupon?.percentOff)
-        : applyDiscount(getTransferenciaAmountARS(course!), coupon?.percentOff);
+        ? applyDiscount(getPayoneerAmountUSD(course), coupon?.percentOff)
+        : applyDiscount(getTransferenciaAmountARS(course), coupon?.percentOff);
   } else {
     const resource = item as ReturnType<typeof getPaidResourceBySlug>;
-    amount = method === "payoneer" ? resource!.priceUSD : resource!.priceARS;
+    amount =
+      method === "payoneer"
+        ? applyDiscount(resource!.priceUSD, coupon?.percentOff)
+        : applyDiscount(resource!.priceARSTransferencia ?? resource!.priceARS, coupon?.percentOff);
   }
 
   await supabaseAdmin.from("compras").insert({

@@ -5,10 +5,12 @@ import { useRouter } from "next/navigation";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import ResourceCheckoutButton from "@/components/ResourceCheckoutButton";
 import { bankDetails } from "@/lib/bankDetails";
+import { applyDiscount } from "@/lib/discount";
 import type { PaidResource } from "@/lib/resources";
 
 type Method = "" | "transferencia" | "mercadopago" | "payoneer";
 type Buyer = { email: string; phone: string };
+type AppliedCoupon = { code: string; percentOff: number };
 
 // Mismo orden que CoursePaymentActions: primero elige cómo pagar, después
 // deja su mail — la cuenta se arma sola después de que el pago se
@@ -19,6 +21,49 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
   const [sessionBuyer, setSessionBuyer] = useState<Buyer | null>(null);
 
   const [method, setMethod] = useState<Method>("");
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
+  const [couponInvalid, setCouponInvalid] = useState(false);
+
+  // Mismo criterio que CoursePaymentActions: se valida contra /api/coupon,
+  // que solo contesta si ESE código puntual es válido, sin revelar la lista.
+  useEffect(() => {
+    const code = couponInput.trim();
+    if (!code) {
+      setAppliedCoupon(null);
+      setCouponInvalid(false);
+      return;
+    }
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      fetch("/api/coupon", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, resourceSlug: resource.slug }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (cancelled) return;
+          if (data.valid) {
+            setAppliedCoupon({ code: data.code, percentOff: data.percentOff });
+            setCouponInvalid(false);
+          } else {
+            setAppliedCoupon(null);
+            setCouponInvalid(true);
+          }
+        })
+        .catch(() => {
+          if (!cancelled) {
+            setAppliedCoupon(null);
+            setCouponInvalid(true);
+          }
+        });
+    }, 400);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [couponInput, resource.slug]);
 
   const [contactSubmitted, setContactSubmitted] = useState(false);
   const [formEmail, setFormEmail] = useState("");
@@ -52,6 +97,7 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
         method,
         buyerEmail: buyer.email,
         buyerPhone: buyer.phone,
+        couponCode: appliedCoupon?.code,
       }),
     }).catch(() => {
       // No bloqueamos la UI si esto falla; Melisa igual recibe el WhatsApp/mail.
@@ -71,6 +117,14 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
     );
   }
 
+  // El cupón aplica pagando por transferencia o Payoneer por igual —
+  // Mercado Pago sigue siempre a precio de lista, sin descuento.
+  const transferenciaARS = applyDiscount(
+    resource.priceARSTransferencia ?? resource.priceARS,
+    appliedCoupon?.percentOff
+  );
+  const payoneerUSD = applyDiscount(resource.priceUSD, appliedCoupon?.percentOff);
+
   function handleContactSubmit(e: React.FormEvent) {
     e.preventDefault();
     setContactSubmitted(true);
@@ -78,9 +132,12 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
 
   function confirmManual(m: "transferencia" | "payoneer") {
     const label = m === "transferencia" ? "Transferencia bancaria" : "Payoneer";
+    const couponLine = appliedCoupon
+      ? `\n🎟️ Cupón: ${appliedCoupon.code} (${appliedCoupon.percentOff}% off)`
+      : "";
     const phoneLine = buyer?.phone ? `\n📱 Celular: ${buyer.phone}` : "";
     const message = encodeURIComponent(
-      `Hola Melisa 👋\n\nQuiero comprar: ${resource.title}\n\n📧 Email: ${buyer?.email}${phoneLine}\n💳 Forma de pago: ${label}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
+      `Hola Melisa 👋\n\nQuiero comprar: ${resource.title}\n\n📧 Email: ${buyer?.email}${phoneLine}\n💳 Forma de pago: ${label}${couponLine}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
     );
     window.open(`https://wa.me/5491123912820?text=${message}`, "_blank");
     router.push("/");
@@ -88,6 +145,24 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
 
   return (
     <div>
+      <div className="mb-3">
+        <label className="text-xs text-bone/60 block mb-1">¿Tenés un cupón?</label>
+        <input
+          type="text"
+          value={couponInput}
+          onChange={(e) => setCouponInput(e.target.value)}
+          placeholder="Código de descuento (opcional)"
+          className="w-full rounded-lg bg-panel border border-black/10 px-3 py-2 text-sm text-bone focus:border-magenta outline-none"
+        />
+        {couponInput && (appliedCoupon || couponInvalid) && (
+          <p className={`text-xs mt-1 ${appliedCoupon ? "text-sage" : "text-magenta"}`}>
+            {appliedCoupon
+              ? `✅ Cupón aplicado: ${appliedCoupon.percentOff}% off pagando por transferencia o Payoneer`
+              : "Ese cupón no es válido."}
+          </p>
+        )}
+      </div>
+
       <div className="mb-3">
         <select
           value={method}
@@ -99,11 +174,10 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
             Mercado Pago — ${resource.priceARS.toLocaleString("es-AR")} ARS
           </option>
           <option value="transferencia">
-            Transferencia bancaria — $
-            {(resource.priceARSTransferencia ?? resource.priceARS).toLocaleString("es-AR")} ARS
+            Transferencia bancaria — ${transferenciaARS.toLocaleString("es-AR")} ARS
           </option>
           {resource.payoneerLink && (
-            <option value="payoneer">Payoneer — USD {resource.priceUSD}</option>
+            <option value="payoneer">Payoneer — USD {payoneerUSD}</option>
           )}
         </select>
       </div>
@@ -169,11 +243,11 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
 
       {method === "payoneer" && buyer && resource.payoneerLink && (
         <div className="card-alt rounded-lg p-4 text-sm text-bone/70">
-          {resource.priceARSTransferencia && (
+          {(resource.priceARSTransferencia || appliedCoupon) && (
             <p className="text-xs text-magenta mb-3">
               ⚠️ Este link de Payoneer todavía cobra el precio de lista en USD — no aplica el
-              descuento por transferencia automáticamente. Pagá con el link y avisanos por
-              WhatsApp: te devolvemos la diferencia o la descontamos de tu próxima compra.
+              descuento por transferencia ni el cupón automáticamente. Pagá con el link y avisanos
+              por WhatsApp: te devolvemos la diferencia o la descontamos de tu próxima compra.
             </p>
           )}
           <a
