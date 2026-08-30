@@ -6,6 +6,7 @@ import { getCourseBySlug } from "@/lib/courses";
 import AboutSection from "@/components/AboutSection";
 import ResourcePaymentActions from "@/components/ResourcePaymentActions";
 import FreeResourceDownloadButton from "@/components/FreeResourceDownloadButton";
+import FreeComboSignup from "@/components/FreeComboSignup";
 import CoursePricingTeaser from "@/components/CoursePricingTeaser";
 
 function formatARS(n: number) {
@@ -143,6 +144,23 @@ export default function Home() {
             </span>
           </div>
         </Link>
+
+        <div className="rounded-xl p-5 sm:p-6 grid sm:grid-cols-[1fr_auto] gap-5 items-center border border-magenta bg-gradient-to-br from-panelAlt to-panel mb-6">
+          <div>
+            <span className="inline-block text-[10px] font-semibold bg-magenta text-white px-2 py-0.5 rounded-full mb-1.5">
+              🎁 Combo gratis
+            </span>
+            <h3 className="font-display text-base text-bone mb-1">
+              Llevate todo el combo gratis
+            </h3>
+            <p className="text-bone/60 text-xs">
+              Los 3 PDFs + la masterclass grabada, con un solo registro.
+            </p>
+          </div>
+          <div className="w-full sm:w-64">
+            <FreeComboSignup />
+          </div>
+        </div>
 
         <div className="grid md:grid-cols-3 gap-4 mb-12">
           {freeResources.map((r) => (
