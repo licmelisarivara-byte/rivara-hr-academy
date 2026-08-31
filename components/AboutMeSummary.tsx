@@ -57,8 +57,10 @@ export default function AboutMeSummary() {
             {expanded ? "Leer menos ↑" : "Leer más →"}
           </button>
         </div>
+        <div className="sm:col-span-2">
+          <ProfessionalRecommendations />
+        </div>
       </div>
-      <ProfessionalRecommendations />
     </div>
   );
 }
