@@ -133,7 +133,17 @@ export async function POST(req: NextRequest) {
   });
 
   if (!res.ok) {
-    return NextResponse.json({ error: "mp_error" }, { status: 502 });
+    // Guardamos el motivo real que da Mercado Pago (antes se descartaba
+    // por completo, así que un 502 no decía nada más que "falló"). Se
+    // devuelve en la respuesta a propósito, para poder diagnosticar sin
+    // acceso a los logs de Vercel — no expone el token ni nada sensible,
+    // solo el mensaje de validación de MP.
+    const detail = await res.text().catch(() => null);
+    console.error("MP checkout/preferences error", res.status, detail);
+    return NextResponse.json(
+      { error: "mp_error", mpStatus: res.status, mpDetail: detail },
+      { status: 502 }
+    );
   }
 
   const data = await res.json();
