@@ -72,7 +72,7 @@ export default function ProfessionalRecommendations() {
   }
 
   return (
-    <div className="mt-6">
+    <div className="mt-4 pt-4 border-t border-black/10">
       <h3 className="font-semibold text-bone mb-4">Recomendaciones profesionales</h3>
       <div className="space-y-4">
         {recommendations.map((r) => {
