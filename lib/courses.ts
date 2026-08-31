@@ -43,6 +43,8 @@ export type Course = {
   payoneerLink?: string; // link de pago en USD para quien elige Payoneer
   comingSoon?: boolean; // todavía no se vende; muestra "Próximamente" en vez de un botón de compra
   freePreviewVideoId?: string; // YouTube ID, unlisted is fine
+  previewClipUrl?: string; // clip corto autoalojado (/public/videos), embebido directo en la página del curso, sin registro — distinto de freePreviewVideoId (YouTube) y de la grabación completa de la masterclass (esa sí pide registro, es lead magnet)
+  previewClipCaption?: string; // texto mostrado arriba del clip
   meetLink?: string; // link de Google Meet del curso en vivo, se muestra solo a quien ya se inscribió
   checklistUrl?: string; // checklist final del curso, se muestra debajo de todos los módulos
   certificadoUrl?: string; // página para pedir el certificado de este curso, se muestra en el dashboard
@@ -354,6 +356,9 @@ export const courses: Course[] = [
     seoTitle: "Curso de Claude para Selección de Personal",
     seoDescription:
       "Aprendé a usar Claude para analizar CVs, generar preguntas STAR y automatizar informes. Curso grabado de 6 módulos + 1 bonus para recruiters.",
+    previewClipUrl: "/videos/masterclass-comparacion-chatgpt-claude.mp4",
+    previewClipCaption:
+      "Mirá este fragmento de mi MasterClass gratuita — esto es lo que vas a poder hacer vos con el curso.",
     outcomes: [
       "Prompts maestros para analizar CVs, armar preguntas STAR y comparar candidatos",
       "Tu propio Proyecto de Claude configurado, para no repetir el prompt cada vez",

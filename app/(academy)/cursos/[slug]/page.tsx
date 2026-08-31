@@ -67,6 +67,23 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
       </h1>
       <p className="text-bone/70 text-lg mb-6">{course.description}</p>
 
+      {course.previewClipUrl && (
+        <div className="mb-8">
+          {course.previewClipCaption && (
+            <p className="text-sm text-bone/60 mb-3">{course.previewClipCaption}</p>
+          )}
+          <div className="rounded-xl overflow-hidden border border-black/10">
+            <video
+              src={course.previewClipUrl}
+              controls
+              playsInline
+              preload="metadata"
+              className="w-full h-auto"
+            />
+          </div>
+        </div>
+      )}
+
       {/* PRECIO Y CTA — visibles sin scrollear, arriba de todo lo demás */}
       <div className="card rounded-xl p-5 sm:p-6 mb-10 flex flex-wrap items-center justify-between gap-4">
         <div>
