@@ -367,7 +367,14 @@ export const courses: Course[] = [
     priceUSDRegular: 50,
     priceNote: "$70.000 ARS por transferencia o Mercado Pago · USD 50 por Payoneer",
     bankDetails,
-    payoneerLink: "https://link.payoneer.com/Token?t=55DF705DCE7144E59B7DAB4C198ACDB1&src=tpl",
+    payoneerLink: "https://link.payoneer.com/Token?t=936ECCB5D89D4398B04DE68B156D1EF3&src=pl",
+    // Link fijo de MP a $70.000, mientras la cuenta de Melisa no tenga
+    // aprobada la exención de impuestos y el cobro automático (Checkout
+    // Pro vía /api/checkout) siga bloqueado por MP con 403
+    // PA_UNAUTHORIZED_RESULT_FROM_POLICIES. CheckoutButton cae acá solo
+    // si /api/checkout falla — sacar este campo (o dejar que caiga en
+    // desuso) apenas el cobro automático vuelva a andar.
+    mpPaymentLink: "https://mpago.la/2rYLA4x",
     faqs: [
       {
         q: "¿Necesito saber programar?",

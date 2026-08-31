@@ -191,10 +191,13 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
     );
   }
 
-  // El cupón aplica pagando por transferencia o Payoneer por igual —
-  // Mercado Pago sigue siempre a precio de lista, sin descuento.
+  // El cupón solo aplica pagando por transferencia. Payoneer y Mercado
+  // Pago quedan siempre a precio de lista: los links de Payoneer son de
+  // monto fijo (no se puede aplicar un % dinámicamente sin armar un link
+  // nuevo por cada combinación cupón × combo), y Mercado Pago nunca tuvo
+  // descuento a propósito.
   const transferenciaARS = applyDiscount(getTransferenciaAmountARS(course), appliedCoupon?.percentOff);
-  const payoneerUSD = applyDiscount(getPayoneerAmountUSD(course), appliedCoupon?.percentOff);
+  const payoneerUSD = getPayoneerAmountUSD(course);
 
   // Combo curso + recurso pago (Kit/Guía/Combo de ebooks): el curso se
   // suma tal cual (con cupón si corresponde, sin ningún % adicional — no
@@ -279,7 +282,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
         {couponInput && (appliedCoupon || couponInvalid) && (
           <p className={`text-xs mt-1 ${appliedCoupon ? "text-sage" : "text-magenta"}`}>
             {appliedCoupon
-              ? `✅ Cupón aplicado: ${appliedCoupon.percentOff}% off pagando por transferencia o Payoneer`
+              ? `✅ Cupón aplicado: ${appliedCoupon.percentOff}% off pagando por transferencia`
               : "Ese cupón no es válido."}
           </p>
         )}
@@ -319,6 +322,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
               }`}
             >
               Payoneer — USD {bundlePayoneerUSD}
+              {!addon && " (sin descuento)"}
             </button>
           )}
           <button
@@ -512,13 +516,6 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
           ) : (
             course.payoneerLink && (
               <>
-                {(appliedCoupon || (addon && !addon.payoneerLinkWithCourse)) && (
-                  <p className="text-xs text-magenta mb-3">
-                    ⚠️ Este link de Payoneer cobra el precio de lista en USD — todavía no puede
-                    aplicar el cupón automáticamente. Pagá con el link y avisanos por WhatsApp con
-                    tu cupón: te devolvemos la diferencia o la descontamos de tu próxima compra.
-                  </p>
-                )}
                 <a
                   href={addon?.payoneerLinkWithCourse ?? course.payoneerLink}
                   target="_blank"

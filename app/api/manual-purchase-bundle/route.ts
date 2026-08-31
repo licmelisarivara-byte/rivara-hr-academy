@@ -33,12 +33,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
 
-  // Mercado Pago nunca acepta cupones ni descuentos en el curso — se
-  // cobra siempre precio de lista, igual que en el resto del sitio.
-  const coupon = method === "mercadopago" ? null : getCoupon(couponCode, { courseSlug: course.slug });
+  // El cupón solo aplica por transferencia — Mercado Pago nunca tuvo
+  // descuento, y los links de Payoneer de combo son de monto fijo (no se
+  // les puede aplicar un % dinámicamente sin armar un link nuevo por cada
+  // combinación cupón × combo).
+  const coupon = method !== "transferencia" ? null : getCoupon(couponCode, { courseSlug: course.slug });
   const courseAmount =
     method === "payoneer"
-      ? applyDiscount(getPayoneerAmountUSD(course), coupon?.percentOff)
+      ? getPayoneerAmountUSD(course)
       : method === "mercadopago"
       ? course.priceARS ?? 0
       : applyDiscount(getTransferenciaAmountARS(course), coupon?.percentOff);

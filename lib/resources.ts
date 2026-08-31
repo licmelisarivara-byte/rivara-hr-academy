@@ -72,6 +72,8 @@ export const paidResources: PaidResource[] = [
     fileUrl: "/downloads/kit-12-prompts-seleccion.pdf",
     image: "/images/covers/kit-12-prompts.png",
     mpPaymentLink: "https://mpago.la/2jfJB1e",
+    mpPaymentLinkWithCourse: "https://mpago.la/1vAro1M",
+    payoneerLinkWithCourse: "https://link.payoneer.com/Token?t=AD1B70120E5D470D8ED6C5D0C7C52553&src=pl",
   },
   {
     slug: "basta-de-filtrar-a-mano",
@@ -86,6 +88,8 @@ export const paidResources: PaidResource[] = [
     fileUrl: "/downloads/guia-automatizacion-pymes.pdf",
     image: "/images/covers/guia-pymes.png",
     mpPaymentLink: "https://mpago.la/1eGALVn",
+    mpPaymentLinkWithCourse: "https://mpago.la/1yugVsN",
+    payoneerLinkWithCourse: "https://link.payoneer.com/Token?t=50173B21B16C4D89968B582C3F6AE297&src=pl",
   },
   {
     slug: "combo-kit-y-guia",
@@ -105,6 +109,8 @@ export const paidResources: PaidResource[] = [
     image: "/images/covers/combo-kit-guia.png",
     mpPaymentLink: "https://mpago.la/1C4L7zt",
     payoneerLink: "https://link.payoneer.com/Token?t=6EFF423EBE87409CAD8EAD6CC230EC8C&src=pl",
+    mpPaymentLinkWithCourse: "https://mpago.la/2649qsd",
+    payoneerLinkWithCourse: "https://link.payoneer.com/Token?t=30839084C1E54A6DA841A0F79BD00990&src=pl",
   },
 ];
 
