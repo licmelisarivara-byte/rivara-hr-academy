@@ -47,6 +47,7 @@ export default function AboutMeSummary() {
                 organigramas, dar capacitaciones y hacer selección real, y te enseño lo que uso
                 yo, todas las semanas, en búsquedas reales.
               </p>
+              <ProfessionalRecommendations />
             </>
           )}
           <button
@@ -56,9 +57,6 @@ export default function AboutMeSummary() {
           >
             {expanded ? "Leer menos ↑" : "Leer más →"}
           </button>
-        </div>
-        <div className="sm:col-span-2">
-          <ProfessionalRecommendations />
         </div>
       </div>
     </div>
