@@ -337,7 +337,6 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
             }`}
           >
             Mercado Pago — ${bundleMercadoPagoARS.toLocaleString("es-AR")} ARS
-            {!addon && " (sin descuento)"}
           </button>
         </div>
       </div>
