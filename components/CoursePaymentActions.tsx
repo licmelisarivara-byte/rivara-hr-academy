@@ -322,7 +322,6 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
               }`}
             >
               Payoneer — USD {bundlePayoneerUSD}
-              {!addon && " (sin descuento)"}
             </button>
           )}
           <button
