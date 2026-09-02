@@ -42,8 +42,9 @@ export const COUPONS: Coupon[] = [
   {
     code: "CLAUDE25",
     percentOff: 25,
-    description: "25% off de lanzamiento en Claude para Selección, válido 7 días",
-    activeUntil: "2026-09-03T23:59:59-03:00",
+    description:
+      "25% off de lanzamiento en Claude para Selección — extendido hasta mediados de septiembre porque la primera semana no se pudo difundir mucho",
+    activeUntil: "2026-09-20T23:59:59-03:00",
     courses: ["claude-para-seleccion"],
   },
 ];
