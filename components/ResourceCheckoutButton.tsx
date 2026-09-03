@@ -67,7 +67,11 @@ export default function ResourceCheckoutButton({
       throw new Error("no-init-point");
     } catch (e) {
       if (resource.mpPaymentLink) {
-        window.open(resource.mpPaymentLink, "_blank", "noopener,noreferrer");
+        // window.open() acá se bloquea como popup en varios navegadores al
+        // llegar después de un await (deja de contar como gesto directo
+        // del usuario) — mismo bug encontrado y arreglado en
+        // CheckoutButton.tsx. Redirigir en la misma pestaña no lo tiene.
+        window.location.href = resource.mpPaymentLink;
       } else {
         setError(
           "El cobro online todavía no está configurado. Escribinos y coordinamos el pago."

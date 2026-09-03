@@ -110,7 +110,14 @@ export default function CheckoutButton({
       throw new Error("no-init-point");
     } catch (e) {
       if (course.mpPaymentLink) {
-        window.open(course.mpPaymentLink, "_blank", "noopener,noreferrer");
+        // window.open() acá se bloquea como popup en varios navegadores
+        // (Safari sobre todo): al llegar después de un await, el navegador
+        // ya no lo considera un gesto directo del usuario, así que el
+        // click no hacía nada y no se veía ningún error — se detectó
+        // probando el flujo real con el link fijo de respaldo activo.
+        // Redirigir en la misma pestaña, igual que el caso de éxito de
+        // arriba, no tiene ese problema.
+        window.location.href = course.mpPaymentLink;
       } else {
         setError(
           "El cobro online todavía no está configurado. Escribinos y coordinamos el pago."
