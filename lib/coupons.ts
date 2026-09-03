@@ -47,6 +47,20 @@ export const COUPONS: Coupon[] = [
     activeUntil: "2026-09-20T23:59:59-03:00",
     courses: ["claude-para-seleccion"],
   },
+  {
+    code: "COMUNIDAD25",
+    percentOff: 25,
+    description: "25% off en Claude para Selección para una comunidad externa aliada",
+    activeUntil: "2026-09-20T23:59:59-03:00",
+    courses: ["claude-para-seleccion"],
+  },
+  {
+    code: "COMUNIDAD10",
+    percentOff: 10,
+    description: "10% off en Claude para Selección para una comunidad externa aliada",
+    activeUntil: "2026-09-20T23:59:59-03:00",
+    courses: ["claude-para-seleccion"],
+  },
 ];
 
 // courseSlug/resourceSlug: si se pasa uno, el cupón solo es válido cuando
