@@ -117,13 +117,17 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
     );
   }
 
-  // El cupón aplica pagando por transferencia o Payoneer por igual —
-  // Mercado Pago sigue siempre a precio de lista, sin descuento.
+  // El cupón solo aplica pagando por transferencia. Payoneer y Mercado
+  // Pago quedan siempre a precio de lista: los links de Payoneer son de
+  // monto fijo (no se puede aplicar un % dinámicamente sin armar un link
+  // nuevo por cada combinación cupón × producto), y Mercado Pago nunca
+  // tuvo descuento a propósito — mismo criterio que CoursePaymentActions
+  // y que ya aplica /api/manual-purchase server-side.
   const transferenciaARS = applyDiscount(
     resource.priceARSTransferencia ?? resource.priceARS,
     appliedCoupon?.percentOff
   );
-  const payoneerUSD = applyDiscount(resource.priceUSD, appliedCoupon?.percentOff);
+  const payoneerUSD = resource.priceUSD;
 
   function handleContactSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -157,7 +161,7 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
         {couponInput && (appliedCoupon || couponInvalid) && (
           <p className={`text-xs mt-1 ${appliedCoupon ? "text-sage" : "text-magenta"}`}>
             {appliedCoupon
-              ? `✅ Cupón aplicado: ${appliedCoupon.percentOff}% off pagando por transferencia o Payoneer`
+              ? `✅ Cupón aplicado: ${appliedCoupon.percentOff}% off pagando por transferencia`
               : "Ese cupón no es válido."}
           </p>
         )}
