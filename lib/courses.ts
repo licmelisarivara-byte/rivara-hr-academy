@@ -382,6 +382,10 @@ export const courses: Course[] = [
     mpPaymentLink: "https://mpago.la/2rYLA4x",
     faqs: [
       {
+        q: "¿Para quién está pensado este curso?",
+        a: "Para nivel principiante o intermedio: si nunca usaste Claude, si venías usando otra IA (ChatGPT, Gemini, Copilot) y querés pasarte, o si ya usás IA pero solo en una parte del proceso de selección y querés aplicarla de punta a punta.",
+      },
+      {
         q: "¿Necesito saber programar?",
         a: "No.",
       },
