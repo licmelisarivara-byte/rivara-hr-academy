@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { freeResources } from "@/lib/resources";
 import { getEventBySlug } from "@/lib/events";
-import { COUPONS } from "@/lib/coupons";
+import { getCoupon } from "@/lib/coupons";
 
 const MASTERCLASS_EVENT_SLUG = "analiza-cvs-con-ia";
+const CURSO_SLUG = "claude-para-seleccion";
 
 // Registra, con un solo formulario, la descarga de los 3 recursos
 // gratuitos + el registro a la masterclass — mismas tablas/columnas que
@@ -41,14 +42,23 @@ export async function POST(req: NextRequest) {
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL || "https://hracademy.rivaraconsultora.com.ar";
   const event = getEventBySlug(MASTERCLASS_EVENT_SLUG);
-  const coupon = COUPONS.find((c) => c.code === "DESCARGA5")!;
+  // Mail 1 de la secuencia (Secuencia_Mails_y_Copy_Lanzamiento.md) — el
+  // único de los 3 que se manda 100% automático, disparado acá mismo al
+  // momento del registro. Mails 2 y 3 los manda /api/cron/secuencia-recursos
+  // a los 3 y 7 días. El P.D. con CLAUDE25 se arma solo mientras el cupón
+  // siga vigente (ver lib/coupons.ts) — cuando venza, este mail deja de
+  // mencionarlo sin que haga falta tocar el código.
+  const cupon = getCoupon("CLAUDE25", { courseSlug: CURSO_SLUG });
 
   if (apiKey && buyerEmail) {
     const firstName = (buyerName || "").split(" ")[0] || "";
     const fileLinks = freeResources
       .filter((r) => r.fileUrl)
-      .map((r) => `<li><a href="${siteUrl}${r.fileUrl}">${r.title}</a></li>`)
+      .map((r) => `<li>✅ <a href="${siteUrl}${r.fileUrl}">${r.title}</a></li>`)
       .join("");
+    const masterclassItem = event
+      ? `<li>✅ <a href="${event.youtubeLink}">Masterclass grabada: Analizá un CV con IA en segundos</a></li>`
+      : "";
 
     await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -60,22 +70,19 @@ export async function POST(req: NextRequest) {
         from: "RIVARA HR Academy <hola@mailhr.rivaraconsultora.com.ar>",
         to: [buyerEmail],
         bcc: ["licmelisarivara@gmail.com"],
-        subject: "Tu combo gratis de RIVARA HR Academy 🎁",
+        subject: "Ya podés descargar tus 4 recursos 🎁",
         html: `
           <p>Hola${firstName ? ` ${firstName}` : ""},</p>
-          <p>¡Gracias por sumarte! Acá tenés los 3 recursos gratuitos:</p>
-          <ul>${fileLinks}</ul>
+          <p>Acá tenés los 4 recursos, listos para usar hoy mismo:</p>
+          <ul>${fileLinks}${masterclassItem}</ul>
+          <p>En la masterclass cuento por qué elijo Claude por sobre otras herramientas de IA para este trabajo — vale la pena verla antes de usar los prompts.</p>
+          <p>Cualquier duda que te surja usando los prompts, respondeme este mail directamente.</p>
+          <p>Lic. Melisa Rivara<br/>RIVARA HR Academy</p>
           ${
-            event
-              ? `<p>Y la masterclass grabada, "${event.title}":</p>
-                 <p><a href="${event.youtubeLink}">${event.youtubeLink}</a></p>`
+            cupon
+              ? `<p style="color:#666">P.D.: Si después de probar los recursos querés ir más a fondo, el curso "Claude aplicado a selección" está con ${cupon.percentOff}% off (código ${cupon.code}, por transferencia) hasta el domingo 20/9. <a href="${siteUrl}/cursos/${CURSO_SLUG}">Ver el curso →</a></p>`
               : ""
           }
-          <p>Si querés ir más en profundidad, tenemos el curso <strong>Claude para Selección</strong> y otros recursos pagos con contenido más completo.</p>
-          <p>Como ya diste este primer paso, te dejamos un <strong>${coupon.percentOff}% off</strong> extra en el curso o en los recursos pagos (Kit de Prompts, Guía o Combo) con el cupón <strong>${coupon.code}</strong>:</p>
-          <p><a href="${siteUrl}/cursos/claude-para-seleccion">${siteUrl}/cursos/claude-para-seleccion</a></p>
-          <p><a href="${siteUrl}/ebooks">${siteUrl}/ebooks</a></p>
-          <p>Cualquier duda, escribinos por WhatsApp: https://wa.me/5491123912820</p>
         `,
       }),
     }).catch(() => {
