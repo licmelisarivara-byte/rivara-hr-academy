@@ -20,6 +20,7 @@ export type Course = {
     recordingStartSeconds?: number; // si el módulo arranca a mitad de un video compartido con otro módulo (ej: el cierre del módulo anterior queda al principio)
     materials?: { title: string; url: string }[]; // PDFs y otros materiales de ESTA clase puntual, se muestran debajo de su video en el dashboard
     triggersCertificate?: boolean; // al terminar este video se genera el certificado del curso automáticamente (ver components/ModuleVideoPlayer.tsx)
+    progressExempt?: boolean; // no cuenta para el "X de Y módulos completados" del dashboard (ej: Bienvenida, Bonus) — solo afecta ese contador visual, no el certificado
   }[];
   image?: string; // portada en /public/images
   outcomes?: string[];
@@ -191,6 +192,7 @@ export const courses: Course[] = [
         icon: "👋",
         items: ["Presentación del curso"],
         recordingVideoId: "Uolt_JCNOOM",
+        progressExempt: true,
       },
       {
         title: "Módulo 1",
@@ -344,6 +346,7 @@ export const courses: Course[] = [
           "prompt de descripción interna del puesto",
         ],
         recordingVideoId: "fvOezdtGWCo",
+        progressExempt: true,
         materials: [
           {
             title: "Kit Módulo Bonus — Atracción de Talento",

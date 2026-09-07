@@ -171,7 +171,7 @@ function DashboardContent() {
   const splitByFormat = liveCourses.length > 0 && recordedCourses.length > 0;
 
   function renderCourseCard(c: Course) {
-    const trackableModules = c.modules.filter((m) => m.recordingVideoId);
+    const trackableModules = c.modules.filter((m) => m.recordingVideoId && !m.progressExempt);
     const completedCount = trackableModules.filter((m) =>
       completedVideoIds.has(m.recordingVideoId!)
     ).length;
