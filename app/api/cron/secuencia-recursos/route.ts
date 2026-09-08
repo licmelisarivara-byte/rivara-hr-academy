@@ -15,6 +15,13 @@ const MASTERCLASS_EVENT_SLUG = "analiza-cvs-con-ia";
 const CURSO_SLUG = "claude-para-seleccion";
 const DIA_MS = 24 * 60 * 60 * 1000;
 const LIMITE_POR_TANDA = 200; // tope de seguridad por corrida
+// Nunca procesar leads de antes de esta fecha (el día que se activó esta
+// automatización). Sin este piso, la primera corrida de un cron nuevo (o
+// una reactivación después de borrar secuencia_mails_enviados) interpreta
+// a TODOS los leads históricos "viejos" como pendientes y les manda el
+// Mail 2/3 de golpe, aunque se hayan registrado hace semanas — pasó
+// exactamente eso el 8/9 con 33 leads de la masterclass anterior.
+const AUTOMATIZACION_DESDE = "2026-09-08T00:00:00-03:00";
 
 function siteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL || "https://hracademy.rivaraconsultora.com.ar";
@@ -97,6 +104,7 @@ export async function GET(req: NextRequest) {
       .from("event_registros")
       .select("email, name, created_at")
       .eq("event_slug", MASTERCLASS_EVENT_SLUG)
+      .gte("created_at", AUTOMATIZACION_DESDE)
       .lte("created_at", limite)
       .not("email", "is", null)
       .order("created_at", { ascending: true })
