@@ -1,82 +1,50 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin, supabaseAdminConfigured } from "@/lib/supabaseAdmin";
-import { getCoupon } from "@/lib/coupons";
+import { enviarResend, mail2, mail3, getClaude25 } from "@/lib/emailSequence";
 
 // Mails 2 y 3 de la secuencia de leads del combo gratis
 // (Secuencia_Mails_y_Copy_Lanzamiento.md) — el Mail 1 es inmediato y se
 // manda desde /api/log-free-combo; estos dos los dispara Vercel Cron una
-// vez por día (ver vercel.json) llamando a esta ruta.
+// vez por día (ver vercel.json) llamando a esta ruta. El copy de los
+// mails vive en lib/emailSequence.ts, compartido con el reenvío manual
+// puntual de app/api/admin/reenviar-mail-secuencia.
 //
-// Por qué "al menos N días" y no "exactamente el día N": si el cron no
-// llega a correr un día puntual (deploy, caída, lo que sea), este approach
-// se autocura solo al día siguiente en vez de perderse esos leads para
-// siempre. secuencia_mails_enviados evita mandar el mismo mail dos veces.
+// Mail 2: se dispara desde el REGISTRO (event_registros), a partir de 3
+// días de antigüedad. Solo mira leads desde AUTOMATIZACION_DESDE en
+// adelante (ver más abajo por qué).
+//
+// Mail 3: se dispara desde que se mandó el MAIL 2 (secuencia_mails_enviados,
+// columna sent_at), a partir de 3 días desde ESE envío — no desde el
+// registro original. Así, aunque un lead haya recibido su Mail 2 tarde o
+// en un momento raro, el Mail 3 siempre le llega espaciado, nunca el mismo
+// día. (Antes usaba "7 días desde el registro", pero eso mandó Mail 2 y
+// Mail 3 juntos el mismo día a leads viejos en la primera corrida del
+// cron — ver más abajo.)
 const MASTERCLASS_EVENT_SLUG = "analiza-cvs-con-ia";
-const CURSO_SLUG = "claude-para-seleccion";
 const DIA_MS = 24 * 60 * 60 * 1000;
 const LIMITE_POR_TANDA = 200; // tope de seguridad por corrida
-// Nunca procesar leads de antes de esta fecha (el día que se activó esta
-// automatización). Sin este piso, la primera corrida de un cron nuevo (o
-// una reactivación después de borrar secuencia_mails_enviados) interpreta
-// a TODOS los leads históricos "viejos" como pendientes y les manda el
-// Mail 2/3 de golpe, aunque se hayan registrado hace semanas — pasó
-// exactamente eso el 8/9 con 33 leads de la masterclass anterior.
+// Nunca inscribir (Mail 2) a leads de antes de esta fecha (el día que se
+// activó esta automatización). Sin este piso, la primera corrida de un
+// cron nuevo (o una reactivación después de borrar
+// secuencia_mails_enviados) interpreta a TODOS los leads históricos
+// "viejos" como pendientes y les manda el Mail 2 de golpe, aunque se
+// hayan registrado hace semanas — pasó exactamente eso el 8/9 con 33
+// leads de la masterclass anterior (y, como en ese momento el Mail 3
+// todavía se basaba en "7 días desde el registro", muchos de esos leads
+// ya tenían también más de 7 días, así que recibieron los dos mails
+// juntos el mismo día).
 const AUTOMATIZACION_DESDE = "2026-09-08T00:00:00-03:00";
 
-function siteUrl() {
-  return process.env.NEXT_PUBLIC_SITE_URL || "https://hracademy.rivaraconsultora.com.ar";
-}
-
-async function enviarResend(apiKey: string, to: string, subject: string, html: string) {
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      from: "RIVARA HR Academy <hola@mailhr.rivaraconsultora.com.ar>",
-      to: [to],
-      bcc: ["licmelisarivara@gmail.com"],
-      subject,
-      html,
-    }),
-  });
-  return res.ok;
-}
-
-function mail2(nombre: string) {
-  const firstName = nombre.split(" ")[0] || "";
-  return {
-    subject: "Un tip para que el Prompt Maestro te rinda mejor",
-    html: `
-      <p>Hola${firstName ? ` ${firstName}` : ""},</p>
-      <p>Un tip rápido para el Prompt Maestro de Análisis de CVs: el resultado es tan bueno como los criterios que le des.</p>
-      <p>Si le pegás solo "estos son los requisitos del puesto" en una línea genérica, te va a devolver un análisis genérico. Pero si le aclarás qué es realmente no negociable (excluyente) y qué es deseable pero no determinante, el análisis cambia por completo — ahí es donde te separa un candidato con un gap entrenable de uno con un gap real.</p>
-      <p>Ejemplo simple: no es lo mismo poner "manejo de Excel" que aclarar "Excel avanzado, excluyente — sin esto no puede armar los reportes que pide el puesto". La segunda versión le da al prompt algo concreto para evaluar, no una casilla para tildar.</p>
-      <p>Cuanto más clara seas vos con el criterio, más útil se vuelve la IA. Esa es, en el fondo, toda la idea detrás del curso.</p>
-      <p>Lic. Melisa Rivara<br/>RIVARA HR Academy</p>
-    `,
-  };
-}
-
-function mail3(nombre: string, cupon: ReturnType<typeof getCoupon>) {
-  const firstName = nombre.split(" ")[0] || "";
-  const cierre = cupon
-    ? `<p>Con el código <strong>${cupon.code}</strong> tenés ${cupon.percentOff}% off por transferencia — de $70.000 a $52.500 — válido hasta el domingo 20/9.</p>`
-    : "";
-  return {
-    subject: "Manual vs. Claude: la diferencia real",
-    html: `
-      <p>Hola${firstName ? ` ${firstName}` : ""},</p>
-      <p>Después de una semana con los recursos, quiero mostrarte el paso que sigue.</p>
-      <p><strong>Filtrando a mano:</strong> leés cada CV, armás tu propio criterio sobre la marcha, y cada selector de tu equipo evalúa un poco distinto.</p>
-      <p><strong>Con Claude bien instruido:</strong> el mismo criterio se aplica a cada CV, con scoring técnico y cultural, banderas rojas y preguntas de entrevista ya armadas — vos seguís tomando la decisión final, pero con la parte mecánica resuelta.</p>
-      <p>Eso es exactamente lo que armamos en <strong>Claude aplicado a selección</strong>: 6 módulos + 1 bonus (~2h10 en total), grabado, a tu ritmo. Vas a construir tu propio asistente de selección, no solo aprender prompts sueltos.</p>
-      ${cierre}
-      <p><a href="${siteUrl()}/cursos/${CURSO_SLUG}">Quiero ver el curso →</a></p>
-      <p>Cualquier pregunta antes de anotarte, escribime.</p>
-      <p>Lic. Melisa Rivara<br/>RIVARA HR Academy</p>
-    `,
-  };
-}
+// Excepciones puntuales al "3 días desde el Mail 2": para casos donde
+// Melisa ya le dijo a alguien a mano una fecha de vencimiento distinta
+// (por ejemplo, por WhatsApp), así el Mail 3 le llega ese día exacto en
+// vez del que le tocaría por regla general. Se borra la entrada una vez
+// que ya se mandó (el chequeo contra secuencia_mails_enviados lo hace
+// innocuo igual, pero así queda prolijo).
+const EXCEPCIONES_MAIL3: Record<string, string> = {
+  // Melisa le dijo a Yanina que el cupón vencía el 10/9.
+  "yaformichelli@gmail.com": "2026-09-10T00:00:00-03:00",
+};
 
 export async function GET(req: NextRequest) {
   const cronSecret = process.env.CRON_SECRET;
@@ -95,51 +63,95 @@ export async function GET(req: NextRequest) {
   }
 
   const resultado = { mail2: 0, mail3: 0 };
+  const limite3dias = new Date(Date.now() - 3 * DIA_MS).toISOString();
 
-  for (const mailNumber of [2, 3] as const) {
-    const diasMinimo = mailNumber === 2 ? 3 : 7;
-    const limite = new Date(Date.now() - diasMinimo * DIA_MS).toISOString();
-
+  // --- Mail 2: 3 días desde el registro (solo leads post-lanzamiento) ---
+  {
     const { data: leads } = await supabaseAdmin
       .from("event_registros")
       .select("email, name, created_at")
       .eq("event_slug", MASTERCLASS_EVENT_SLUG)
       .gte("created_at", AUTOMATIZACION_DESDE)
-      .lte("created_at", limite)
+      .lte("created_at", limite3dias)
       .not("email", "is", null)
       .order("created_at", { ascending: true })
       .limit(LIMITE_POR_TANDA);
-    if (!leads?.length) continue;
 
-    const { data: yaEnviados } = await supabaseAdmin
-      .from("secuencia_mails_enviados")
-      .select("email")
-      .eq("event_slug", MASTERCLASS_EVENT_SLUG)
-      .eq("mail_number", mailNumber);
-    const enviadosSet = new Set((yaEnviados ?? []).map((r) => r.email.toLowerCase()));
-
-    const cupon =
-      mailNumber === 3 ? getCoupon("CLAUDE25", { courseSlug: CURSO_SLUG }) : null;
-
-    const vistos = new Set<string>(); // evita duplicar dentro de la misma corrida
-    for (const lead of leads) {
-      const email = lead.email?.trim().toLowerCase();
-      if (!email || enviadosSet.has(email) || vistos.has(email)) continue;
-      vistos.add(email);
-
-      const { subject, html } =
-        mailNumber === 2 ? mail2(lead.name || "") : mail3(lead.name || "", cupon);
-
-      const ok = await enviarResend(apiKey, email, subject, html);
-      if (!ok) continue;
-
-      const { error: insertError } = await supabaseAdmin
+    if (leads?.length) {
+      const { data: yaEnviados } = await supabaseAdmin
         .from("secuencia_mails_enviados")
-        .insert({ email, event_slug: MASTERCLASS_EVENT_SLUG, mail_number: mailNumber });
-      // Si insertError es por el unique constraint, alguien más ya lo marcó
-      // como enviado (otra corrida en paralelo) — no es un problema real,
-      // solo mandamos el mail dos veces en el peor caso de carrera exacta.
-      if (!insertError) resultado[mailNumber === 2 ? "mail2" : "mail3"]++;
+        .select("email")
+        .eq("event_slug", MASTERCLASS_EVENT_SLUG)
+        .eq("mail_number", 2);
+      const enviadosSet = new Set((yaEnviados ?? []).map((r) => r.email.toLowerCase()));
+
+      const vistos = new Set<string>();
+      for (const lead of leads) {
+        const email = lead.email?.trim().toLowerCase();
+        if (!email || enviadosSet.has(email) || vistos.has(email)) continue;
+        vistos.add(email);
+
+        const { subject, html } = mail2(lead.name || "");
+        const ok = await enviarResend(apiKey, email, subject, html);
+        if (!ok) continue;
+
+        const { error: insertError } = await supabaseAdmin
+          .from("secuencia_mails_enviados")
+          .insert({ email, event_slug: MASTERCLASS_EVENT_SLUG, mail_number: 2 });
+        if (!insertError) resultado.mail2++;
+      }
+    }
+  }
+
+  // --- Mail 3: 3 días desde que se mandó el Mail 2 (no desde el registro) ---
+  {
+    const { data: pendientes } = await supabaseAdmin
+      .from("secuencia_mails_enviados")
+      .select("email, sent_at")
+      .eq("event_slug", MASTERCLASS_EVENT_SLUG)
+      .eq("mail_number", 2)
+      .order("sent_at", { ascending: true })
+      .limit(LIMITE_POR_TANDA);
+
+    if (pendientes?.length) {
+      const { data: yaEnviados } = await supabaseAdmin
+        .from("secuencia_mails_enviados")
+        .select("email")
+        .eq("event_slug", MASTERCLASS_EVENT_SLUG)
+        .eq("mail_number", 3);
+      const enviadosSet = new Set((yaEnviados ?? []).map((r) => r.email.toLowerCase()));
+
+      const cupon = getClaude25();
+      const vistos = new Set<string>();
+      for (const p of pendientes) {
+        const email = p.email?.trim().toLowerCase();
+        if (!email || enviadosSet.has(email) || vistos.has(email)) continue;
+
+        const excepcion = EXCEPCIONES_MAIL3[email];
+        const umbral = excepcion
+          ? new Date(excepcion).getTime()
+          : new Date(p.sent_at).getTime() + 3 * DIA_MS;
+        if (Date.now() < umbral) continue;
+        vistos.add(email);
+
+        const { data: registro } = await supabaseAdmin
+          .from("event_registros")
+          .select("name")
+          .eq("event_slug", MASTERCLASS_EVENT_SLUG)
+          .ilike("email", email)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        const { subject, html } = mail3(registro?.name || "", cupon);
+        const ok = await enviarResend(apiKey, email, subject, html);
+        if (!ok) continue;
+
+        const { error: insertError } = await supabaseAdmin
+          .from("secuencia_mails_enviados")
+          .insert({ email, event_slug: MASTERCLASS_EVENT_SLUG, mail_number: 3 });
+        if (!insertError) resultado.mail3++;
+      }
     }
   }
 
