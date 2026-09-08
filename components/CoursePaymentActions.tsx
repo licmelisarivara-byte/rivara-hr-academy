@@ -253,6 +253,12 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
     const couponLine = appliedCoupon
       ? `\n🎟️ Cupón: ${appliedCoupon.code} (${appliedCoupon.percentOff}% off)`
       : "";
+    // Se repiten CBU/alias acá como respaldo — por si no los copió de la
+    // página, los tiene igual en el mensaje que nos manda.
+    const bankLine =
+      m === "transferencia" && course.bankDetails
+        ? `\n🏦 CBU: ${course.bankDetails.cbu}\n🏦 Alias: ${course.bankDetails.alias}`
+        : "";
     const comboAmount =
       m === "payoneer"
         ? `USD ${bundlePayoneerUSD}`
@@ -262,7 +268,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
     const comboLine = addon ? `\n📦 Combo: + ${addon.title}\n💰 Total con combo: ${comboAmount}` : "";
     const phoneLine = buyer?.phone ? `\n📱 Celular: ${buyer.phone}` : "";
     const message = encodeURIComponent(
-      `Hola Melisa 👋\n\nQuiero inscribirme al curso "${course.title}" de RIVARA HR Academy.\n\n📧 Email: ${buyer?.email}${phoneLine}\n💳 Forma de pago: ${label}${couponLine}${comboLine}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
+      `Hola Melisa 👋\n\nQuiero inscribirme al curso "${course.title}" de RIVARA HR Academy.\n\n📧 Email: ${buyer?.email}${phoneLine}\n💳 Forma de pago: ${label}${couponLine}${bankLine}${comboLine}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
     );
     window.open(`https://wa.me/5491123912820?text=${message}`, "_blank");
     router.push("/");
@@ -339,6 +345,37 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
           </button>
         </div>
       </div>
+
+      {/* Datos para transferencia arriba de todo, apenas se elige el método —
+          antes quedaban después de "Sumá también" y del formulario de mail,
+          muy abajo en compras del curso solo, y costaba encontrarlos. */}
+      {method === "transferencia" && course.bankDetails && (
+        <div className="card-alt rounded-lg p-4 mb-4 text-sm text-bone/70">
+          <p className="font-semibold text-bone mb-2">Datos para transferencia</p>
+          <p>Titular: {course.bankDetails.holder}</p>
+          <p>CBU: {course.bankDetails.cbu}</p>
+          <p>Alias: {course.bankDetails.alias}</p>
+          <p>CUIL: {course.bankDetails.cuil}</p>
+          {buyer && (
+            <>
+              <p className="mt-3 text-xs text-bone/50">
+                Una vez transferido, enviá el comprobante por WhatsApp o a{" "}
+                <a href="mailto:hola@rivaraconsultora.com.ar" className="text-magenta hover:underline">
+                  hola@rivaraconsultora.com.ar
+                </a>{" "}
+                para confirmar tu lugar.
+              </p>
+              <button
+                type="button"
+                onClick={() => confirmManual("transferencia")}
+                className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors mt-3"
+              >
+                Confirmar inscripción →
+              </button>
+            </>
+          )}
+        </div>
+      )}
 
       {(method === "transferencia" || method === "payoneer" || method === "mercadopago") && (() => {
         const addonPercent = method === "mercadopago" ? MP_BUNDLE_DISCOUNT_PERCENT : BUNDLE_DISCOUNT_PERCENT;
@@ -464,30 +501,6 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
               </button>
             </>
           )}
-        </div>
-      )}
-
-      {method === "transferencia" && buyer && course.bankDetails && (
-        <div className="card-alt rounded-lg p-4 mb-4 text-sm text-bone/70">
-          <p className="font-semibold text-bone mb-2">Datos para transferencia</p>
-          <p>Titular: {course.bankDetails.holder}</p>
-          <p>CBU: {course.bankDetails.cbu}</p>
-          <p>Alias: {course.bankDetails.alias}</p>
-          <p>CUIL: {course.bankDetails.cuil}</p>
-          <p className="mt-3 text-xs text-bone/50">
-            Una vez transferido, enviá el comprobante por WhatsApp o a{" "}
-            <a href="mailto:hola@rivaraconsultora.com.ar" className="text-magenta hover:underline">
-              hola@rivaraconsultora.com.ar
-            </a>{" "}
-            para confirmar tu lugar.
-          </p>
-          <button
-            type="button"
-            onClick={() => confirmManual("transferencia")}
-            className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors mt-3"
-          >
-            Confirmar inscripción →
-          </button>
         </div>
       )}
 

@@ -139,9 +139,15 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
     const couponLine = appliedCoupon
       ? `\n🎟️ Cupón: ${appliedCoupon.code} (${appliedCoupon.percentOff}% off)`
       : "";
+    // Se repiten CBU/alias acá como respaldo — por si no los copió de la
+    // página, los tiene igual en el mensaje que nos manda.
+    const bankLine =
+      m === "transferencia"
+        ? `\n🏦 CBU: ${bankDetails.cbu}\n🏦 Alias: ${bankDetails.alias}`
+        : "";
     const phoneLine = buyer?.phone ? `\n📱 Celular: ${buyer.phone}` : "";
     const message = encodeURIComponent(
-      `Hola Melisa 👋\n\nQuiero comprar: ${resource.title}\n\n📧 Email: ${buyer?.email}${phoneLine}\n💳 Forma de pago: ${label}${couponLine}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
+      `Hola Melisa 👋\n\nQuiero comprar: ${resource.title}\n\n📧 Email: ${buyer?.email}${phoneLine}\n💳 Forma de pago: ${label}${couponLine}${bankLine}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
     );
     window.open(`https://wa.me/5491123912820?text=${message}`, "_blank");
     router.push("/");
@@ -186,6 +192,37 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
         </select>
       </div>
 
+      {/* Datos para transferencia arriba de todo, apenas se elige el
+          método — antes quedaban después del formulario de mail, muy
+          abajo, y costaba encontrarlos. */}
+      {method === "transferencia" && (
+        <div className="card-alt rounded-lg p-4 mb-3 text-sm text-bone/70">
+          <p className="font-semibold text-bone mb-2">Datos para transferencia</p>
+          <p>Titular: {bankDetails.holder}</p>
+          <p>CBU: {bankDetails.cbu}</p>
+          <p>Alias: {bankDetails.alias}</p>
+          <p>CUIL: {bankDetails.cuil}</p>
+          {buyer && (
+            <>
+              <p className="mt-3 text-xs text-bone/50">
+                Una vez transferido, enviá el comprobante por WhatsApp o a{" "}
+                <a href="mailto:hola@rivaraconsultora.com.ar" className="text-magenta hover:underline">
+                  hola@rivaraconsultora.com.ar
+                </a>{" "}
+                para confirmar tu compra.
+              </p>
+              <button
+                type="button"
+                onClick={() => confirmManual("transferencia")}
+                className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors mt-3"
+              >
+                Confirmar compra →
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
       {method && !buyer && (
         <form onSubmit={handleContactSubmit} className="card-alt rounded-lg p-4 mb-3 space-y-3">
           <p className="text-sm font-semibold text-bone">Tu mail</p>
@@ -219,30 +256,6 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
 
       {method === "mercadopago" && buyer && (
         <ResourceCheckoutButton resource={resource} buyerEmail={buyer.email} />
-      )}
-
-      {method === "transferencia" && buyer && (
-        <div className="card-alt rounded-lg p-4 text-sm text-bone/70">
-          <p className="font-semibold text-bone mb-2">Datos para transferencia</p>
-          <p>Titular: {bankDetails.holder}</p>
-          <p>CBU: {bankDetails.cbu}</p>
-          <p>Alias: {bankDetails.alias}</p>
-          <p>CUIL: {bankDetails.cuil}</p>
-          <p className="mt-3 text-xs text-bone/50">
-            Una vez transferido, enviá el comprobante por WhatsApp o a{" "}
-            <a href="mailto:hola@rivaraconsultora.com.ar" className="text-magenta hover:underline">
-              hola@rivaraconsultora.com.ar
-            </a>{" "}
-            para confirmar tu compra.
-          </p>
-          <button
-            type="button"
-            onClick={() => confirmManual("transferencia")}
-            className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors mt-3"
-          >
-            Confirmar compra →
-          </button>
-        </div>
       )}
 
       {method === "payoneer" && buyer && resource.payoneerLink && (
