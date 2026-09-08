@@ -34,7 +34,7 @@ export function mail2(nombre: string) {
       <p>Un tip rápido para el Prompt Maestro de Análisis de CVs: el resultado es tan bueno como los criterios que le des.</p>
       <p>Si le pegás solo "estos son los requisitos del puesto" en una línea genérica, te va a devolver un análisis genérico. Pero si le aclarás qué es realmente no negociable (excluyente) y qué es deseable pero no determinante, el análisis cambia por completo — ahí es donde te separa un candidato con un gap entrenable de uno con un gap real.</p>
       <p>Ejemplo simple: no es lo mismo poner "manejo de Excel" que aclarar "Excel avanzado, excluyente — sin esto no puede armar los reportes que pide el puesto". La segunda versión le da al prompt algo concreto para evaluar, no una casilla para tildar.</p>
-      <p>Cuanto más clara seas vos con el criterio, más útil se vuelve la IA. Esa es, en el fondo, toda la idea detrás del curso.</p>
+      <p>Cuanto más claro sea el criterio que le des, más útil se vuelve la IA. Esa es, en el fondo, toda la idea detrás del curso.</p>
       <p>Lic. Melisa Rivara<br/>RIVARA HR Academy</p>
     `,
   };
