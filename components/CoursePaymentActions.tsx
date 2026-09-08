@@ -348,7 +348,10 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
 
       {/* Datos para transferencia arriba de todo, apenas se elige el método —
           antes quedaban después de "Sumá también" y del formulario de mail,
-          muy abajo en compras del curso solo, y costaba encontrarlos. */}
+          muy abajo en compras del curso solo, y costaba encontrarlos. Es
+          solo informativo acá — el botón de confirmar queda más abajo,
+          pegado al formulario de mail, para no obligar a volver a
+          scrollear hasta arriba después de completarlo. */}
       {method === "transferencia" && course.bankDetails && (
         <div className="card-alt rounded-lg p-4 mb-4 text-sm text-bone/70">
           <p className="font-semibold text-bone mb-2">Datos para transferencia</p>
@@ -356,24 +359,6 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
           <p>CBU: {course.bankDetails.cbu}</p>
           <p>Alias: {course.bankDetails.alias}</p>
           <p>CUIL: {course.bankDetails.cuil}</p>
-          {buyer && (
-            <>
-              <p className="mt-3 text-xs text-bone/50">
-                Una vez transferido, enviá el comprobante por WhatsApp o a{" "}
-                <a href="mailto:hola@rivaraconsultora.com.ar" className="text-magenta hover:underline">
-                  hola@rivaraconsultora.com.ar
-                </a>{" "}
-                para confirmar tu lugar.
-              </p>
-              <button
-                type="button"
-                onClick={() => confirmManual("transferencia")}
-                className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors mt-3"
-              >
-                Confirmar inscripción →
-              </button>
-            </>
-          )}
         </div>
       )}
 
@@ -465,6 +450,25 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
             Continuar →
           </button>
         </form>
+      )}
+
+      {method === "transferencia" && buyer && course.bankDetails && (
+        <div className="card-alt rounded-lg p-4 mb-4 text-sm text-bone/70">
+          <p className="text-xs text-bone/50">
+            Una vez transferido, enviá el comprobante por WhatsApp o a{" "}
+            <a href="mailto:hola@rivaraconsultora.com.ar" className="text-magenta hover:underline">
+              hola@rivaraconsultora.com.ar
+            </a>{" "}
+            para confirmar tu lugar.
+          </p>
+          <button
+            type="button"
+            onClick={() => confirmManual("transferencia")}
+            className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors mt-3"
+          >
+            Confirmar inscripción →
+          </button>
+        </div>
       )}
 
       {method === "mercadopago" && buyer && !addon && (

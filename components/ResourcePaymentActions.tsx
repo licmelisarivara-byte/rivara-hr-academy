@@ -194,7 +194,10 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
 
       {/* Datos para transferencia arriba de todo, apenas se elige el
           método — antes quedaban después del formulario de mail, muy
-          abajo, y costaba encontrarlos. */}
+          abajo, y costaba encontrarlos. Es solo informativo acá — el
+          botón de confirmar queda más abajo, pegado al formulario de
+          mail, para no obligar a volver a scrollear hasta arriba
+          después de completarlo. */}
       {method === "transferencia" && (
         <div className="card-alt rounded-lg p-4 mb-3 text-sm text-bone/70">
           <p className="font-semibold text-bone mb-2">Datos para transferencia</p>
@@ -202,24 +205,6 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
           <p>CBU: {bankDetails.cbu}</p>
           <p>Alias: {bankDetails.alias}</p>
           <p>CUIL: {bankDetails.cuil}</p>
-          {buyer && (
-            <>
-              <p className="mt-3 text-xs text-bone/50">
-                Una vez transferido, enviá el comprobante por WhatsApp o a{" "}
-                <a href="mailto:hola@rivaraconsultora.com.ar" className="text-magenta hover:underline">
-                  hola@rivaraconsultora.com.ar
-                </a>{" "}
-                para confirmar tu compra.
-              </p>
-              <button
-                type="button"
-                onClick={() => confirmManual("transferencia")}
-                className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors mt-3"
-              >
-                Confirmar compra →
-              </button>
-            </>
-          )}
         </div>
       )}
 
@@ -252,6 +237,25 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
             Continuar →
           </button>
         </form>
+      )}
+
+      {method === "transferencia" && buyer && (
+        <div className="card-alt rounded-lg p-4 mb-3 text-sm text-bone/70">
+          <p className="text-xs text-bone/50">
+            Una vez transferido, enviá el comprobante por WhatsApp o a{" "}
+            <a href="mailto:hola@rivaraconsultora.com.ar" className="text-magenta hover:underline">
+              hola@rivaraconsultora.com.ar
+            </a>{" "}
+            para confirmar tu compra.
+          </p>
+          <button
+            type="button"
+            onClick={() => confirmManual("transferencia")}
+            className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors mt-3"
+          >
+            Confirmar compra →
+          </button>
+        </div>
       )}
 
       {method === "mercadopago" && buyer && (
