@@ -36,16 +36,28 @@ export async function POST(req: NextRequest) {
   const enviados: string[] = [];
   const fallidos: string[] = [];
   const vistos = new Set<string>();
+  const pausa = () => new Promise((r) => setTimeout(r, 600));
 
+  let primero = true;
   for (const r of recipients) {
     const email = String(r?.email || "").trim().toLowerCase();
     if (!email || vistos.has(email)) continue;
     vistos.add(email);
 
+    // Resend limita ~2 req/s; sin esta pausa, tandas grandes fallan a la
+    // mitad (pasó con 25 destinatarios: 5 devolvieron error de rate limit).
+    if (!primero) await pausa();
+    primero = false;
+
     const firstName = String(r?.nombre || "").trim().split(/\s+/)[0] || "";
     const personalizado = html.split("{{nombre}}").join(firstName ? ` ${firstName}` : "");
 
-    const ok = await enviarResend(apiKey, email, subject, personalizado);
+    let ok = await enviarResend(apiKey, email, subject, personalizado);
+    if (!ok) {
+      // Un reintento tras una pausa más larga cubre el rate limit puntual.
+      await new Promise((r) => setTimeout(r, 1500));
+      ok = await enviarResend(apiKey, email, subject, personalizado);
+    }
     (ok ? enviados : fallidos).push(email);
   }
 
