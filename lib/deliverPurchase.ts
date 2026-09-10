@@ -60,6 +60,7 @@ export async function deliverCourseAccess(courseSlug: string, buyerEmail: string
     },
     body: JSON.stringify({
       from: "RIVARA HR Academy <hola@mailhr.rivaraconsultora.com.ar>",
+      reply_to: "hola@rivaraconsultora.com.ar",
       to: [buyerEmail],
       bcc: ["licmelisarivara@gmail.com"],
       subject: `¡Ya podés acceder! ${course.title}`,
@@ -98,6 +99,7 @@ export async function deliverResource(resourceSlug: string, buyerEmail: string) 
     },
     body: JSON.stringify({
       from: "RIVARA HR Academy <hola@mailhr.rivaraconsultora.com.ar>",
+      reply_to: "hola@rivaraconsultora.com.ar",
       to: [buyerEmail],
       bcc: ["licmelisarivara@gmail.com"],
       subject: `¡Ya podés acceder! ${resource.title}`,

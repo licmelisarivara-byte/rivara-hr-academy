@@ -16,6 +16,7 @@ export async function enviarResend(apiKey: string, to: string, subject: string, 
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       from: "RIVARA HR Academy <hola@mailhr.rivaraconsultora.com.ar>",
+      reply_to: "hola@rivaraconsultora.com.ar",
       to: [to],
       bcc: ["licmelisarivara@gmail.com"],
       subject,

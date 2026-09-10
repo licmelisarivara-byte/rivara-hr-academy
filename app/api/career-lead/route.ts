@@ -37,6 +37,7 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         from: "RIVARA Consultora <hola@mailhr.rivaraconsultora.com.ar>",
+        reply_to: "hola@rivaraconsultora.com.ar",
         to: [email],
         bcc: ["licmelisarivara@gmail.com"],
         subject: "Tus 5 tips para la búsqueda laboral 🎁",

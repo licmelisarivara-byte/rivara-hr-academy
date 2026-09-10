@@ -42,6 +42,7 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         from: "RIVARA HR Academy <hola@mailhr.rivaraconsultora.com.ar>",
+        reply_to: "hola@rivaraconsultora.com.ar",
         to: [buyerEmail],
         bcc: ["licmelisarivara@gmail.com"],
         subject: `Gracias por descargar ${resource.title} 🎁`,
