@@ -12,9 +12,11 @@ import type { Course } from "@/lib/courses";
 export default function CheckoutButton({
   course,
   buyerEmail: buyerEmailProp,
+  buyerName,
 }: {
   course: Course;
   buyerEmail?: string;
+  buyerName?: string;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -99,7 +101,7 @@ export default function CheckoutButton({
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind: "course", slug: course.slug, buyerEmail }),
+        body: JSON.stringify({ kind: "course", slug: course.slug, buyerEmail, buyerName }),
       });
       if (!res.ok) throw new Error("no-config");
       const data = await res.json();

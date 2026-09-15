@@ -14,7 +14,7 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 export async function POST(req: NextRequest) {
   const accessToken = process.env.MP_ACCESS_TOKEN;
 
-  const { kind, slug, buyerEmail } = await req.json();
+  const { kind, slug, buyerEmail, buyerName } = await req.json();
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL || "https://hracademy.rivaraconsultora.com.ar";
 
@@ -51,6 +51,7 @@ export async function POST(req: NextRequest) {
           status: "pending",
           payment_method: "mercadopago",
           buyer_email: buyerEmail || null,
+          buyer_name: buyerName || null,
         })
         .select("id")
         .single();
@@ -79,6 +80,7 @@ export async function POST(req: NextRequest) {
           status: "pending",
           payment_method: "mercadopago",
           buyer_email: buyerEmail || null,
+          buyer_name: buyerName || null,
         })
         .select("id")
         .single();
@@ -120,7 +122,7 @@ export async function POST(req: NextRequest) {
     preference.external_reference = purchaseId;
   }
   if (buyerEmail) {
-    preference.payer = { email: buyerEmail };
+    preference.payer = { email: buyerEmail, ...(buyerName ? { name: buyerName } : {}) };
   }
 
   const res = await fetch("https://api.mercadopago.com/checkout/preferences", {
