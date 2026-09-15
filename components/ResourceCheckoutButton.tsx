@@ -10,9 +10,11 @@ import type { PaidResource } from "@/lib/resources";
 export default function ResourceCheckoutButton({
   resource,
   buyerEmail: buyerEmailProp,
+  buyerName,
 }: {
   resource: PaidResource;
   buyerEmail?: string;
+  buyerName?: string;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,7 +58,7 @@ export default function ResourceCheckoutButton({
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind: "resource", slug: resource.slug, buyerEmail }),
+        body: JSON.stringify({ kind: "resource", slug: resource.slug, buyerEmail, buyerName }),
       });
       if (!res.ok) throw new Error("no-config");
       const data = await res.json();

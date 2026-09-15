@@ -9,7 +9,7 @@ import { applyDiscount } from "@/lib/discount";
 import type { PaidResource } from "@/lib/resources";
 
 type Method = "" | "transferencia" | "mercadopago" | "payoneer";
-type Buyer = { email: string; phone: string };
+type Buyer = { email: string; phone: string; name: string };
 type AppliedCoupon = { code: string; percentOff: number };
 
 // Mismo orden que CoursePaymentActions: primero elige cómo pagar, después
@@ -66,10 +66,12 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
   }, [couponInput, resource.slug]);
 
   const [contactSubmitted, setContactSubmitted] = useState(false);
+  const [formName, setFormName] = useState("");
   const [formEmail, setFormEmail] = useState("");
   const [formPhone, setFormPhone] = useState("");
 
-  const buyer = sessionBuyer ?? (contactSubmitted ? { email: formEmail, phone: formPhone } : null);
+  const buyer =
+    sessionBuyer ?? (contactSubmitted ? { email: formEmail, phone: formPhone, name: formName } : null);
 
   useEffect(() => {
     if (!supabase) {
@@ -79,7 +81,11 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
     supabase.auth.getSession().then(({ data }) => {
       const user = data.session?.user;
       if (user?.email) {
-        setSessionBuyer({ email: user.email, phone: user.user_metadata?.phone ?? "" });
+        setSessionBuyer({
+          email: user.email,
+          phone: user.user_metadata?.phone ?? "",
+          name: user.user_metadata?.full_name ?? "",
+        });
       }
       setChecking(false);
     });
@@ -96,6 +102,7 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
         slug: resource.slug,
         method,
         buyerEmail: buyer.email,
+        buyerName: buyer.name,
         buyerPhone: buyer.phone,
         couponCode: appliedCoupon?.code,
       }),
@@ -146,8 +153,9 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
         ? `\n🏦 CBU: ${bankDetails.cbu}\n🏦 Alias: ${bankDetails.alias}`
         : "";
     const phoneLine = buyer?.phone ? `\n📱 Celular: ${buyer.phone}` : "";
+    const nameLine = buyer?.name ? `\n🙋 Nombre: ${buyer.name}` : "";
     const message = encodeURIComponent(
-      `Hola Melisa 👋\n\nQuiero comprar: ${resource.title}\n\n📧 Email: ${buyer?.email}${phoneLine}\n💳 Forma de pago: ${label}${couponLine}${bankLine}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
+      `Hola Melisa 👋\n\nQuiero comprar: ${resource.title}\n${nameLine}\n📧 Email: ${buyer?.email}${phoneLine}\n💳 Forma de pago: ${label}${couponLine}${bankLine}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
     );
     window.open(`https://wa.me/5491123912820?text=${message}`, "_blank");
     router.push("/");
@@ -210,14 +218,22 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
 
       {method && !buyer && (
         <form onSubmit={handleContactSubmit} className="card-alt rounded-lg p-4 mb-3 space-y-3">
-          <p className="text-sm font-semibold text-bone">Tu mail</p>
+          <p className="text-sm font-semibold text-bone">Tus datos</p>
           <p className="text-xs text-bone/50">
             Ahí te vamos a mandar la confirmación y, cuando el pago esté listo, la descarga.
           </p>
           <input
-            type="email"
+            type="text"
             required
             autoFocus
+            value={formName}
+            onChange={(e) => setFormName(e.target.value)}
+            placeholder="Nombre y apellido"
+            className="w-full rounded-lg bg-panel border border-black/10 px-4 py-2.5 text-sm text-bone focus:border-magenta outline-none"
+          />
+          <input
+            type="email"
+            required
             value={formEmail}
             onChange={(e) => setFormEmail(e.target.value)}
             placeholder="Email"
@@ -259,7 +275,7 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
       )}
 
       {method === "mercadopago" && buyer && (
-        <ResourceCheckoutButton resource={resource} buyerEmail={buyer.email} />
+        <ResourceCheckoutButton resource={resource} buyerEmail={buyer.email} buyerName={buyer.name} />
       )}
 
       {method === "payoneer" && buyer && resource.payoneerLink && (
