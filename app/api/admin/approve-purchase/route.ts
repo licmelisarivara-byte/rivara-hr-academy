@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
     if (siblings) group = [...group, ...siblings];
   }
 
+  const fallidas: string[] = [];
   for (const row of group) {
     if (row.status === "approved" && row.delivered_at) continue;
 
@@ -61,17 +62,24 @@ export async function POST(req: NextRequest) {
     await supabaseAdmin.from("compras").update(updates).eq("id", row.id);
 
     if (!row.delivered_at && row.buyer_email) {
-      if (row.kind === "course") {
-        await deliverCourseAccess(row.resource_slug, row.buyer_email);
+      const entregado =
+        row.kind === "course"
+          ? await deliverCourseAccess(row.resource_slug, row.buyer_email)
+          : await deliverResource(row.resource_slug, row.buyer_email);
+      // Si falló, NO marcamos delivered_at — así queda visible en la tabla
+      // (delivered_at null con status approved) y se puede reintentar
+      // llamando a este mismo endpoint de nuevo. deliverPurchase.ts ya le
+      // manda un aviso aparte a Melisa cuando esto pasa.
+      if (entregado) {
+        await supabaseAdmin
+          .from("compras")
+          .update({ delivered_at: new Date().toISOString() })
+          .eq("id", row.id);
       } else {
-        await deliverResource(row.resource_slug, row.buyer_email);
+        fallidas.push(row.id);
       }
-      await supabaseAdmin
-        .from("compras")
-        .update({ delivered_at: new Date().toISOString() })
-        .eq("id", row.id);
     }
   }
 
-  return NextResponse.json({ ok: true, processed: group.length });
+  return NextResponse.json({ ok: true, processed: group.length, fallidas });
 }

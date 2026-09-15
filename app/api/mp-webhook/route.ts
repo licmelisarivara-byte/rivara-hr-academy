@@ -125,15 +125,21 @@ async function handleNotification(req: NextRequest) {
     .eq("id", purchaseId);
 
   if (status === "approved" && !purchase.delivered_at && buyerEmail) {
-    if (purchase.kind === "course") {
-      await deliverCourseAccess(purchase.resource_slug, buyerEmail);
-    } else {
-      await deliverResource(purchase.resource_slug, buyerEmail);
+    const entregado =
+      purchase.kind === "course"
+        ? await deliverCourseAccess(purchase.resource_slug, buyerEmail)
+        : await deliverResource(purchase.resource_slug, buyerEmail);
+    // Si falló, no marcamos delivered_at — queda pendiente y visible en la
+    // tabla `compras` (aprobada pero sin entregar). deliverPurchase.ts ya le
+    // manda un aviso aparte a Melisa; para reintentar, usar
+    // /api/admin/approve-purchase con el mismo id (funciona igual para
+    // compras que ya están aprobadas, solo reintenta la entrega).
+    if (entregado) {
+      await supabaseAdmin
+        .from("compras")
+        .update({ delivered_at: new Date().toISOString() })
+        .eq("id", purchaseId);
     }
-    await supabaseAdmin
-      .from("compras")
-      .update({ delivered_at: new Date().toISOString() })
-      .eq("id", purchaseId);
   }
 
   return NextResponse.json({ ok: true });
