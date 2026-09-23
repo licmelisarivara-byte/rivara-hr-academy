@@ -22,6 +22,29 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json().catch(() => ({}));
+
+  // Diagnóstico de credenciales (body { "diagnostico": true }): devuelve
+  // solo el prefijo del token (APP_USR- = producción, TEST- = pruebas; el
+  // prefijo no es secreto) y a qué cuenta de MP pertenece, sin exponer el
+  // token. Sirve para chequear que el sitio no mezcle entornos.
+  if (body?.diagnostico) {
+    const me = await fetch("https://api.mercadopago.com/users/me", {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    const meData = await me.json().catch(() => null);
+    return NextResponse.json({
+      tokenPrefix: `${accessToken.split("-")[0]}-`,
+      tokenLength: accessToken.length,
+      usersMe: {
+        status: me.status,
+        id: meData?.id,
+        nickname: meData?.nickname,
+        site_id: meData?.site_id,
+        mensaje: me.ok ? undefined : meData?.message,
+      },
+    });
+  }
+
   const days = Math.min(Math.max(Number(body?.days) || 3, 1), 30);
 
   const params = new URLSearchParams({
