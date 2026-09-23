@@ -35,6 +35,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       tokenPrefix: `${accessToken.split("-")[0]}-`,
       tokenLength: accessToken.length,
+      // Forma del token con los caracteres enmascarados (9 = dígito, x =
+      // otro carácter): permite distinguir un Access Token (largo, con
+      // números) de una Public Key (APP_USR- + uuid de 36 caracteres)
+      // sin exponer nada del valor real.
+      tokenShape: accessToken.replace(/[0-9]/g, "9").replace(/[a-zA-Z]/g, "x"),
       usersMe: {
         status: me.status,
         id: meData?.id,
