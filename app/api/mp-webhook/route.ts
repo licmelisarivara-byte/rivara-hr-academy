@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { deliverCourseAccess, deliverResource } from "@/lib/deliverPurchase";
+import { processMpPayment } from "@/lib/mpPayments";
 
 // Mercado Pago llama a esta URL (configurada como `notification_url` al
 // crear la preferencia en /api/checkout) cada vez que cambia el estado de
 // un pago. Acá confirmamos el pago contra la API de MP (nunca confiamos en
-// el body de la notificación solo), marcamos la compra como aprobada en
-// Supabase y mandamos el PDF por mail automáticamente.
+// el body de la notificación solo) y lo procesamos con lib/mpPayments:
+// marcar la compra como aprobada y mandar el acceso por mail.
+//
+// Ojo: el webhook de la aplicación de MP de Melisa ("Rivara Recruiter")
+// apunta a otro proyecto (Supabase "hr rivara"), no a este. Los pagos que
+// entran por el link fijo se recuperan con /api/admin/mp-sync.
 
 function paymentIdFrom(req: NextRequest, body: any): string | null {
   const { searchParams } = new URL(req.url);
@@ -90,57 +94,6 @@ async function handleNotification(req: NextRequest) {
   }
   const payment = await mpRes.json();
 
-  const purchaseId: string | undefined = payment.external_reference;
-  if (!purchaseId) {
-    return NextResponse.json({ ok: true, skipped: "no_external_reference" });
-  }
-
-  const { data: purchase } = await supabaseAdmin
-    .from("compras")
-    .select("*")
-    .eq("id", purchaseId)
-    .single();
-  if (!purchase) {
-    return NextResponse.json({ ok: true, skipped: "purchase_not_found" });
-  }
-
-  const status: string = payment.status; // approved | rejected | pending | in_process | cancelled
-  // El mail ya suele estar guardado desde que la persona arrancó la compra
-  // (login previo); si MP nos manda uno, lo preferimos por ser el que
-  // efectivamente pagó, pero nunca lo dejamos en blanco.
-  const buyerEmail: string | null = payment.payer?.email ?? purchase.buyer_email ?? null;
-  const buyerName: string | null =
-    [payment.payer?.first_name, payment.payer?.last_name].filter(Boolean).join(" ") || null;
-
-  await supabaseAdmin
-    .from("compras")
-    .update({
-      status,
-      mp_payment_id: String(payment.id),
-      buyer_email: buyerEmail,
-      buyer_name: buyerName,
-      raw_payment: payment,
-      paid_at: status === "approved" ? new Date().toISOString() : purchase.paid_at,
-    })
-    .eq("id", purchaseId);
-
-  if (status === "approved" && !purchase.delivered_at && buyerEmail) {
-    const entregado =
-      purchase.kind === "course"
-        ? await deliverCourseAccess(purchase.resource_slug, buyerEmail)
-        : await deliverResource(purchase.resource_slug, buyerEmail);
-    // Si falló, no marcamos delivered_at — queda pendiente y visible en la
-    // tabla `compras` (aprobada pero sin entregar). deliverPurchase.ts ya le
-    // manda un aviso aparte a Melisa; para reintentar, usar
-    // /api/admin/approve-purchase con el mismo id (funciona igual para
-    // compras que ya están aprobadas, solo reintenta la entrega).
-    if (entregado) {
-      await supabaseAdmin
-        .from("compras")
-        .update({ delivered_at: new Date().toISOString() })
-        .eq("id", purchaseId);
-    }
-  }
-
-  return NextResponse.json({ ok: true });
+  const result = await processMpPayment(payment);
+  return NextResponse.json({ ok: true, result });
 }
