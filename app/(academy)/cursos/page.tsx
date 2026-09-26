@@ -15,7 +15,7 @@ export default function CursosPage() {
       <h1 className="font-display text-3xl sm:text-4xl text-bone mb-10">Cursos</h1>
 
       <div className="grid md:grid-cols-2 gap-6">
-        {courses.map((c) => {
+        {courses.filter((c) => !c.supersededBy).map((c) => {
           // Precio ya resuelto contra la fecha de hoy (nunca el campo
           // estático `price`, que queda desactualizado apenas termina el
           // early bird — ver comentario de getCoursePriceSummary). Si el

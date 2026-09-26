@@ -123,9 +123,10 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
   useEffect(() => {
     if (!buyer) return;
     if (addonSlug) {
-      // El combo se ofrece con los 3 métodos (sin addon, Mercado Pago
-      // sigue su propio flujo dinámico vía /api/checkout más abajo).
-      if (method !== "transferencia" && method !== "payoneer" && method !== "mercadopago") return;
+      // Por Mercado Pago el combo se registra recién al tocar el botón de
+      // pago (/api/checkout, kind "bundle", que crea las dos filas y el
+      // cobro automático) — acá solo transferencia y Payoneer.
+      if (method !== "transferencia" && method !== "payoneer") return;
       fetch("/api/manual-purchase-bundle", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -501,37 +502,18 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
         <CheckoutButton course={course} buyerEmail={buyer.email} buyerName={buyer.name} />
       )}
 
+      {/* Combo por Mercado Pago con cobro automático: el servidor calcula el
+          total (curso + recurso con el 5%) y crea las dos compras. Los links
+          fijos de combo (mpComboLink, solo curso de Claude) quedan como
+          respaldo si el cobro automático falla. */}
       {method === "mercadopago" && buyer && addon && (
-        <div className="card-alt rounded-lg p-4 mb-4 text-sm text-bone/70">
-          {mpComboLink ? (
-            <a
-              href={mpComboLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-cta w-full inline-block text-center bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors"
-            >
-              Pagar con Mercado Pago →
-            </a>
-          ) : (
-            // Todavía no existe un link de Mercado Pago específico para
-            // este combo (curso + este recurso) — se completa
-            // `mpPaymentLinkWithCourse` en lib/resources.ts apenas esté
-            // creado. Mientras tanto, se coordina el pago a mano.
-            <>
-              <p className="text-xs text-bone/60 mb-3">
-                Todavía no tenemos armado el link de Mercado Pago para este combo puntual. Escribinos
-                y coordinamos el pago directamente por WhatsApp.
-              </p>
-              <button
-                type="button"
-                onClick={() => confirmManual("mercadopago")}
-                className="btn-cta w-full bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors"
-              >
-                Escribime por WhatsApp para coordinar el pago →
-              </button>
-            </>
-          )}
-        </div>
+        <CheckoutButton
+          course={course}
+          buyerEmail={buyer.email}
+          buyerName={buyer.name}
+          addonSlug={addon.slug}
+          fallbackLink={mpComboLink}
+        />
       )}
 
       {method === "payoneer" && buyer && (course.payoneerLink || addon) && (

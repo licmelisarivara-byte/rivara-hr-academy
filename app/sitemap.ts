@@ -10,7 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: new Date(),
   }));
 
-  const courseRoutes = courses.map((c) => ({
+  const courseRoutes = courses.filter((c) => !c.supersededBy).map((c) => ({
     url: `${siteUrl}/cursos/${c.slug}`,
     lastModified: new Date(),
   }));

@@ -145,7 +145,7 @@ export const notes: Note[] = [
         type: "cta",
         before: "Para eso diseñé mi taller ",
         linkText: "“De cero a tu Asistente de Selección y tu propio ATS”",
-        linkHref: "/cursos/de-cero-a-tu-asistente",
+        linkHref: "/cursos/de-cero-a-tu-asistente-3ra-edicion",
         after:
           " — en 2 clases en vivo. No es un curso más de herramientas; es un taller práctico para que profesionales de RRHH y Psicología aprendan a integrar la IA con criterio estratégico y ético, tal como pide el mercado actual.",
       },
@@ -219,7 +219,7 @@ export const notes: Note[] = [
         type: "cta",
         before: "Si este análisis resuena con lo que ves en tu día a día, te invito a mi taller práctico ",
         linkText: "“De cero a tu Asistente de Selección y tu propio ATS”",
-        linkHref: "/cursos/de-cero-a-tu-asistente",
+        linkHref: "/cursos/de-cero-a-tu-asistente-3ra-edicion",
         after:
           " — en 2 clases en vivo. No es un curso de herramientas, es un espacio para aprender a integrar IA con criterio estratégico y ético.",
       },

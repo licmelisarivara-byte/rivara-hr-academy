@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCourseBySlug } from "@/lib/courses";
 import { getPaidResourceBySlug } from "@/lib/resources";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { applyDiscount } from "@/lib/discount";
+
+// Descuento del recurso cuando se compra junto con un curso por Mercado
+// Pago (5%, más chico que el 15% de transferencia porque ahí el curso no
+// tiene ningún descuento). Tiene que coincidir con MP_BUNDLE_DISCOUNT_PERCENT
+// de components/CoursePaymentActions.tsx y con /api/manual-purchase-bundle.
+const MP_BUNDLE_DISCOUNT_PERCENT = 5;
 
 // Requiere la variable de entorno MP_ACCESS_TOKEN (Access Token de
 // Mercado Pago, modo Checkout Pro), configurada en Vercel. Sin esa
@@ -14,7 +21,11 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 export async function POST(req: NextRequest) {
   const accessToken = process.env.MP_ACCESS_TOKEN;
 
-  const { kind, slug, buyerEmail, buyerName } = await req.json();
+  // kind "bundle" = combo curso + recurso pago (slug = curso, addonSlug =
+  // recurso): un solo cobro por el total, con dos filas en `compras` que
+  // comparten bundle_group_id (mismo esquema que /api/manual-purchase-bundle);
+  // el webhook / la sincronización aprueban y entregan las dos juntas.
+  const { kind, slug, buyerEmail, buyerName, addonSlug } = await req.json();
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL || "https://hracademy.rivaraconsultora.com.ar";
 
@@ -23,6 +34,7 @@ export async function POST(req: NextRequest) {
   let successUrl = `${siteUrl}/dashboard?compra=exitosa`;
   let failureUrl = `${siteUrl}?compra=fallida`;
   let purchaseId: string | null = null;
+  let bundleIds: string[] = [];
 
   // Registramos la intención de compra como "pending" en cuanto alguien
   // toca "Comprar/Inscribirme", ANTES de chequear si Mercado Pago está
@@ -57,6 +69,55 @@ export async function POST(req: NextRequest) {
         .single();
       if (!error && purchase) {
         purchaseId = purchase.id;
+      }
+    }
+  } else if (kind === "bundle") {
+    const course = getCourseBySlug(slug);
+    const resource = getPaidResourceBySlug(addonSlug);
+    if (!course || !resource) {
+      return NextResponse.json({ error: "not_found" }, { status: 404 });
+    }
+    // Los montos se calculan SIEMPRE acá (nunca se confía en lo que
+    // mande el navegador): el curso a precio de Mercado Pago, sin
+    // descuento, y el recurso con el 5% del combo.
+    const courseAmount = course.priceARS ?? 0;
+    const resourceAmount = applyDiscount(resource.priceARS, MP_BUNDLE_DISCOUNT_PERCENT);
+    title = `${course.title} + ${resource.title}`;
+    unitPrice = courseAmount + resourceAmount;
+    failureUrl = `${siteUrl}/cursos/${course.slug}?compra=fallida`;
+
+    if (supabaseAdmin) {
+      const bundleGroupId = crypto.randomUUID();
+      const base = {
+        currency: "ARS",
+        status: "pending",
+        payment_method: "mercadopago",
+        buyer_email: buyerEmail || null,
+        buyer_name: buyerName || null,
+        bundle_group_id: bundleGroupId,
+      };
+      const { data: rows, error } = await supabaseAdmin
+        .from("compras")
+        .insert([
+          {
+            ...base,
+            kind: "course",
+            resource_slug: course.slug,
+            title: `${course.title} (combo)`,
+            amount: courseAmount,
+          },
+          {
+            ...base,
+            kind: "resource",
+            resource_slug: resource.slug,
+            title: `${resource.title} (combo)`,
+            amount: resourceAmount,
+          },
+        ])
+        .select("id, kind");
+      if (!error && rows) {
+        bundleIds = rows.map((r) => r.id);
+        purchaseId = rows.find((r) => r.kind === "course")?.id ?? null;
       }
     }
   } else {
@@ -154,7 +215,7 @@ export async function POST(req: NextRequest) {
     await supabaseAdmin
       .from("compras")
       .update({ mp_preference_id: data.id })
-      .eq("id", purchaseId);
+      .in("id", bundleIds.length ? bundleIds : [purchaseId]);
   }
 
   return NextResponse.json({ init_point: data.init_point });

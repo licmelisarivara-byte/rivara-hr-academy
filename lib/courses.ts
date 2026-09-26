@@ -52,6 +52,7 @@ export type Course = {
   certificadoTipo?: string; // "tipo" que se manda a /api/certificado (curso-bot-ats, claude-seleccion, etc.)
   whatsappGroupLink?: string; // link de invitación al grupo de WhatsApp del curso
   mercadoPagoNote?: string; // aclaración junto al precio de Mercado Pago (ej: cuotas sin interés)
+  supersededBy?: string; // slug de la edición que la reemplaza: la página pública redirige ahí y no se lista ni entra al sitemap. Los alumnos de esta edición la siguen viendo igual en su panel y en sus certificados.
   highlight?: { title: string; text: string }; // bloque destacado "Novedad en esta edición", arriba de "¿Qué vas a lograr?" en la página del curso
 };
 
@@ -178,10 +179,12 @@ export const courses: Course[] = [
       "https://noble-shawl-f26.notion.site/Tu-checklist-para-armar-tu-asistente-de-selecci-n-3ae5c6b67016816ead9ad4c5fb17d5a6",
     certificadoUrl: "/cursos/de-cero-a-tu-asistente/certificado",
     certificadoTipo: "curso-bot-ats",
-    // Única modificación a esta edición (agosto): el link de la Comunidad de
-    // Alumnos, para quien quiera sumarse desde su panel. Todo lo demás
-    // (fechas, certificados ya emitidos, Meet) se deja como está.
+    // Cambios a esta edición (agosto), ninguno afecta a sus alumnos: el
+    // link de la Comunidad de Alumnos en su panel, y que la página pública
+    // ya no se lista ni se ofrece — redirige a la 3ra edición. Todo lo
+    // demás (fechas, certificados ya emitidos, Meet, panel) queda igual.
     whatsappGroupLink: "https://chat.whatsapp.com/Go39ka3niC69HwP4wsRTbz",
+    supersededBy: "de-cero-a-tu-asistente-3ra-edicion",
   },
   // 3ra edición (15 y 22 de octubre de 2026): curso NUEVO e independiente,
   // copia de la edición de agosto con sus propios datos — así los alumnos y

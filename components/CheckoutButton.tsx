@@ -13,10 +13,17 @@ export default function CheckoutButton({
   course,
   buyerEmail: buyerEmailProp,
   buyerName,
+  addonSlug,
+  fallbackLink,
 }: {
   course: Course;
   buyerEmail?: string;
   buyerName?: string;
+  // Combo curso + recurso pago (slug del recurso). El monto lo calcula el
+  // servidor. fallbackLink = link fijo de MP a usar si el cobro automático
+  // falla (solo existe para los combos del curso de Claude).
+  addonSlug?: string;
+  fallbackLink?: string;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -101,7 +108,11 @@ export default function CheckoutButton({
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind: "course", slug: course.slug, buyerEmail, buyerName }),
+        body: JSON.stringify(
+          addonSlug
+            ? { kind: "bundle", slug: course.slug, addonSlug, buyerEmail, buyerName }
+            : { kind: "course", slug: course.slug, buyerEmail, buyerName }
+        ),
       });
       if (!res.ok) throw new Error("no-config");
       const data = await res.json();
@@ -111,7 +122,8 @@ export default function CheckoutButton({
       }
       throw new Error("no-init-point");
     } catch (e) {
-      if (course.mpPaymentLink) {
+      const linkRespaldo = addonSlug ? fallbackLink : course.mpPaymentLink;
+      if (linkRespaldo) {
         // window.open() acá se bloquea como popup en varios navegadores
         // (Safari sobre todo): al llegar después de un await, el navegador
         // ya no lo considera un gesto directo del usuario, así que el
@@ -119,7 +131,7 @@ export default function CheckoutButton({
         // probando el flujo real con el link fijo de respaldo activo.
         // Redirigir en la misma pestaña, igual que el caso de éxito de
         // arriba, no tiene ese problema.
-        window.location.href = course.mpPaymentLink;
+        window.location.href = linkRespaldo;
       } else {
         setError(
           "El cobro online todavía no está configurado. Escribinos y coordinamos el pago."

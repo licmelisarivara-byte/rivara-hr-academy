@@ -132,6 +132,30 @@ export async function processMpPayment(payment: any): Promise<string> {
     return "purchase_not_found";
   }
 
+  // Combo (curso + recurso pago): el cobro es uno solo pero hay dos filas
+  // con el mismo bundle_group_id — se aplica el pago a las dos, y el
+  // resultado que se informa es el de la fila principal.
+  const filas: any[] = [purchase];
+  if (purchase.bundle_group_id) {
+    const { data: hermanas } = await supabaseAdmin
+      .from("compras")
+      .select("*")
+      .eq("bundle_group_id", purchase.bundle_group_id)
+      .neq("id", purchase.id);
+    if (hermanas) filas.push(...hermanas);
+  }
+  let resultado = "";
+  for (const fila of filas) {
+    const r = await applyPaymentToRow(payment, fila);
+    if (!resultado) resultado = r;
+  }
+  return resultado;
+}
+
+// Aplica un pago de MP a UNA fila de compras: actualiza su estado y, si
+// está aprobado y todavía no se entregó, manda el mail de acceso.
+async function applyPaymentToRow(payment: any, purchase: any): Promise<string> {
+  if (!supabaseAdmin) return "not_configured";
   const status: string = payment.status; // approved | rejected | pending | in_process | cancelled
   // El mail ya suele estar guardado desde que la persona arrancó la compra;
   // si MP nos manda uno, lo preferimos por ser el que efectivamente pagó,

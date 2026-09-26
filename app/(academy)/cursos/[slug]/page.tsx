@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import Link from "next/link";
 import { courses, getCourseBySlug, moduleAnchor } from "@/lib/courses";
 import { paidResources } from "@/lib/resources";
@@ -25,6 +25,10 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
 export default function CourseDetailPage({ params }: { params: { slug: string } }) {
   const course = getCourseBySlug(params.slug);
   if (!course) return notFound();
+  // Edición anterior ya reemplazada: quien entra por la web pública (o por
+  // un link viejo, como el de las notas) va a la edición vigente. El panel
+  // y los certificados de sus alumnos no pasan por esta página.
+  if (course.supersededBy) permanentRedirect(`/cursos/${course.supersededBy}`);
 
   const courseJsonLd = {
     "@context": "https://schema.org",
