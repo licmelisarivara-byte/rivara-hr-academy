@@ -4,6 +4,7 @@ import {
   esRespuestaCorrecta,
   CERTIFICADO_GRABACION_URL,
   CERTIFICADO_CURSO_BOT_ATS,
+  CERTIFICADO_CURSO_BOT_ATS_3,
   CERTIFICADO_CLAUDE_SELECCION,
 } from "@/lib/certificado";
 import { syncCertificadoDescargadoEnNotion } from "@/lib/notion";
@@ -20,7 +21,9 @@ export async function POST(req: NextRequest) {
   const email = typeof body?.email === "string" ? body.email.trim() : "";
   const respuesta = typeof body?.respuesta === "string" ? body.respuesta : "";
   const tipo =
-    body?.tipo === "curso-bot-ats" || body?.tipo === "claude-seleccion"
+    body?.tipo === "curso-bot-ats" ||
+    body?.tipo === "curso-bot-ats-3" ||
+    body?.tipo === "claude-seleccion"
       ? body.tipo
       : "masterclass";
 
@@ -62,6 +65,7 @@ export async function POST(req: NextRequest) {
   // aprobada de ese mail — no tiene sentido pedir trivia para algo pago.
   const resourceSlugPorTipo: Record<string, string> = {
     "curso-bot-ats": CERTIFICADO_CURSO_BOT_ATS.resourceSlug,
+    "curso-bot-ats-3": CERTIFICADO_CURSO_BOT_ATS_3.resourceSlug,
     "claude-seleccion": CERTIFICADO_CLAUDE_SELECCION.resourceSlug,
   };
 

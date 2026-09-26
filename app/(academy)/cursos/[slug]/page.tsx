@@ -122,6 +122,14 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
         </div>
       )}
 
+      {course.highlight && (
+        <div className="card rounded-xl p-5 sm:p-6 mb-8 border border-magenta/30">
+          <p className="eyebrow mb-2">Novedad en esta edición</p>
+          <h2 className="font-display text-xl text-bone mb-2">{course.highlight.title}</h2>
+          <p className="text-sm text-bone/70">{course.highlight.text}</p>
+        </div>
+      )}
+
       {course.outcomes && (
         <div className="mb-10">
           <h2 className="font-display text-2xl text-bone mb-6">¿Qué vas a lograr?</h2>

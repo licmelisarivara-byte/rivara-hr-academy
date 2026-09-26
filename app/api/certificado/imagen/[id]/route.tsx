@@ -4,6 +4,7 @@ import { supabaseAdmin, supabaseAdminConfigured } from "@/lib/supabaseAdmin";
 import {
   CERTIFICADO_EVENTO,
   CERTIFICADO_CURSO_BOT_ATS,
+  CERTIFICADO_CURSO_BOT_ATS_3,
   CERTIFICADO_CLAUDE_SELECCION,
 } from "@/lib/certificado";
 import { loadGoogleFont } from "@/lib/googleFont";
@@ -46,6 +47,13 @@ export async function GET(
       evento: CERTIFICADO_CURSO_BOT_ATS,
       duracion: "Duración: 2 clases en vivo de 90 minutos",
       descripcion: (evento: typeof CERTIFICADO_CURSO_BOT_ATS) =>
+        `Por completar el curso en vivo "${evento.titulo}" (2 clases), dictado los días ${evento.fecha} por RIVARA HR Academy.`,
+      fechaLabel: "Fechas del curso",
+    },
+    "curso-bot-ats-3": {
+      evento: CERTIFICADO_CURSO_BOT_ATS_3,
+      duracion: "Duración: 2 clases en vivo de 90 minutos",
+      descripcion: (evento: typeof CERTIFICADO_CURSO_BOT_ATS_3) =>
         `Por completar el curso en vivo "${evento.titulo}" (2 clases), dictado los días ${evento.fecha} por RIVARA HR Academy.`,
       fechaLabel: "Fechas del curso",
     },

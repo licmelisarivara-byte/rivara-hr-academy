@@ -51,6 +51,7 @@ export type Course = {
   certificadoUrl?: string; // página para pedir el certificado de este curso, se muestra en el dashboard
   certificadoTipo?: string; // "tipo" que se manda a /api/certificado (curso-bot-ats, claude-seleccion, etc.)
   whatsappGroupLink?: string; // link de invitación al grupo de WhatsApp del curso
+  highlight?: { title: string; text: string }; // bloque destacado "Novedad en esta edición", arriba de "¿Qué vas a lograr?" en la página del curso
 };
 
 // ⚠️ Contenido real tomado de lo que Melisa definió. Los precios en ARS son
@@ -176,6 +177,116 @@ export const courses: Course[] = [
       "https://noble-shawl-f26.notion.site/Tu-checklist-para-armar-tu-asistente-de-selecci-n-3ae5c6b67016816ead9ad4c5fb17d5a6",
     certificadoUrl: "/cursos/de-cero-a-tu-asistente/certificado",
     certificadoTipo: "curso-bot-ats",
+    // Única modificación a esta edición (agosto): el link de la Comunidad de
+    // Alumnos, para quien quiera sumarse desde su panel. Todo lo demás
+    // (fechas, certificados ya emitidos, Meet) se deja como está.
+    whatsappGroupLink: "https://chat.whatsapp.com/Go39ka3niC69HwP4wsRTbz",
+  },
+  // 3ra edición (15 y 22 de octubre de 2026): curso NUEVO e independiente,
+  // copia de la edición de agosto con sus propios datos — así los alumnos y
+  // certificados de la edición anterior no se tocan. Tiene su propio
+  // certificado (tipo "curso-bot-ats-3", con la fecha de octubre).
+  {
+    slug: "de-cero-a-tu-asistente-3ra-edicion",
+    title: "Creá tu propio Bot de Selección + ATS con IA (3ra edición)",
+    format: "En vivo",
+    image: "/images/covers/curso-bot-seleccion.png",
+    tagline:
+      "En 2 clases en vivo armás tu asistente de selección con IA y publicás tu propio ATS, sin perfil técnico.",
+    description:
+      "Curso en vivo de dos clases donde armamos, paso a paso, un asistente de selección con Claude, un bot conectado con Botpress, y un ATS propio con IA publicado en Lovable. Pensado para recruiters y profesionales de RRHH sin perfil técnico que quieren dejar de filtrar CVs a mano.",
+    highlight: {
+      title: "💬 Comunidad de Alumnos por WhatsApp",
+      text: "Esta edición suma una comunidad permanente por WhatsApp: un espacio para compartir lo que vas armando, resolver dudas entre colegas y seguir aprendiendo después de las clases. Te sumás apenas confirmás tu inscripción.",
+    },
+    modules: [
+      {
+        title: "Módulo 1 (15 de octubre) — Tu asistente de selección con IA",
+        icon: "🤖",
+        items: [
+          "Introducción a Claude y sus ventajas frente a otras IAs",
+          "Manejo de tokens y límites de uso",
+          "Armado paso a paso de tu asistente de selección",
+          "Prompt maestro de análisis de CV",
+          "Introducción a Botpress",
+        ],
+        materials: [
+          {
+            title: "Resumen Clase 1",
+            url: "/downloads/resumen-clase1-bot-seleccion.pdf",
+          },
+          {
+            title: "Slides Clase 1",
+            url: "/downloads/slides-clase1-bot-seleccion.pdf",
+          },
+          {
+            title: "Ejemplo de CV y puesto",
+            url: "/downloads/ejemplo-cv-puesto-clase1.pdf",
+          },
+        ],
+      },
+      {
+        title: "Módulo 2 (22 de octubre) — Tu propio ATS con IA",
+        icon: "🗂️",
+        items: [
+          "Precios de las plataformas (Botpress y Lovable)",
+          "Diseño de tu ATS en Claude",
+          "Deploy del ATS en Lovable",
+          "Pipeline de candidatos tipo Kanban",
+          "Publicación del ATS recibiendo postulantes reales",
+        ],
+        materials: [
+          {
+            title: "Resumen Clase 2",
+            url: "/downloads/resumen-clase2-rivara.pdf",
+          },
+          {
+            title: "Slides Clase 2",
+            url: "/downloads/slides-clase2-ats.pdf",
+          },
+          {
+            title: "CV de ejemplo (Martín Sosa)",
+            url: "/downloads/cv-ejemplo-martin-sosa.pdf",
+          },
+        ],
+      },
+    ],
+    outcomes: [
+      "Tu asistente de selección con IA, configurado con tu propio contexto",
+      "Análisis de CVs en segundos, con scoring y recomendación automática",
+      "Tu propio ATS publicado, con pipeline Kanban y formulario de postulación",
+      "Prompts maestros para entrevistas y preguntas STAR",
+      "Criterios de privacidad y mitigación de sesgos",
+      "Grabación incluida de las dos clases",
+      "Certificado de asistencia",
+    ],
+    // Sin precio cargado todavía: queda como "Próximamente" hasta que
+    // Melisa confirme el monto de la 3ra edición (precio, medios de pago y
+    // link de Meet se completan acá cuando los tenga).
+    price: "Próximamente",
+    comingSoon: true,
+    bankDetails,
+    faqs: [
+      {
+        q: "¿Necesito conocimientos técnicos?",
+        a: "No. El curso está diseñado para recruiters y profesionales de RRHH sin perfil técnico.",
+      },
+      {
+        q: "¿Las herramientas que usamos son pagas?",
+        a: "No para empezar. Claude y Lovable tienen plan gratuito.",
+      },
+      {
+        q: "¿Qué pasa si no puedo ir en vivo a alguna clase?",
+        a: "Las dos clases quedan grabadas, así que podés verlas después. Igual se recomienda asistir en vivo para practicar en el momento.",
+      },
+    ],
+    schedule:
+      "Jueves 15 y jueves 22 de octubre · 19:00 a 20:30 hs (ARG) · por Google Meet · incluye grabación y certificado de asistencia",
+    checklistUrl:
+      "https://noble-shawl-f26.notion.site/Tu-checklist-para-armar-tu-asistente-de-selecci-n-3ae5c6b67016816ead9ad4c5fb17d5a6",
+    certificadoUrl: "/cursos/de-cero-a-tu-asistente-3ra-edicion/certificado",
+    certificadoTipo: "curso-bot-ats-3",
+    whatsappGroupLink: "https://chat.whatsapp.com/Go39ka3niC69HwP4wsRTbz",
   },
   {
     slug: "claude-para-seleccion",

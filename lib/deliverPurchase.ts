@@ -116,6 +116,11 @@ export async function deliverCourseAccess(courseSlug: string, buyerEmail: string
               : `<p>Entrá a tu cuenta acá: <a href="${siteUrl()}/dashboard">${siteUrl()}/dashboard</a></p>`
           }
           ${course.schedule ? `<p>${course.schedule}</p>` : ""}
+          ${
+            course.whatsappGroupLink
+              ? `<p>💬 Sumate a la Comunidad de Alumnos por WhatsApp: <a href="${course.whatsappGroupLink}">${course.whatsappGroupLink}</a></p>`
+              : ""
+          }
           <p>Cualquier duda, escribinos por WhatsApp: https://wa.me/5491123912820</p>
         `,
       }),

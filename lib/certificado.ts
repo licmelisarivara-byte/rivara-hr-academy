@@ -36,6 +36,18 @@ export const CERTIFICADO_CURSO_BOT_ATS = {
   resourceSlug: "de-cero-a-tu-asistente",
 };
 
+// 3ra edición del mismo curso en vivo (15 y 22 de octubre de 2026). Es un
+// tipo de certificado APARTE ("curso-bot-ats-3") y no una modificación del
+// de arriba: los certificados de la edición de agosto se renderizan desde
+// CERTIFICADO_CURSO_BOT_ATS cada vez que se abren, así que cambiarle la
+// fecha les cambiaría la fecha a todos los ya emitidos.
+export const CERTIFICADO_CURSO_BOT_ATS_3 = {
+  titulo: "Creá tu propio Bot de Selección + ATS con IA",
+  fecha: "15 y 22 de octubre de 2026",
+  fechaCorta: "15-22 / 10 / 2026",
+  resourceSlug: "de-cero-a-tu-asistente-3ra-edicion",
+};
+
 // Certificado del curso grabado "Claude para Selección". Es autoservicio (a
 // su ritmo, sin fecha fija), así que en vez de fechas se muestra la
 // modalidad. Se valida contra una compra aprobada, igual que el curso en
