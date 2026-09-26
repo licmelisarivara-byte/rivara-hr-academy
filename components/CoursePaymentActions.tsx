@@ -213,6 +213,14 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
   // precio de lista, EN REEMPLAZO de su 10% individual (no se acumulan):
   // 15% por transferencia/Payoneer, 5% por Mercado Pago.
   const addon = addonSlug ? getPaidResourceBySlug(addonSlug) : undefined;
+  // Los links fijos de combo (curso + recurso) de lib/resources.ts están
+  // armados con el precio del curso de Claude para Selección: usarlos con
+  // otro curso cobraría un monto equivocado. Para cualquier otro curso el
+  // combo por Mercado Pago/Payoneer se coordina por WhatsApp (por
+  // transferencia se calcula bien con el precio de cada curso).
+  const combosFijos = course.slug === "claude-para-seleccion";
+  const mpComboLink = combosFijos ? addon?.mpPaymentLinkWithCourse : undefined;
+  const payoneerComboLink = combosFijos ? addon?.payoneerLinkWithCourse : undefined;
   const mpCourseARS = course.priceARS ?? 0; // Mercado Pago nunca tiene cupón ni descuento en el curso
   const addonBundleARS = addon ? applyDiscount(addon.priceARS, BUNDLE_DISCOUNT_PERCENT) : 0;
   const addonBundleUSD = addon ? applyDiscount(addon.priceUSD, BUNDLE_DISCOUNT_PERCENT) : 0;
@@ -495,9 +503,9 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
 
       {method === "mercadopago" && buyer && addon && (
         <div className="card-alt rounded-lg p-4 mb-4 text-sm text-bone/70">
-          {addon.mpPaymentLinkWithCourse ? (
+          {mpComboLink ? (
             <a
-              href={addon.mpPaymentLinkWithCourse}
+              href={mpComboLink}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-cta w-full inline-block text-center bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors"
@@ -528,7 +536,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
 
       {method === "payoneer" && buyer && (course.payoneerLink || addon) && (
         <div className="card-alt rounded-lg p-4 mb-4 text-sm text-bone/70">
-          {addon && !addon.payoneerLinkWithCourse ? (
+          {addon && !payoneerComboLink ? (
             // Todavía no existe un link de Payoneer específico para este
             // combo (curso + este recurso) — se completa
             // `payoneerLinkWithCourse` en lib/resources.ts apenas esté
@@ -550,7 +558,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
             course.payoneerLink && (
               <>
                 <a
-                  href={addon?.payoneerLinkWithCourse ?? course.payoneerLink}
+                  href={payoneerComboLink ?? course.payoneerLink}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-cta w-full inline-block text-center bg-magenta text-white px-4 py-2.5 rounded-full hover:bg-magentaSoft transition-colors"
