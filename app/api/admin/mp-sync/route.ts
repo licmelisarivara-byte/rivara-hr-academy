@@ -52,6 +52,46 @@ export async function POST(req: NextRequest) {
 
   const days = Math.min(Math.max(Number(body?.days) || 3, 1), 30);
 
+  // Modo solo lectura (body { "solo_ver": true }): lista los movimientos
+  // recientes tal como los devuelve MP, sin filtrar por estado y SIN
+  // procesar nada (no aprueba compras, no manda mails). Sirve para ver si
+  // un ingreso (por ejemplo una transferencia a la cuenta de MP) aparece
+  // en la API. Prueba además la API de movimientos de cuenta.
+  if (body?.solo_ver) {
+    const headers = { Authorization: `Bearer ${accessToken}` };
+    const q = new URLSearchParams({
+      sort: "date_created",
+      criteria: "desc",
+      range: "date_created",
+      begin_date: `NOW-${days}DAYS`,
+      end_date: "NOW",
+      limit: "30",
+    });
+    const pRes = await fetch(`https://api.mercadopago.com/v1/payments/search?${q}`, { headers });
+    const pData = await pRes.json().catch(() => null);
+    const pagos = (pData?.results ?? []).map((p: any) => ({
+      id: p.id,
+      status: p.status,
+      operation_type: p.operation_type,
+      payment_type_id: p.payment_type_id,
+      payment_method_id: p.payment_method_id,
+      monto: p.transaction_amount,
+      fecha: p.date_created,
+      payer_email: p.payer?.email ?? null,
+      descripcion: p.description ?? null,
+      external_reference: p.external_reference ?? null,
+    }));
+    const mRes = await fetch(
+      `https://api.mercadopago.com/v1/account/movements/search?limit=30&sort=date_created&criteria=desc`,
+      { headers }
+    );
+    const mText = await mRes.text().catch(() => "");
+    return NextResponse.json({
+      payments: { status: pRes.status, total: pData?.paging?.total, pagos },
+      movements: { status: mRes.status, cuerpo: mText.slice(0, 3000) },
+    });
+  }
+
   const params = new URLSearchParams({
     status: "approved",
     sort: "date_created",
