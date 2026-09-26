@@ -211,20 +211,9 @@ export const courses: Course[] = [
           "Prompt maestro de análisis de CV",
           "Introducción a Botpress",
         ],
-        materials: [
-          {
-            title: "Resumen Clase 1",
-            url: "/downloads/resumen-clase1-bot-seleccion.pdf",
-          },
-          {
-            title: "Slides Clase 1",
-            url: "/downloads/slides-clase1-bot-seleccion.pdf",
-          },
-          {
-            title: "Ejemplo de CV y puesto",
-            url: "/downloads/ejemplo-cv-puesto-clase1.pdf",
-          },
-        ],
+        // Materiales, slides y grabación de esta clase: se cargan DESPUÉS
+        // de la clase (Melisa los pasa post clase). Confirmar con ella si
+        // cambiaron respecto de la edición de agosto antes de subirlos.
       },
       {
         title: "Módulo 2 (22 de octubre) — Tu propio ATS con IA",
@@ -236,20 +225,7 @@ export const courses: Course[] = [
           "Pipeline de candidatos tipo Kanban",
           "Publicación del ATS recibiendo postulantes reales",
         ],
-        materials: [
-          {
-            title: "Resumen Clase 2",
-            url: "/downloads/resumen-clase2-rivara.pdf",
-          },
-          {
-            title: "Slides Clase 2",
-            url: "/downloads/slides-clase2-ats.pdf",
-          },
-          {
-            title: "CV de ejemplo (Martín Sosa)",
-            url: "/downloads/cv-ejemplo-martin-sosa.pdf",
-          },
-        ],
+        // Igual que el módulo 1: materiales, slides y grabación post clase.
       },
     ],
     outcomes: [
