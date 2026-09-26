@@ -33,7 +33,7 @@ export const COUPONS: Coupon[] = [
       "10% off para leads de LinkedIn (post del 7/8) que escriben después del early bird",
     activeFrom: "2026-08-10T00:00:00-03:00",
     // La 3ra edición del curso Bot + ATS ya tiene su propio early bird
-    // ($70.000 por transferencia hasta el 7/10): este 10% se sumaría encima.
+    // ($72.000 por transferencia hasta el 7/10): este 10% se sumaría encima.
     excludeCourses: ["de-cero-a-tu-asistente-3ra-edicion"],
   },
   {
@@ -65,6 +65,19 @@ export const COUPONS: Coupon[] = [
     activeUntil: "2026-09-20T23:59:59-03:00",
     courses: ["claude-para-seleccion"],
   },
+  {
+    // BOT al 25% solo para la 3ra edición del curso Bot + ATS. Arranca el
+    // 8/10, cuando termina el early bird: sobre el precio de lista
+    // ($96.000) da $72.000, igual que el early bird. Antes del 8/10 no
+    // aplica para que no se acumule con el early bird. (El BOT de 10% de
+    // arriba excluye este curso.)
+    code: "BOT",
+    percentOff: 25,
+    description:
+      "25% off en la 3ra edición del curso Bot + ATS, desde que termina el early bird (8/10)",
+    activeFrom: "2026-10-08T00:00:00-03:00",
+    courses: ["de-cero-a-tu-asistente-3ra-edicion"],
+  },
 ];
 
 // courseSlug/resourceSlug: si se pasa uno, el cupón solo es válido cuando
@@ -76,15 +89,20 @@ export function getCoupon(
   target?: { courseSlug?: string; resourceSlug?: string }
 ): Coupon | null {
   if (!code) return null;
-  const coupon = COUPONS.find((c) => c.code === code.trim().toUpperCase());
-  if (!coupon) return null;
   const now = Date.now();
-  if (coupon.activeFrom && now < new Date(coupon.activeFrom).getTime()) return null;
-  if (coupon.activeUntil && now > new Date(coupon.activeUntil).getTime()) return null;
   const courseSlug = target?.courseSlug;
   const resourceSlug = target?.resourceSlug;
-  if (coupon.courses && (!courseSlug || !coupon.courses.includes(courseSlug))) return null;
-  if (courseSlug && coupon.excludeCourses?.includes(courseSlug)) return null;
-  if (coupon.resources && (!resourceSlug || !coupon.resources.includes(resourceSlug))) return null;
-  return coupon;
+  // Un mismo código puede tener más de una entrada con distinto alcance
+  // (ej: BOT vale 10% en general y 25% en la 3ra edición del curso Bot +
+  // ATS): se devuelve la primera que aplica a este curso/recurso y fecha.
+  const candidatos = COUPONS.filter((c) => c.code === code.trim().toUpperCase());
+  for (const coupon of candidatos) {
+    if (coupon.activeFrom && now < new Date(coupon.activeFrom).getTime()) continue;
+    if (coupon.activeUntil && now > new Date(coupon.activeUntil).getTime()) continue;
+    if (coupon.courses && (!courseSlug || !coupon.courses.includes(courseSlug))) continue;
+    if (courseSlug && coupon.excludeCourses?.includes(courseSlug)) continue;
+    if (coupon.resources && (!resourceSlug || !coupon.resources.includes(resourceSlug))) continue;
+    return coupon;
+  }
+  return null;
 }

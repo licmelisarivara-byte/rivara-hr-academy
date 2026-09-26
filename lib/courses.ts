@@ -237,18 +237,18 @@ export const courses: Course[] = [
       "Grabación incluida de las dos clases",
       "Certificado de asistencia",
     ],
-    // Precios 3ra edición: early bird por transferencia $70.000 hasta el
-    // miércoles 7/10; después $90.000. Mercado Pago siempre $90.000 (sin
+    // Precios 3ra edición: early bird por transferencia $72.000 (25% off) hasta el
+    // miércoles 7/10; después $96.000. Mercado Pago siempre $96.000 (sin
     // descuento), o 3 cuotas sin interés de $30.000. Sin Payoneer por ahora
     // (no hay payoneerLink). Falta cargar el link de Meet (meetLink).
-    price: "$90.000 ARS",
-    priceARS: 90000,
+    price: "$96.000 ARS",
+    priceARS: 96000,
     priceNote:
-      "Early bird por transferencia: $70.000 hasta el miércoles 7/10 · Precio regular $90.000 · Mercado Pago: $90.000 o 3 cuotas sin interés de $30.000",
+      "Early bird por transferencia: $72.000 (25% off) hasta el miércoles 7/10 · Precio regular $96.000 · Mercado Pago: $96.000 o 3 cuotas sin interés de $32.000",
     earlyBirdUntil: "2026-10-07T23:59:59-03:00",
-    priceARSEarlyBird: 70000,
-    priceARSRegular: 90000,
-    mercadoPagoNote: "o 3 cuotas sin interés de $30.000",
+    priceARSEarlyBird: 72000,
+    priceARSRegular: 96000,
+    mercadoPagoNote: "o 3 cuotas sin interés de $32.000",
     bankDetails,
     faqs: [
       {
