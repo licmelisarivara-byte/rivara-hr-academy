@@ -33,6 +33,58 @@ function html(body: string, status = 200) {
   );
 }
 
+// Ingresos por transferencia bancaria a la cuenta de Mercado Pago (últimos
+// días) cuyo monto coincide con el de la compra y que todavía no se
+// usaron para confirmar otra compra. Es solo una ayuda para quien confirma:
+// ver que la plata realmente entró. Si las transferencias van a otra cuenta
+// (BBVA) o MP no responde, devuelve `null` y la página no muestra nada.
+async function buscarIngresos(total: number) {
+  const token = process.env.MP_ACCESS_TOKEN;
+  if (!token || !supabaseAdmin || !(total > 0)) return null;
+  try {
+    const q = new URLSearchParams({
+      status: "approved",
+      sort: "date_created",
+      criteria: "desc",
+      range: "date_created",
+      begin_date: "NOW-5DAYS",
+      end_date: "NOW",
+      limit: "50",
+    });
+    const res = await fetch(`https://api.mercadopago.com/v1/payments/search?${q}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const candidatos = (data.results ?? []).filter(
+      (p: any) =>
+        p.payment_type_id === "bank_transfer" &&
+        p.operation_type === "account_fund" &&
+        Math.abs(Number(p.transaction_amount) - total) < 0.5
+    );
+    if (!candidatos.length) return [];
+    const ids = candidatos.map((p: any) => String(p.id));
+    const { data: usados } = await supabaseAdmin
+      .from("compras")
+      .select("mp_payment_id")
+      .in("mp_payment_id", ids);
+    const usadosSet = new Set((usados ?? []).map((u) => u.mp_payment_id));
+    return candidatos.filter((p: any) => !usadosSet.has(String(p.id)));
+  } catch {
+    return null;
+  }
+}
+
+function fechaAR(iso: string) {
+  return new Date(iso).toLocaleString("es-AR", {
+    timeZone: "America/Argentina/Buenos_Aires",
+    day: "numeric",
+    month: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 async function loadGroup(id: string) {
   if (!supabaseAdmin) return null;
   const { data: row } = await supabaseAdmin.from("compras").select("*").eq("id", id).single();
@@ -62,6 +114,16 @@ export async function GET(req: NextRequest) {
   const moneda = row.currency === "USD" ? "USD " : "$";
   const total = filas.reduce((s, f) => s + Number(f.amount || 0), 0);
   const yaConfirmada = filas.every((f) => f.status === "approved" && f.delivered_at);
+  const ingresos =
+    yaConfirmada || row.payment_method !== "transferencia" ? null : await buscarIngresos(total);
+  const ingresoBloque =
+    ingresos === null
+      ? ""
+      : ingresos.length
+      ? `<p class="ok">✅ Encontré en tu Mercado Pago ${ingresos.length > 1 ? "estos ingresos" : "un ingreso"} por ${moneda}${total.toLocaleString("es-AR")} (transferencia): ${ingresos
+          .map((p: any) => fechaAR(p.date_created))
+          .join(" · ")}.</p>`
+      : `<p class="warn">⚠️ No veo todavía en Mercado Pago un ingreso por transferencia de ${moneda}${total.toLocaleString("es-AR")} (sin usar). Puede tardar unos minutos, o haber ido a otra cuenta.</p>`;
 
   return html(`
     <h1>${yaConfirmada ? "✅ Ya estaba confirmado" : "Confirmar pago recibido"}</h1>
@@ -72,12 +134,14 @@ export async function GET(req: NextRequest) {
       <li><strong>Mail:</strong> ${esc(row.buyer_email)}</li>
       ${row.discount_code ? `<li><strong>Cupón:</strong> ${esc(row.discount_code)}</li>` : ""}
     </ul>
+    ${ingresoBloque}
     ${
       yaConfirmada
         ? "<p>El acceso ya se había enviado. No hace falta hacer nada más.</p>"
         : `<form method="POST">
       <input type="hidden" name="id" value="${esc(id)}">
       <input type="hidden" name="t" value="${esc(t)}">
+      ${ingresos && ingresos.length ? `<input type="hidden" name="pid" value="${esc(ingresos[0].id)}">` : ""}
       ${filas.length > 1 ? "" : `<label>Monto que recibiste (${moneda.trim()}):<br>
         <input type="number" name="amount" step="any" value="${Number(row.amount)}"></label>`}
       <p><small>Si te transfirió otro monto, corregilo acá. Se habilita el acceso y se le manda el mail de bienvenida.</small></p>
@@ -100,6 +164,12 @@ export async function POST(req: NextRequest) {
   const result = await approvePurchase(id, Number.isFinite(amount) ? amount : undefined);
   if ("error" in result) {
     return html(`<h1>No se pudo confirmar</h1><p>Error: ${esc(result.error)}</p>`, 500);
+  }
+  // Si se detectó el ingreso en Mercado Pago, se deja registrado en la
+  // compra para que el mismo ingreso no sirva para confirmar otra.
+  const pid = String(form?.get("pid") ?? "");
+  if (/^\d+$/.test(pid) && supabaseAdmin) {
+    await supabaseAdmin.from("compras").update({ mp_payment_id: pid }).eq("id", id);
   }
   if (result.fallidas.length) {
     return html(`<h1 class="warn">⚠️ Confirmado, pero falló el mail</h1>

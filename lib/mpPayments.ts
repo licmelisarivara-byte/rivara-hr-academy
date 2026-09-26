@@ -106,8 +106,19 @@ async function alertUnmatchedPayment(payment: any) {
 
 // Procesa un pago ya traído de la API de MP. Devuelve una etiqueta con lo
 // que pasó (para el resumen de la sincronización y para los logs).
-export async function processMpPayment(payment: any): Promise<string> {
+export async function processMpPayment(
+  payment: any,
+  opts?: { collectorId?: number }
+): Promise<string> {
   if (!supabaseAdmin) return "not_configured";
+
+  // Solo cobros que recibe Melisa: los pagos que ella hace como compradora
+  // (que también aparecen en la consulta) y los ingresos de plata a su
+  // cuenta (transferencias, account_fund) no son ventas de la academia.
+  if (opts?.collectorId && payment.collector_id && Number(payment.collector_id) !== opts.collectorId) {
+    return "ignored_not_collector";
+  }
+  if (payment.operation_type === "account_fund") return "ignored_transfer_in";
 
   const ref: string | undefined = payment.external_reference || undefined;
   // Los pagos de otros productos (ej. Rivara Recruiter usa

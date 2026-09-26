@@ -118,11 +118,17 @@ export async function POST(req: NextRequest) {
 
   const data = await res.json();
   const pagos: any[] = data.results ?? [];
+  // Id de la cuenta de MP dueña del token: solo se procesan los pagos que
+  // ella COBRA (ver lib/mpPayments).
+  const meRes = await fetch("https://api.mercadopago.com/users/me", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  const collectorId = meRes.ok ? Number((await meRes.json().catch(() => null))?.id) || undefined : undefined;
   const resumen: Record<string, number> = {};
   const detalle: { id: string; email: string | null; monto: number; resultado: string }[] = [];
 
   for (const pago of pagos) {
-    const resultado = await processMpPayment(pago);
+    const resultado = await processMpPayment(pago, { collectorId });
     resumen[resultado] = (resumen[resultado] ?? 0) + 1;
     detalle.push({
       id: String(pago.id),
