@@ -59,6 +59,12 @@ export async function POST(req: NextRequest) {
   // en la API. Prueba además la API de movimientos de cuenta.
   if (body?.solo_ver) {
     const headers = { Authorization: `Bearer ${accessToken}` };
+    // Con { "payment_id": ... } devuelve el pago completo tal cual lo da MP
+    // (para ver qué datos trae quien transfiere).
+    if (body?.payment_id) {
+      const one = await fetch(`https://api.mercadopago.com/v1/payments/${body.payment_id}`, { headers });
+      return NextResponse.json({ status: one.status, pago: await one.json().catch(() => null) });
+    }
     const q = new URLSearchParams({
       sort: "date_created",
       criteria: "desc",
