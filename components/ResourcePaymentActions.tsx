@@ -142,6 +142,15 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
   }
 
   function confirmManual(m: "transferencia" | "payoneer") {
+    // Avisa a Melisa por mail con el botón "Confirmar pago".
+    if (buyer?.email) {
+      fetch("/api/transfer-notice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: resource.slug, buyerEmail: buyer.email, method: m }),
+        keepalive: true,
+      }).catch(() => {});
+    }
     const label = m === "transferencia" ? "Transferencia bancaria" : "Payoneer";
     const couponLine = appliedCoupon
       ? `\n🎟️ Cupón: ${appliedCoupon.code} (${appliedCoupon.percentOff}% off)`

@@ -260,6 +260,16 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
   }
 
   function confirmManual(m: "transferencia" | "payoneer" | "mercadopago") {
+    // Avisa a Melisa por mail con el botón "Confirmar pago" (solo para
+    // transferencia/Payoneer; el cobro de Mercado Pago es automático).
+    if ((m === "transferencia" || m === "payoneer") && buyer?.email) {
+      fetch("/api/transfer-notice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: course.slug, buyerEmail: buyer.email, method: m }),
+        keepalive: true,
+      }).catch(() => {});
+    }
     (window as any).gtag?.("event", "generate_lead", {
       event_category: "curso",
       event_label: course.slug,
