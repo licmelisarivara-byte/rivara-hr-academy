@@ -351,6 +351,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
             }`}
           >
             Mercado Pago — ${bundleMercadoPagoARS.toLocaleString("es-AR")} ARS
+            {!addon && course.mercadoPagoNote ? ` ${course.mercadoPagoNote}` : ""}
           </button>
         </div>
       </div>

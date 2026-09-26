@@ -51,6 +51,7 @@ export type Course = {
   certificadoUrl?: string; // página para pedir el certificado de este curso, se muestra en el dashboard
   certificadoTipo?: string; // "tipo" que se manda a /api/certificado (curso-bot-ats, claude-seleccion, etc.)
   whatsappGroupLink?: string; // link de invitación al grupo de WhatsApp del curso
+  mercadoPagoNote?: string; // aclaración junto al precio de Mercado Pago (ej: cuotas sin interés)
   highlight?: { title: string; text: string }; // bloque destacado "Novedad en esta edición", arriba de "¿Qué vas a lograr?" en la página del curso
 };
 
@@ -190,7 +191,7 @@ export const courses: Course[] = [
     slug: "de-cero-a-tu-asistente-3ra-edicion",
     title: "Creá tu propio Bot de Selección + ATS con IA (3ra edición)",
     format: "En vivo",
-    image: "/images/covers/curso-bot-seleccion.png",
+    image: "/images/covers/curso-bot-seleccion-3ra-edicion.png",
     tagline:
       "En 2 clases en vivo armás tu asistente de selección con IA y publicás tu propio ATS, sin perfil técnico.",
     description:
@@ -260,11 +261,18 @@ export const courses: Course[] = [
       "Grabación incluida de las dos clases",
       "Certificado de asistencia",
     ],
-    // Sin precio cargado todavía: queda como "Próximamente" hasta que
-    // Melisa confirme el monto de la 3ra edición (precio, medios de pago y
-    // link de Meet se completan acá cuando los tenga).
-    price: "Próximamente",
-    comingSoon: true,
+    // Precios 3ra edición: early bird por transferencia $70.000 hasta el
+    // miércoles 7/10; después $90.000. Mercado Pago siempre $90.000 (sin
+    // descuento), o 3 cuotas sin interés de $30.000. Sin Payoneer por ahora
+    // (no hay payoneerLink). Falta cargar el link de Meet (meetLink).
+    price: "$90.000 ARS",
+    priceARS: 90000,
+    priceNote:
+      "Early bird por transferencia: $70.000 hasta el miércoles 7/10 · Precio regular $90.000 · Mercado Pago: $90.000 o 3 cuotas sin interés de $30.000",
+    earlyBirdUntil: "2026-10-07T23:59:59-03:00",
+    priceARSEarlyBird: 70000,
+    priceARSRegular: 90000,
+    mercadoPagoNote: "o 3 cuotas sin interés de $30.000",
     bankDetails,
     faqs: [
       {
@@ -532,6 +540,18 @@ export function moduleAnchor(title: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
+// Fecha límite del early bird como "d/m" (hora de Argentina), tomada de
+// earlyBirdUntil — antes los textos tenían fijo "9/8" y quedaban mal en
+// cualquier otra edición.
+function earlyBirdDateLabel(course: Course): string {
+  if (!course.earlyBirdUntil) return "";
+  return new Date(course.earlyBirdUntil).toLocaleDateString("es-AR", {
+    day: "numeric",
+    month: "numeric",
+    timeZone: "America/Argentina/Buenos_Aires",
+  });
+}
+
 export function isEarlyBird(course: Course): boolean {
   if (!course.earlyBirdUntil) return false;
   return Date.now() < new Date(course.earlyBirdUntil).getTime();
@@ -572,21 +592,23 @@ export function getCoursePriceSummary(course: Course) {
       {
         method: "Transferencia bancaria",
         price: `$${transferenciaARS.toLocaleString("es-AR")} ARS`,
-        note: earlyBirdActive ? `Antes del 9/8 (después $${(course.priceARSRegular ?? mercadoPagoARS).toLocaleString("es-AR")})` : undefined,
+        note: earlyBirdActive ? `Antes del ${earlyBirdDateLabel(course)} (después $${(course.priceARSRegular ?? mercadoPagoARS).toLocaleString("es-AR")})` : undefined,
       },
       ...(course.payoneerLink
         ? [
             {
               method: "Payoneer",
               price: `USD ${payoneerUSD}`,
-              note: earlyBirdActive ? `Antes del 9/8 (después USD ${course.priceUSDRegular})` : undefined,
+              note: earlyBirdActive ? `Antes del ${earlyBirdDateLabel(course)} (después USD ${course.priceUSDRegular})` : undefined,
             },
           ]
         : []),
       {
         method: "Mercado Pago",
         price: `$${mercadoPagoARS.toLocaleString("es-AR")} ARS`,
-        note: "Pago online inmediato, sin descuento",
+        note: course.mercadoPagoNote
+          ? `Pago online inmediato, sin descuento ${course.mercadoPagoNote}`
+          : "Pago online inmediato, sin descuento",
       },
     ] as PaymentOption[],
   };

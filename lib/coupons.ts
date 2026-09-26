@@ -16,6 +16,7 @@ export type Coupon = {
   activeFrom?: string; // ISO datetime; antes de esto el cupón no es válido
   activeUntil?: string; // ISO datetime; después de esto el cupón no es válido
   courses?: string[]; // si está definido, el cupón solo vale para estos slugs de curso (sin definir = todos)
+  excludeCourses?: string[]; // el cupón NO vale para estos slugs de curso (ej: para que no se acumule con un early bird propio)
   resources?: string[]; // si está definido, el cupón solo vale para estos slugs de recurso pago (sin definir = todos)
 };
 
@@ -31,6 +32,9 @@ export const COUPONS: Coupon[] = [
     description:
       "10% off para leads de LinkedIn (post del 7/8) que escriben después del early bird",
     activeFrom: "2026-08-10T00:00:00-03:00",
+    // La 3ra edición del curso Bot + ATS ya tiene su propio early bird
+    // ($70.000 por transferencia hasta el 7/10): este 10% se sumaría encima.
+    excludeCourses: ["de-cero-a-tu-asistente-3ra-edicion"],
   },
   {
     code: "MASTERCLASS",
@@ -80,6 +84,7 @@ export function getCoupon(
   const courseSlug = target?.courseSlug;
   const resourceSlug = target?.resourceSlug;
   if (coupon.courses && (!courseSlug || !coupon.courses.includes(courseSlug))) return null;
+  if (courseSlug && coupon.excludeCourses?.includes(courseSlug)) return null;
   if (coupon.resources && (!resourceSlug || !coupon.resources.includes(resourceSlug))) return null;
   return coupon;
 }
