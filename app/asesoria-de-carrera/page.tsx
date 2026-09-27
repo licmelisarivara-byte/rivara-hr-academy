@@ -88,9 +88,9 @@ const recursos = [
 const proceso = [
   {
     step: "1",
-    title: "Sesión inicial",
+    title: "Completás el formulario",
     description:
-      "Nos conocemos, reviso tu experiencia y entendemos juntos hacia dónde apunta tu búsqueda.",
+      "Contame tu experiencia, tu CV actual y hacia dónde apunta tu búsqueda — 5 minutos, apenas confirmás la compra.",
   },
   {
     step: "2",
