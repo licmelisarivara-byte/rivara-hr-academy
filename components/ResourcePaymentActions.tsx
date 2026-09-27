@@ -159,7 +159,7 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
     // página, los tiene igual en el mensaje que nos manda.
     const bankLine =
       m === "transferencia"
-        ? `\n🏦 CBU: ${bankDetails.cbu}\n🏦 Alias: ${bankDetails.alias}`
+        ? `\n🏦 CBU/CVU: ${bankDetails.cbu}\n🏦 Alias: ${bankDetails.alias}`
         : "";
     const phoneLine = buyer?.phone ? `\n📱 Celular: ${buyer.phone}` : "";
     const nameLine = buyer?.name ? `\n🙋 Nombre: ${buyer.name}` : "";
@@ -219,7 +219,7 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
         <div className="card-alt rounded-lg p-4 mb-3 text-sm text-bone/70">
           <p className="font-semibold text-bone mb-2">Datos para transferencia</p>
           <p>Titular: {bankDetails.holder}</p>
-          <p>CBU: {bankDetails.cbu}</p>
+          <p>CBU/CVU: {bankDetails.cbu}</p>
           <p>Alias: {bankDetails.alias}</p>
           <p>CUIL: {bankDetails.cuil}</p>
         </div>

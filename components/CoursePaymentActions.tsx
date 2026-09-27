@@ -284,7 +284,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
     // página, los tiene igual en el mensaje que nos manda.
     const bankLine =
       m === "transferencia" && course.bankDetails
-        ? `\n🏦 CBU: ${course.bankDetails.cbu}\n🏦 Alias: ${course.bankDetails.alias}`
+        ? `\n🏦 CBU/CVU: ${course.bankDetails.cbu}\n🏦 Alias: ${course.bankDetails.alias}`
         : "";
     const comboAmount =
       m === "payoneer"
@@ -385,7 +385,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
         <div className="card-alt rounded-lg p-4 mb-4 text-sm text-bone/70">
           <p className="font-semibold text-bone mb-2">Datos para transferencia</p>
           <p>Titular: {course.bankDetails.holder}</p>
-          <p>CBU: {course.bankDetails.cbu}</p>
+          <p>CBU/CVU: {course.bankDetails.cbu}</p>
           <p>Alias: {course.bankDetails.alias}</p>
           <p>CUIL: {course.bankDetails.cuil}</p>
         </div>

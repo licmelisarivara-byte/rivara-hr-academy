@@ -36,8 +36,8 @@ function html(body: string, status = 200) {
 // Ingresos por transferencia bancaria a la cuenta de Mercado Pago (últimos
 // días) cuyo monto coincide con el de la compra y que todavía no se
 // usaron para confirmar otra compra. Es solo una ayuda para quien confirma:
-// ver que la plata realmente entró. Si las transferencias van a otra cuenta
-// (BBVA) o MP no responde, devuelve `null` y la página no muestra nada.
+// ver que la plata realmente entró. Si la transferencia fue a otra cuenta
+// o MP no responde, devuelve `null` y la página no muestra nada.
 async function buscarIngresos(total: number) {
   const token = process.env.MP_ACCESS_TOKEN;
   if (!token || !supabaseAdmin || !(total > 0)) return null;
