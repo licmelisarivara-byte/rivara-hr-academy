@@ -36,19 +36,19 @@ export default function Home() {
           <div>
             <p className="eyebrow mb-5 text-magenta">RIVARA HR ACADEMY</p>
             <h1 className="font-display text-4xl sm:text-5xl leading-[1.08] text-white mb-6">
-              Aprendé a usar Claude en tu proceso de selección
+              Aprendé a usar IA en tu proceso de selección
             </h1>
             <p className="text-white/70 text-lg max-w-xl mb-8">
-              Curso grabado de 6 módulos + 1 bonus para recruiters que quieren
-              aplicar IA sin tecnicismos, a tu ritmo.
+              Cursos con Claude para recruiters que quieren dejar de filtrar CVs a mano:
+              uno grabado a tu ritmo y otro en vivo para armar tu propio bot y ATS.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link
-                href={`/cursos/${featuredCourse.slug}`}
+              <a
+                href="#cursos-en-vivo"
                 className="btn-cta bg-magenta text-white px-8 py-4 rounded-full hover:bg-magentaSoft transition-colors shadow-lg shadow-magenta/30"
               >
-                Ver el programa del curso →
-              </Link>
+                Ver los cursos →
+              </a>
             </div>
           </div>
 
