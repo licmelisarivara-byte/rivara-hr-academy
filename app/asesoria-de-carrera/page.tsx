@@ -1,5 +1,7 @@
 import Image from "next/image";
 import CareerResourceDownload from "@/components/CareerResourceDownload";
+import AsesoriaCheckoutButton from "@/components/AsesoriaCheckoutButton";
+import { ASESORIA_PACKS } from "@/lib/asesoriaPacks";
 
 const WHATSAPP_URL =
   "https://wa.me/5491123912820?text=" +
@@ -330,24 +332,87 @@ export default function AsesoriaCarreraPage() {
       </section>
 
       {/* PRECIO */}
-      <section className="bg-careerFucsia">
-        <div className="max-w-3xl mx-auto px-6 py-20 text-center">
-          <h2 className="font-display text-2xl sm:text-3xl text-careerCream mb-4">
+      <section className="bg-white/50 border-y border-careerNavy/10">
+        <div className="max-w-6xl mx-auto px-6 py-24">
+          <h2 className="font-display text-2xl sm:text-3xl text-careerNavy mb-3 text-center">
             Inversión
           </h2>
-          <p className="font-body text-careerCream/85 text-lg mb-8">
-            Cotización a medida según tu perfil y necesidad (ej. si es en un
-            solo idioma o bilingüe, si ya tenés LinkedIn armado o hay que
-            construirlo desde cero).
+          <p className="font-body text-careerNavy/70 text-center mb-2">
+            Elegí el pack que se ajusta a tu búsqueda.
           </p>
-          <a
-            href={WHATSAPP_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-cta inline-block bg-careerCream text-careerFucsia px-8 py-4 rounded-full hover:bg-white transition-colors"
-          >
-            Pedir mi cotización →
-          </a>
+          <p className="font-display text-sm text-careerFucsia text-center uppercase tracking-widest mb-10">
+            3 cuotas sin interés con tarjeta
+          </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {ASESORIA_PACKS.map((pack) => (
+              <div
+                key={pack.slug}
+                className={
+                  pack.popular
+                    ? "rounded-2xl p-6 flex flex-col bg-careerNavy text-careerCream border-2 border-careerFucsia relative"
+                    : "rounded-2xl p-6 flex flex-col bg-careerCream border border-careerNavy/10"
+                }
+              >
+                {pack.popular && (
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-careerFucsia text-careerCream text-xs font-display px-4 py-1 rounded-full whitespace-nowrap">
+                    MÁS ELEGIDO
+                  </span>
+                )}
+                <h3
+                  className={
+                    "font-display text-lg mb-3 " +
+                    (pack.popular ? "text-careerCream" : "text-careerNavy")
+                  }
+                >
+                  {pack.title}
+                </h3>
+                <div className="mb-4">
+                  <span
+                    className={
+                      "font-body text-sm line-through block " +
+                      (pack.popular ? "text-careerCream/50" : "text-careerNavy/40")
+                    }
+                  >
+                    ${pack.originalPriceARS.toLocaleString("es-AR")}
+                  </span>
+                  <span className="font-display text-3xl">
+                    ${pack.priceARS.toLocaleString("es-AR")}
+                  </span>
+                </div>
+                <ul className="space-y-1.5 mb-6 flex-1">
+                  {pack.items.map((item) => (
+                    <li
+                      key={item}
+                      className={
+                        "font-body text-sm flex gap-2 " +
+                        (pack.popular ? "text-careerCream/80" : "text-careerNavy/70")
+                      }
+                    >
+                      <span className="text-careerFucsia shrink-0">✓</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+                <AsesoriaCheckoutButton
+                  pack={pack}
+                  allowTraduccion={pack.slug === "inicio" || pack.slug === "completo-es"}
+                />
+              </div>
+            ))}
+          </div>
+          <p className="font-body text-careerNavy/60 text-sm text-center mt-8">
+            ¿Necesitás algo puntual (solo un CV, solo LinkedIn)? Los servicios
+            sueltos se cotizan por WhatsApp:{" "}
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-careerFucsia hover:underline"
+            >
+              escribime acá
+            </a>
+            .
+          </p>
         </div>
       </section>
 

@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/dashboard", "/login", "/registro"],
+        disallow: ["/dashboard", "/login", "/registro", "/admin"],
       },
     ],
     sitemap: "https://hracademy.rivaraconsultora.com.ar/sitemap.xml",
