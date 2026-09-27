@@ -46,6 +46,7 @@ export async function processAsesoriaMpPayment(payment: any) {
     .eq("id", pedido.id);
 
   await notifyMelisaNuevoPago(pedido);
+  await notifyCompradoraPagoConfirmado(pedido);
 
   return { ok: true as const, pedidoId: pedido.id };
 }
@@ -80,6 +81,43 @@ async function notifyMelisaNuevoPago(pedido: any) {
         </ul>
         <p>Todavía falta que complete el formulario con el CV, LinkedIn y objetivo — te avisamos apenas lo haga.</p>
         <p><a href="${formUrl}">${formUrl}</a></p>
+      `,
+    }),
+  }).catch(() => {
+    // No bloqueamos el webhook si el mail falla.
+  });
+}
+
+// Mercado Pago redirige sola a /gracias apenas se aprueba el pago (auto_return),
+// pero si la clienta cierra la pestaña antes de que eso pase, este mail es el
+// único lugar donde le queda el link para completar el formulario con el CV,
+// LinkedIn y objetivo laboral.
+async function notifyCompradoraPagoConfirmado(pedido: any) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey || !pedido.buyer_email) return;
+
+  const formUrl = `${SITE_URL}/gracias?pedido=${pedido.id}`;
+  const packLabel = pedido.addon_traduccion
+    ? `${pedido.pack_title} + Traducción al inglés`
+    : pedido.pack_title;
+
+  await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "RIVARA Consultora <hola@mailhr.rivaraconsultora.com.ar>",
+      bcc: [MELISA_EMAIL],
+      to: [pedido.buyer_email],
+      subject: "¡Pago confirmado! Un último paso para arrancar",
+      html: `
+        <p>Hola${pedido.buyer_name ? ` ${pedido.buyer_name}` : ""},</p>
+        <p>Recibimos tu pago de <strong>${packLabel}</strong>. Antes de empezar a armar tu material necesito que completes un formulario cortito: tu CV, tu LinkedIn (o que me cuentes que todavía no tenés perfil armado) y hacia dónde apunta tu búsqueda.</p>
+        <p><a href="${formUrl}">${formUrl}</a></p>
+        <p>Si ya lo completaste después de pagar, ignorá este mail.</p>
+        <p>Cualquier duda, escribime por WhatsApp: <a href="https://wa.me/5491123912820">https://wa.me/5491123912820</a></p>
       `,
     }),
   }).catch(() => {
