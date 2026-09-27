@@ -1,10 +1,6 @@
 import Link from "next/link";
 import RivaraMark from "@/components/RivaraMark";
 
-const WHATSAPP_URL =
-  "https://wa.me/5491123912820?text=" +
-  encodeURIComponent("Hola Melisa! Quiero info sobre la Asesoría de Carrera.");
-
 export default function CareerHeader() {
   return (
     <header className="sticky top-0 z-40 bg-careerNavy/95 backdrop-blur border-b border-white/10">
@@ -22,13 +18,10 @@ export default function CareerHeader() {
         </Link>
 
         <a
-          href={WHATSAPP_URL}
-          target="_blank"
-          rel="noopener noreferrer"
+          href="#planes"
           className="btn-cta text-xs sm:text-sm bg-careerFucsia text-careerCream px-3 sm:px-5 py-2.5 rounded-full hover:bg-careerFucsia/85 transition-colors whitespace-nowrap shrink-0"
         >
-          <span className="sm:hidden">WhatsApp</span>
-          <span className="hidden sm:inline">Escribir por WhatsApp</span>
+          Ver planes
         </a>
       </div>
     </header>

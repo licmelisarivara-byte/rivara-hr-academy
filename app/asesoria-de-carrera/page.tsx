@@ -165,9 +165,7 @@ export default function AsesoriaCarreraPage() {
               consigas el trabajo que buscás en Argentina.
             </p>
             <a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#planes"
               className="btn-cta inline-block bg-careerFucsia text-careerCream px-8 py-4 rounded-full hover:bg-careerFucsia/85 transition-colors shadow-lg shadow-careerFucsia/20"
             >
               Quiero mi asesoría →
@@ -282,6 +280,14 @@ export default function AsesoriaCarreraPage() {
             </div>
           ))}
         </div>
+        <div className="text-center mt-10">
+          <a
+            href="#planes"
+            className="btn-cta inline-block bg-careerFucsia text-careerCream px-6 py-3 rounded-full hover:bg-careerFucsia/85 transition-colors"
+          >
+            Ver los planes →
+          </a>
+        </div>
       </section>
 
       {/* RECURSOS GRATIS */}
@@ -312,19 +318,22 @@ export default function AsesoriaCarreraPage() {
             Consejos prácticos para tu búsqueda laboral, sin necesidad de
             agendar nada.
           </p>
-          <div className="grid sm:grid-cols-2 gap-5 mb-10">
+          <div className="space-y-3 mb-10">
             {recursos.map((r) => (
-              <div
+              <details
                 key={r.title}
-                className="rounded-xl p-5 bg-careerCream border border-careerNavy/10"
+                className="group rounded-xl border border-careerNavy/10 bg-careerCream px-5 py-4"
               >
-                <h3 className="font-display text-base text-careerNavy mb-1.5">
+                <summary className="font-display text-base text-careerNavy cursor-pointer list-none flex items-center justify-between gap-4">
                   {r.title}
-                </h3>
-                <p className="font-body text-sm text-careerNavy/70">
+                  <span className="text-careerFucsia group-open:rotate-45 transition-transform text-xl leading-none shrink-0">
+                    +
+                  </span>
+                </summary>
+                <p className="font-body text-sm text-careerNavy/70 mt-3">
                   {r.description}
                 </p>
-              </div>
+              </details>
             ))}
           </div>
           <CareerResourceDownload />
@@ -332,7 +341,7 @@ export default function AsesoriaCarreraPage() {
       </section>
 
       {/* PRECIO */}
-      <section className="bg-white/50 border-y border-careerNavy/10">
+      <section id="planes" className="bg-white/50 border-y border-careerNavy/10 scroll-mt-20">
         <div className="max-w-6xl mx-auto px-6 py-24">
           <h2 className="font-display text-2xl sm:text-3xl text-careerNavy mb-3 text-center">
             Inversión
@@ -555,22 +564,22 @@ export default function AsesoriaCarreraPage() {
             Empecemos con tu búsqueda laboral
           </h2>
           <p className="font-body text-careerCream/70 text-lg mb-8">
-            Escribime y coordinamos una primera sesión.
+            Elegí tu pack y arrancamos apenas confirmes la compra.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
+            <a
+              href="#planes"
+              className="btn-cta inline-block bg-careerFucsia text-careerCream px-8 py-4 rounded-full hover:bg-careerFucsia/85 transition-colors"
+            >
+              Ver planes →
+            </a>
             <a
               href={WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-cta inline-block bg-careerFucsia text-careerCream px-8 py-4 rounded-full hover:bg-careerFucsia/85 transition-colors"
-            >
-              Escribir por WhatsApp
-            </a>
-            <a
-              href="mailto:hola@rivaraconsultora.com.ar?subject=Asesor%C3%ADa%20de%20Carrera"
               className="btn-cta inline-block border border-careerCream/30 text-careerCream px-8 py-4 rounded-full hover:bg-white/5 transition-colors"
             >
-              Agendar sesión inicial
+              ¿Dudas? Escribime por WhatsApp
             </a>
           </div>
         </div>
