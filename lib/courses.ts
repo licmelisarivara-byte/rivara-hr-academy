@@ -286,7 +286,6 @@ export const courses: Course[] = [
     modules: [
       {
         title: "Bienvenida",
-        icon: "👋",
         items: ["Presentación del curso"],
         recordingVideoId: "Uolt_JCNOOM",
         progressExempt: true,
@@ -294,7 +293,6 @@ export const courses: Course[] = [
       {
         title: "Módulo 1",
         benefit: "Escribile bien a Claude desde el primer prompt",
-        icon: "✍️",
         items: ["Fundamentos: cómo piensa Claude y cómo escribirle bien"],
         takeaways: [
           "Criterio para elegir herramienta según la tarea",
@@ -312,7 +310,6 @@ export const courses: Course[] = [
       {
         title: "Módulo 2",
         benefit: "Analizá CVs en segundos, con criterio consistente",
-        icon: "🔍",
         items: ["Análisis de CVs con el prompt maestro"],
         takeaways: [
           "Prompt maestro de análisis de CV listo para copiar",
@@ -346,7 +343,6 @@ export const courses: Course[] = [
       {
         title: "Módulo 3",
         benefit: "Llegá a cada entrevista con las preguntas justas",
-        icon: "🎤",
         items: ["Preguntas STAR y guías de entrevista"],
         takeaways: [
           "Banco de 8 preguntas STAR por seniority",
@@ -363,7 +359,6 @@ export const courses: Course[] = [
       {
         title: "Módulo 4",
         benefit: "Armá la terna sin dudar entre candidatos parecidos",
-        icon: "⚖️",
         items: ["Comparar candidatos y armar la terna"],
         takeaways: [
           "Prompt de comparativa múltiple",
@@ -389,7 +384,6 @@ export const courses: Course[] = [
       {
         title: "Módulo 5",
         benefit: "Comunicá tus decisiones con informes profesionales",
-        icon: "📊",
         items: ["Informes ejecutivos y comunicación con el cliente"],
         takeaways: [
           "3 plantillas listas: resumen post-entrevista, email al candidato, informe al hiring manager",
@@ -417,7 +411,6 @@ export const courses: Course[] = [
       {
         title: "Módulo 6",
         benefit: "Dejá de repetir el mismo prompt cada vez",
-        icon: "⚙️",
         items: ["Armar tu propio Proyecto de Claude para no repetir el prompt cada vez"],
         takeaways: [
           "Setup de tu Project configurado con tu metodología",
@@ -435,7 +428,6 @@ export const courses: Course[] = [
       {
         title: "Módulo Bonus",
         benefit: "Atraé mejores candidatos antes de que lleguen los CVs",
-        icon: "🧲",
         items: ["Atracción de talento: antes de que lleguen los CVs"],
         takeaways: [
           "Prompt de aviso de empleo",

@@ -199,7 +199,7 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
 
       <h2 className="font-display text-2xl text-bone mb-6">Contenido</h2>
       <div className="mb-10">
-        <ModuleAccordion modules={course.modules} />
+        <ModuleAccordion modules={course.modules} defaultOpenAll={course.modules.length <= 2} />
       </div>
 
       {course.slug === "claude-para-seleccion" && <Testimonials />}

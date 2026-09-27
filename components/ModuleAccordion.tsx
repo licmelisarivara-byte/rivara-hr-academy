@@ -11,13 +11,37 @@ type ModuleItem = {
   takeaways?: string[];
 };
 
-export default function ModuleAccordion({ modules }: { modules: ModuleItem[] }) {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+export default function ModuleAccordion({
+  modules,
+  defaultOpenAll = false,
+}: {
+  modules: ModuleItem[];
+  // Cursos con pocos módulos (como la 3ra edición del Bot+ATS, con solo 2)
+  // arrancan con todos abiertos: no hace falta ahorrar espacio en pantalla
+  // y así se ve todo el contenido sin tener que clickear. El resto de los
+  // cursos (con más módulos) sigue arrancando con solo el primero abierto.
+  defaultOpenAll?: boolean;
+}) {
+  const [openIndexes, setOpenIndexes] = useState<Set<number>>(
+    () => new Set(defaultOpenAll ? modules.map((_, i) => i) : [0])
+  );
+
+  function toggle(i: number) {
+    setOpenIndexes((prev) => {
+      const next = new Set(prev);
+      if (next.has(i)) {
+        next.delete(i);
+      } else {
+        next.add(i);
+      }
+      return next;
+    });
+  }
 
   return (
     <div className="space-y-4">
       {modules.map((m, i) => {
-        const isOpen = openIndex === i;
+        const isOpen = openIndexes.has(i);
         const panelId = `${moduleAnchor(m.title)}-panel`;
         return (
           <div
@@ -28,7 +52,7 @@ export default function ModuleAccordion({ modules }: { modules: ModuleItem[] }) 
             <h3>
               <button
                 type="button"
-                onClick={() => setOpenIndex(isOpen ? null : i)}
+                onClick={() => toggle(i)}
                 aria-expanded={isOpen}
                 aria-controls={panelId}
                 className="w-full flex items-center justify-between gap-4 text-left px-6 py-5"
