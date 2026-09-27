@@ -6,7 +6,24 @@ import { paidResources } from "@/lib/resources";
 import CoursePaymentActions from "@/components/CoursePaymentActions";
 import ModuleAccordion from "@/components/ModuleAccordion";
 import AboutMeSummary from "@/components/AboutMeSummary";
-import Testimonials from "@/components/Testimonials";
+import Testimonials, { type Testimonial } from "@/components/Testimonials";
+
+// Testimonio de una alumna de la edición anterior de este mismo curso
+// (agosto 2026, certificado real): se suma solo en la página de este
+// curso, no en la de Claude para Selección, porque habla puntualmente del
+// bot/ATS armado en el taller.
+const jessikaTestimonial: Testimonial = {
+  quote:
+    "Aprendiendo cada día para dar un mejor servicio a nuestros clientes, ahora en Consultora Human 360°, contamos con chat bot, ahora más rápido y eficiente para las empresas que nos contraten como reclutadores de sus búsquedas. Gracias Melisa Rivara por el aprendizaje y las herramientas brindadas, sin duda los mejores.",
+  name: "Jessika Bottini",
+  source: "Comentario público en LinkedIn · alumna de la edición de agosto",
+  linkedin: {},
+};
+
+const showAboutAndTestimonials = new Set([
+  "claude-para-seleccion",
+  "de-cero-a-tu-asistente-3ra-edicion",
+]);
 
 export function generateStaticParams() {
   return courses.map((c) => ({ slug: c.slug }));
@@ -104,7 +121,7 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
         </a>
       </div>
 
-      {course.slug === "claude-para-seleccion" && <AboutMeSummary />}
+      {showAboutAndTestimonials.has(course.slug) && <AboutMeSummary />}
 
       {course.modules.length > 3 && (
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-bone/50 mb-8">
@@ -186,6 +203,9 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
       </div>
 
       {course.slug === "claude-para-seleccion" && <Testimonials />}
+      {course.slug === "de-cero-a-tu-asistente-3ra-edicion" && (
+        <Testimonials extra={[jessikaTestimonial]} />
+      )}
 
       {course.faqs && (
         <div>

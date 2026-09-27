@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { getCoursePriceSummary, type Course } from "@/lib/courses";
+import { getCoursePriceSummary, earlyBirdDateLabel, type Course } from "@/lib/courses";
 
 // Card de precio de la home. Es client component a propósito: la página
 // se genera estática en el build, así que si el precio se calculara ahí
@@ -30,7 +30,10 @@ export default function CoursePricingTeaser({ course }: { course: Course }) {
       </div>
       {summary.earlyBirdActive ? (
         <>
-          <div className="text-sm text-magenta mb-1">Por transferencia o Payoneer, hasta el 9/8</div>
+          <div className="text-sm text-magenta mb-1">
+            Por transferencia{course.payoneerLink ? " o Payoneer" : ""}, hasta el{" "}
+            {earlyBirdDateLabel(course)}
+          </div>
           <div className="detail-text mb-6">
             Por Mercado Pago: ${summary.mercadoPagoARS.toLocaleString("es-AR")} ARS
           </div>

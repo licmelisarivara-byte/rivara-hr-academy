@@ -34,9 +34,11 @@ export default function ModuleAccordion({ modules }: { modules: ModuleItem[] }) 
                 className="w-full flex items-center justify-between gap-4 text-left px-6 py-5"
               >
                 <span className="flex items-start gap-3">
-                  <span className="text-xl leading-none mt-0.5" aria-hidden="true">
-                    {m.icon ?? "📚"}
-                  </span>
+                  {m.icon && (
+                    <span className="text-xl leading-none mt-0.5" aria-hidden="true">
+                      {m.icon}
+                    </span>
+                  )}
                   <span>
                     {m.benefit && (
                       <span className="block text-magenta text-sm font-semibold mb-1">

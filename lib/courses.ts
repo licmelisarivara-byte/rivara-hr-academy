@@ -206,7 +206,6 @@ export const courses: Course[] = [
     modules: [
       {
         title: "Módulo 1 (15 de octubre) — Tu asistente de selección con IA",
-        icon: "🤖",
         items: [
           "Introducción a Claude y sus ventajas frente a otras IAs",
           "Manejo de tokens y límites de uso",
@@ -220,7 +219,6 @@ export const courses: Course[] = [
       },
       {
         title: "Módulo 2 (22 de octubre) — Tu propio ATS con IA",
-        icon: "🗂️",
         items: [
           "Precios de las plataformas (Botpress y Lovable)",
           "Diseño de tu ATS en Claude",
@@ -242,16 +240,17 @@ export const courses: Course[] = [
     ],
     // Precios 3ra edición: early bird por transferencia $72.000 (25% off) hasta el
     // miércoles 7/10; después $96.000. Mercado Pago siempre $96.000 (sin
-    // descuento), o 3 cuotas sin interés de $30.000. Sin Payoneer por ahora
-    // (no hay payoneerLink). Falta cargar el link de Meet (meetLink).
+    // descuento), con 2 y 3 cuotas sin interés ya activadas en la cuenta de
+    // Mercado Pago. Sin Payoneer por ahora (no hay payoneerLink). Falta
+    // cargar el link de Meet (meetLink).
     price: "$96.000 ARS",
     priceARS: 96000,
     priceNote:
-      "Early bird por transferencia: $72.000 (25% off) hasta el miércoles 7/10 · Precio regular $96.000 · Mercado Pago: $96.000 o 3 cuotas sin interés de $32.000",
+      "Early bird por transferencia: $72.000 (25% off) hasta el miércoles 7/10 · Precio regular $96.000 · Mercado Pago: $96.000 o hasta 3 cuotas sin interés",
     earlyBirdUntil: "2026-10-07T23:59:59-03:00",
     priceARSEarlyBird: 72000,
     priceARSRegular: 96000,
-    mercadoPagoNote: "o 3 cuotas sin interés de $32.000",
+    mercadoPagoNote: "o hasta 3 cuotas sin interés",
     bankDetails,
     faqs: [
       {
@@ -522,7 +521,7 @@ export function moduleAnchor(title: string): string {
 // Fecha límite del early bird como "d/m" (hora de Argentina), tomada de
 // earlyBirdUntil — antes los textos tenían fijo "9/8" y quedaban mal en
 // cualquier otra edición.
-function earlyBirdDateLabel(course: Course): string {
+export function earlyBirdDateLabel(course: Course): string {
   if (!course.earlyBirdUntil) return "";
   return new Date(course.earlyBirdUntil).toLocaleDateString("es-AR", {
     day: "numeric",

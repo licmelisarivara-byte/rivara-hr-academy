@@ -14,6 +14,7 @@ function formatARS(n: number) {
 }
 
 const featuredCourse = getCourseBySlug("claude-para-seleccion")!;
+const liveCourse = getCourseBySlug("de-cero-a-tu-asistente-3ra-edicion")!;
 
 export const metadata: Metadata = {
   title: "Curso de Claude para RRHH",
@@ -73,43 +74,82 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CURSO DESTACADO — oferta principal, primero después del hero */}
+      {/* NUESTROS CURSOS — el grabado (siempre disponible) y el en vivo (cupos por edición), lado a lado */}
       <section id="cursos-en-vivo" className="max-w-6xl mx-auto px-6 pt-20 pb-28">
-        <p className="eyebrow mb-3">📚 Curso destacado</p>
+        <p className="eyebrow mb-3">📚 Nuestros cursos</p>
         <h2 className="font-display text-2xl sm:text-3xl text-bone mb-10">
-          Aprendé con Claude, a tu ritmo
+          Elegí cómo aprender con Claude
         </h2>
 
-        <div className="relative card rounded-2xl p-8 sm:p-10 grid md:grid-cols-[1.3fr_1fr] gap-8 items-center border-2 border-magenta/60">
-          <span className="absolute -top-3 left-8 text-xs font-semibold bg-magenta text-white px-3 py-1 rounded-full shadow-md">
-            ⭐ Curso destacado
-          </span>
-          <div>
-            <span className="eyebrow">{featuredCourse.format}</span>
-            <h3 className="font-display text-2xl sm:text-3xl text-bone mt-3 mb-4">
-              {featuredCourse.title}
-            </h3>
-            <p className="text-bone/70 text-lg mb-4">{featuredCourse.tagline}</p>
-            <div className="card-alt rounded-lg p-4 mb-4">
-              <p className="text-magenta text-sm mb-1">⭐⭐⭐⭐</p>
-              <p className="text-sm text-bone/80 mb-2">
-                &ldquo;Es muy valioso su aporte para automatizar tareas y agilizar todo el
-                proceso de selección. Muy útil.&rdquo;
-              </p>
-              <p className="text-xs text-bone/50">Paula G. — Reseña de Google</p>
+        <div className="grid lg:grid-cols-2 gap-8 items-stretch">
+          <div className="relative card rounded-2xl p-8 sm:p-10 flex flex-col gap-6 border-2 border-magenta/60">
+            <span className="absolute -top-3 left-8 text-xs font-semibold bg-magenta text-white px-3 py-1 rounded-full shadow-md">
+              ⭐ El más elegido
+            </span>
+            <div>
+              <span className="eyebrow">{featuredCourse.format}</span>
+              <h3 className="font-display text-xl sm:text-2xl text-bone mt-3 mb-4">
+                {featuredCourse.title}
+              </h3>
+              <p className="text-bone/70 mb-4">{featuredCourse.tagline}</p>
+              <div className="card-alt rounded-lg p-4 mb-4">
+                <p className="text-magenta text-sm mb-1">⭐⭐⭐⭐</p>
+                <p className="text-sm text-bone/80 mb-2">
+                  &ldquo;Es muy valioso su aporte para automatizar tareas y agilizar todo el
+                  proceso de selección. Muy útil.&rdquo;
+                </p>
+                <p className="text-xs text-bone/50">Paula G. — Reseña de Google</p>
+              </div>
+              <div className="detail-text flex flex-col gap-2 mb-4">
+                <span>🎥 6 módulos + 1 bonus · A tu ritmo</span>
+              </div>
+              <Link
+                href={`/cursos/${featuredCourse.slug}`}
+                className="text-magenta text-sm font-semibold hover:underline"
+              >
+                Ver detalles del curso →
+              </Link>
             </div>
-            <div className="detail-text flex flex-col gap-2 mb-4">
-              <span>🎥 6 módulos + 1 bonus · A tu ritmo</span>
+
+            <div className="mt-auto">
+              <CoursePricingTeaser course={featuredCourse} />
             </div>
-            <Link
-              href={`/cursos/${featuredCourse.slug}`}
-              className="text-magenta text-sm font-semibold hover:underline"
-            >
-              Ver detalles del curso →
-            </Link>
           </div>
 
-          <CoursePricingTeaser course={featuredCourse} />
+          <div className="relative card rounded-2xl p-8 sm:p-10 flex flex-col gap-6 border-2 border-sage/60">
+            <span className="absolute -top-3 left-8 text-xs font-semibold bg-sage text-ink px-3 py-1 rounded-full shadow-md">
+              🔴 En vivo · Octubre
+            </span>
+            <div>
+              <span className="eyebrow">{liveCourse.format}</span>
+              <h3 className="font-display text-xl sm:text-2xl text-bone mt-3 mb-4">
+                {liveCourse.title}
+              </h3>
+              <p className="text-bone/70 mb-4">{liveCourse.tagline}</p>
+              <div className="card-alt rounded-lg p-4 mb-4">
+                <p className="text-sm text-bone/80 mb-2">
+                  &ldquo;Gracias Melisa Rivara por el aprendizaje y las herramientas brindadas, sin
+                  duda los mejores.&rdquo;
+                </p>
+                <p className="text-xs text-bone/50">
+                  Jessika Bottini — alumna de la edición de agosto
+                </p>
+              </div>
+              <div className="detail-text flex flex-col gap-2 mb-4">
+                <span>🗓️ 2 clases en vivo · {liveCourse.schedule?.split("·")[0]?.trim()}</span>
+              </div>
+              <Link
+                href={`/cursos/${liveCourse.slug}`}
+                className="text-magenta text-sm font-semibold hover:underline"
+              >
+                Ver detalles del curso →
+              </Link>
+            </div>
+
+            <div className="mt-auto">
+              <CoursePricingTeaser course={liveCourse} />
+            </div>
+          </div>
         </div>
       </section>
 

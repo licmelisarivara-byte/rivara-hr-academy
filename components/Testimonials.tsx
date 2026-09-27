@@ -1,6 +1,6 @@
 import LinkedInIcon from "./LinkedInIcon";
 
-type Testimonial = {
+export type Testimonial = {
   quote: string;
   name: string;
   role?: string;
@@ -31,17 +31,21 @@ const testimonials: Testimonial[] = [
   },
 ];
 
-// Los testimonios son de talleres anteriores (no de este curso grabado
-// puntual) — por eso el encabezado habla de "mis talleres" en general, sin
-// prometer que sean específicos de este contenido.
-export default function Testimonials() {
+// Los testimonios base son de talleres anteriores en general (no de un
+// curso puntual) — por eso el encabezado habla de "mis talleres" en
+// general, sin prometer que sean específicos de este contenido. `extra`
+// permite sumar testimonios propios de un curso puntual (por ejemplo, de
+// una edición anterior de este mismo curso) sin duplicar la lista base
+// en otras páginas que también usan este componente.
+export default function Testimonials({ extra = [] }: { extra?: Testimonial[] }) {
+  const all = [...testimonials, ...extra];
   return (
     <div className="mb-10">
       <h2 className="font-display text-2xl text-bone mb-6">
         Lo que dicen quienes ya participaron de mis talleres
       </h2>
       <div className="grid sm:grid-cols-2 gap-4">
-        {testimonials.map((t) => (
+        {all.map((t) => (
           <div key={t.name} className="card-alt rounded-xl p-6 border border-black/5">
             <div className="flex items-start justify-between gap-3 mb-2">
               {t.stars ? (
