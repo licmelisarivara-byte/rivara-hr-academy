@@ -71,7 +71,12 @@ export default function AsesoriaCheckoutButton({
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-2.5">
       {allowTraduccion && (
-        <label className="font-body text-sm text-careerNavy/80 flex items-center gap-2 mb-1">
+        <label
+          className={
+            "font-body text-sm flex items-center gap-2 mb-1 " +
+            (pack.popular ? "text-careerCream/90" : "text-careerNavy/80")
+          }
+        >
           <input
             type="checkbox"
             checked={addonTraduccion}
@@ -117,7 +122,12 @@ export default function AsesoriaCheckoutButton({
           : `Pagar $${total.toLocaleString("es-AR")} →`}
       </button>
       {error && (
-        <p className="font-body text-xs text-careerNavy/60">
+        <p
+          className={
+            "font-body text-xs " +
+            (pack.popular ? "text-careerCream/80" : "text-careerNavy/60")
+          }
+        >
           {error}{" "}
           <a
             href={WHATSAPP_FALLBACK}
