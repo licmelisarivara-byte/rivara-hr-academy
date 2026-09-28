@@ -251,6 +251,9 @@ export const courses: Course[] = [
     priceARSEarlyBird: 72000,
     priceARSRegular: 96000,
     mercadoPagoNote: "o hasta 3 cuotas sin interés",
+    previewClipUrl: "/videos/3ra-edicion-whatsapp-bot-demo.mp4",
+    previewClipCaption:
+      "Mirá este fragmento de una clase en vivo — el bot conectado a WhatsApp, respondiendo candidatos 24/7.",
     bankDetails,
     faqs: [
       {
