@@ -63,12 +63,15 @@ export default function CertificadoCursoBotAtsPage() {
           <h2 className="font-display text-xl text-bone mb-4">
             ¡Listo, {estado.nombre.split(" ")[0]}! 🎉
           </h2>
-          <div className="rounded-lg overflow-hidden border border-black/10 mb-6">
+          {/* Ancho mínimo + scroll horizontal: en mobile, si se achica para
+              entrar en pantalla, el texto queda ilegible sin zoom. */}
+          <div className="rounded-lg overflow-x-auto border border-black/10 mb-6">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={`/api/certificado/imagen/${estado.id}`}
               alt={`Certificado de participación de ${estado.nombre}`}
-              className="w-full h-auto"
+              className="h-auto max-w-none"
+              style={{ width: "100%", minWidth: 640 }}
             />
           </div>
           <a

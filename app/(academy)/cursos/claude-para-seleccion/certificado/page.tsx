@@ -67,12 +67,19 @@ export default function CertificadoClaudeSeleccionPage() {
           <h2 className="font-display text-xl text-bone mb-4">
             ¡Listo, {estado.nombre.split(" ")[0]}! 🎉
           </h2>
-          <div className="rounded-lg overflow-hidden border border-black/10 mb-6">
+          {/* En mobile, si el certificado (horizontal) se achica para entrar
+              en la pantalla, el texto queda ilegible sin hacer zoom. En vez
+              de forzarlo a 100% de ancho, lo mostramos con un ancho mínimo
+              fijo y el contenedor con scroll horizontal — así el texto
+              siempre se ve a un tamaño legible, y en pantallas chicas se
+              desliza para verlo completo. */}
+          <div className="rounded-lg overflow-x-auto border border-black/10 mb-6">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={`/api/certificado/imagen/${estado.id}`}
               alt={`Certificado de participación de ${estado.nombre}`}
-              className="w-full h-auto"
+              className="h-auto max-w-none"
+              style={{ width: "100%", minWidth: 640 }}
             />
           </div>
           <a

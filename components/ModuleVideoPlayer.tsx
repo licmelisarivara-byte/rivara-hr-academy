@@ -169,12 +169,15 @@ export default function ModuleVideoPlayer({
           <p className="text-sm text-bone/80 mb-3">
             🎉 ¡Terminaste el curso, {cert.nombre.split(" ")[0]}! Ya generamos tu certificado.
           </p>
-          <div className="rounded-lg overflow-hidden border border-black/10 mb-4 max-w-2xl mx-auto">
+          {/* Ancho mínimo + scroll horizontal: en mobile, si se achica para
+              entrar en pantalla, el texto queda ilegible sin zoom. */}
+          <div className="rounded-lg overflow-x-auto border border-black/10 mb-4 max-w-2xl mx-auto">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={`/api/certificado/imagen/${cert.id}`}
               alt={`Certificado de participación de ${cert.nombre}`}
-              className="w-full h-auto"
+              className="h-auto max-w-none"
+              style={{ width: "100%", minWidth: 560 }}
             />
           </div>
           <a
