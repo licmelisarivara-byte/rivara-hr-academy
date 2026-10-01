@@ -53,7 +53,8 @@ type CertState =
   | { paso: "idle" }
   | { paso: "generando" }
   | { paso: "listo"; id: string; nombre: string }
-  | { paso: "error" };
+  | { paso: "error" }
+  | { paso: "sin_nombre" };
 
 export default function ModuleVideoPlayer({
   title,
@@ -95,7 +96,15 @@ export default function ModuleVideoPlayer({
               markVideoCompleted(videoId);
               onComplete?.(videoId);
               if (triggersCertificate && userEmail && certificadoTipo) {
-                generarCertificado();
+                // Sin nombre cargado en "Mi cuenta" no generamos solos: antes
+                // caía al principio del mail (ej. "vittolajulian96" ->
+                // "Vittolajulian96") y quedaba un certificado con un nombre
+                // que no es el real, sin que la alumna se diera cuenta.
+                if (userName) {
+                  generarCertificado();
+                } else {
+                  setCert({ paso: "sin_nombre" });
+                }
               }
             }
           },
@@ -110,11 +119,9 @@ export default function ModuleVideoPlayer({
   }, [videoId, triggersCertificate, userEmail, certificadoTipo]);
 
   async function generarCertificado() {
-    if (!userEmail || !certificadoTipo) return;
+    if (!userEmail || !certificadoTipo || !userName) return;
     setCert({ paso: "generando" });
-    const nombre = (userName || userEmail.split("@")[0])
-      .toLowerCase()
-      .replace(/(^|\s)\S/g, (c) => c.toUpperCase());
+    const nombre = userName.toLowerCase().replace(/(^|\s)\S/g, (c) => c.toUpperCase());
     try {
       const res = await fetch("/api/certificado", {
         method: "POST",
@@ -199,6 +206,15 @@ export default function ModuleVideoPlayer({
           No pudimos generar tu certificado automáticamente.{" "}
           <a href={certificadoUrl} className="text-magenta hover:underline">
             Pedilo acá →
+          </a>
+        </p>
+      )}
+
+      {cert.paso === "sin_nombre" && certificadoUrl && (
+        <p className="text-xs text-bone/50 mt-3">
+          🎓 ¡Terminaste el curso! Para generar tu certificado con tu nombre completo,{" "}
+          <a href={certificadoUrl} className="text-magenta hover:underline">
+            pedilo acá →
           </a>
         </p>
       )}

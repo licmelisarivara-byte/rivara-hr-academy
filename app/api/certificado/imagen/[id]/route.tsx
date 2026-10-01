@@ -279,8 +279,7 @@ export async function GET(
               </div>
             </div>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 260 }}>
-              <div style={{ width: "100%", height: 1, background: "rgba(247,244,238,0.3)", display: "flex" }} />
-              <div style={{ marginTop: 10, fontSize: 16, fontWeight: 700, color: "#FFFFFF" }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "#FFFFFF" }}>
                 {evento.fechaCorta}
               </div>
               <div style={{ fontSize: 13, color: "rgba(247,244,238,0.55)" }}>
