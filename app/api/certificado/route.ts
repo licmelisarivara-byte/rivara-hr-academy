@@ -6,6 +6,7 @@ import {
   CERTIFICADO_CURSO_BOT_ATS,
   CERTIFICADO_CURSO_BOT_ATS_3,
   CERTIFICADO_CLAUDE_SELECCION,
+  enviarMailCertificado,
 } from "@/lib/certificado";
 import { syncCertificadoDescargadoEnNotion } from "@/lib/notion";
 
@@ -108,6 +109,11 @@ export async function POST(req: NextRequest) {
   if (tipo === "masterclass") {
     await syncCertificadoDescargadoEnNotion(nombre, email);
   }
+
+  // Solo la primera vez que se crea (no en el "ya existía" de arriba, que
+  // devuelve antes de llegar acá) — así no se reenvía el mail cada vez que
+  // alguien vuelve a pasar por el formulario o el video ya visto.
+  await enviarMailCertificado(email, nombre, tipo, data.id);
 
   return NextResponse.json({ correcta: true, id: data.id });
 }

@@ -1,4 +1,5 @@
 import { getEventBySlug } from "@/lib/events";
+import { siteUrl } from "@/lib/emailSequence";
 
 // Datos de la masterclass en vivo del 4/8. El link de la grabación toma por
 // default el mismo youtubeLink que ya usa /masterclass (lib/events.ts) — es
@@ -59,6 +60,48 @@ export const CERTIFICADO_CLAUDE_SELECCION = {
   fechaCorta: "A TU RITMO",
   resourceSlug: "claude-para-seleccion",
 };
+
+const TITULOS_POR_TIPO: Record<string, string> = {
+  masterclass: CERTIFICADO_EVENTO.titulo,
+  "curso-bot-ats": CERTIFICADO_CURSO_BOT_ATS.titulo,
+  "curso-bot-ats-3": CERTIFICADO_CURSO_BOT_ATS_3.titulo,
+  "claude-seleccion": CERTIFICADO_CLAUDE_SELECCION.titulo,
+};
+
+// Manda una copia del certificado por mail apenas se genera (una sola vez,
+// la primera vez que se crea — ver app/api/certificado/route.ts). Así
+// queda guardado en la casilla de la persona aunque nunca haya tocado
+// "Descargar", y no depende de que encuentre de nuevo la página del curso.
+export async function enviarMailCertificado(
+  email: string,
+  nombre: string,
+  tipo: string,
+  id: string
+) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return;
+  const firstName = nombre.split(" ")[0] || "";
+  const titulo = TITULOS_POR_TIPO[tipo] ?? "RIVARA HR Academy";
+  const imagenUrl = `${siteUrl()}/api/certificado/imagen/${id}`;
+
+  await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from: "RIVARA HR Academy <hola@mailhr.rivaraconsultora.com.ar>",
+      reply_to: "hola@rivaraconsultora.com.ar",
+      to: [email],
+      subject: `🎓 Tu certificado de "${titulo}"`,
+      html: `
+        <p>Hola${firstName ? ` ${firstName}` : ""},</p>
+        <p>Acá tenés tu certificado de participación de <strong>${titulo}</strong>, para que lo tengas guardado.</p>
+        <p><a href="${imagenUrl}" style="display:inline-block;background:#E8006F;color:#fff;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:bold">Ver y descargar mi certificado →</a></p>
+        <p>¡Gracias por participar!</p>
+        <p>Melisa<br/>RIVARA HR Academy</p>
+      `,
+    }),
+  }).catch(() => {});
+}
 
 export function normalizarRespuesta(raw: string): string {
   return raw
