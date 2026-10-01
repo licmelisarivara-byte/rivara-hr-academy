@@ -50,9 +50,10 @@ export async function POST(req: NextRequest) {
           <p>Hola${firstName ? ` ${firstName}` : ""},</p>
           <p>¡Gracias por descargar <strong>${resource.title}</strong>! Ya la tenés lista, y si por algo no llegó a bajarse, la volvés a tener acá:</p>
           ${resource.fileUrl ? `<p><a href="${siteUrl}${resource.fileUrl}">${siteUrl}${resource.fileUrl}</a></p>` : ""}
-          <p>Si querés ir más en profundidad, tenemos el curso <strong>Claude para Selección</strong> y otros recursos pagos con contenido más completo.</p>
-          <p>Como ya diste este primer paso, te dejamos un <strong>${coupon.percentOff}% off</strong> extra en el curso o en los recursos pagos (Kit de Prompts, Guía o Combo) con el cupón <strong>${coupon.code}</strong>:</p>
+          <p>Si querés ir más en profundidad, tenemos el curso grabado <strong>Claude para Selección</strong>, el taller en vivo <strong>Creá tu propio Bot de Selección + ATS con IA</strong> (arranca el 15/10, inscripciones abiertas hasta el 14/10) y otros recursos pagos con contenido más completo.</p>
+          <p>Como ya diste este primer paso, te dejamos un <strong>${coupon.percentOff}% off</strong> extra en cualquiera de los dos cursos o en los recursos pagos (Kit de Prompts, Guía o Combo) con el cupón <strong>${coupon.code}</strong>:</p>
           <p><a href="${siteUrl}/cursos/claude-para-seleccion">${siteUrl}/cursos/claude-para-seleccion</a></p>
+          <p><a href="${siteUrl}/cursos/de-cero-a-tu-asistente-3ra-edicion">${siteUrl}/cursos/de-cero-a-tu-asistente-3ra-edicion</a></p>
           <p><a href="${siteUrl}/ebooks">${siteUrl}/ebooks</a></p>
           <p>Cualquier duda, escribinos por WhatsApp: https://wa.me/5491123912820</p>
         `,
