@@ -149,10 +149,10 @@ export async function GET(
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={logoDataUri} width={48} height={48} style={{ borderRadius: 10 }} />
             </div>
-            <div style={{ marginTop: 14, fontSize: 24, fontWeight: 800, color: "#FFFFFF", letterSpacing: 2 }}>
+            <div style={{ marginTop: 16, fontSize: 34, fontWeight: 800, color: "#FFFFFF", letterSpacing: 2 }}>
               RIVARA
             </div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 4, marginTop: 2 }}>
+            <div style={{ fontSize: 17, fontWeight: 700, color: "#FFFFFF", letterSpacing: 5, marginTop: 4 }}>
               HR ACADEMY
             </div>
           </div>
