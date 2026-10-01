@@ -9,7 +9,7 @@ import { courses, type Course } from "@/lib/courses";
 import { getPaidResourceBySlug, freeResources } from "@/lib/resources";
 import FreeResourceDownloadButton from "@/components/FreeResourceDownloadButton";
 import ModuleVideoPlayer from "@/components/ModuleVideoPlayer";
-import { getCompletedVideoIds } from "@/lib/progress";
+import { getCompletedVideoIds, getCertificadoGenerado } from "@/lib/progress";
 
 type MyPurchase = {
   kind: "resource" | "course";
@@ -36,6 +36,10 @@ function DashboardContent() {
   const [userName, setUserName] = useState<string | null>(null);
   const [purchases, setPurchases] = useState<MyPurchase[]>([]);
   const [completedVideoIds, setCompletedVideoIds] = useState<Set<string>>(new Set());
+  // Certificados ya generados (certificadoTipo -> {id, nombre}), para
+  // mostrarlos fijos más abajo de cada curso, no solo dentro del video del
+  // módulo que los dispara — ver lib/progress.ts.
+  const [certificados, setCertificados] = useState<Record<string, { id: string; nombre: string }>>({});
   const [collapsedCourses, setCollapsedCourses] = useState<Set<string>>(new Set());
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState("");
@@ -67,6 +71,19 @@ function DashboardContent() {
   // sin esperar a un reload.
   useEffect(() => {
     setCompletedVideoIds(getCompletedVideoIds());
+  }, []);
+
+  // Certificados ya generados en este navegador, uno por curso (si lo
+  // tiene) — se leen todos juntos al entrar, así la tarjeta queda fija de
+  // entrada sin esperar a que la alumna abra el video del módulo.
+  useEffect(() => {
+    const encontrados: Record<string, { id: string; nombre: string }> = {};
+    for (const c of courses) {
+      if (!c.certificadoTipo) continue;
+      const guardado = getCertificadoGenerado(c.certificadoTipo);
+      if (guardado) encontrados[c.certificadoTipo] = guardado;
+    }
+    setCertificados(encontrados);
   }, []);
 
   // Qué cursos dejó plegados la alumna (acordeón) — también en
@@ -259,6 +276,10 @@ function DashboardContent() {
                       onComplete={(videoId) =>
                         setCompletedVideoIds((prev) => new Set(prev).add(videoId))
                       }
+                      onCertificado={(cert) =>
+                        c.certificadoTipo &&
+                        setCertificados((prev) => ({ ...prev, [c.certificadoTipo!]: cert }))
+                      }
                     />
                   ) : (
                     <p className="text-xs text-bone/40">
@@ -298,8 +319,64 @@ function DashboardContent() {
               </div>
             )}
 
+            {/* Certificado ya generado: queda fijo acá abajo (no solo
+                adentro del video del módulo que lo dispara), con las mismas
+                acciones de LinkedIn/reseña que se ven justo al generarlo —
+                así no hay que ir a buscarlo entre los módulos cada vez. */}
+            {(() => {
+              const cert = c.certificadoTipo ? certificados[c.certificadoTipo] : undefined;
+              if (!cert) return null;
+              return (
+                <div className="card-alt rounded-xl p-5 mb-4 border border-sage/40 text-center">
+                  <p className="text-sm text-bone/80 mb-3">
+                    🏆 Tu certificado de {c.title}, {cert.nombre.split(" ")[0]}:
+                  </p>
+                  <div className="rounded-lg overflow-x-auto border border-black/10 mb-4 max-w-2xl mx-auto">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={`/api/certificado/imagen/${cert.id}`}
+                      alt={`Certificado de participación de ${cert.nombre}`}
+                      className="h-auto max-w-none"
+                      style={{ width: "100%", minWidth: 560 }}
+                    />
+                  </div>
+                  <a
+                    href={`/api/certificado/imagen/${cert.id}`}
+                    download
+                    className="btn-cta bg-magenta text-white px-5 py-2.5 rounded-full hover:bg-magentaSoft transition-colors inline-block text-sm"
+                  >
+                    Descargar mi certificado
+                  </a>
+
+                  <div className="hairline my-4" />
+
+                  <p className="text-xs text-bone/60 mb-2">
+                    ¿Te sirvió el curso? Dejame tu reseña en Google 🙏
+                  </p>
+                  <a
+                    href="https://maps.app.goo.gl/XEqBvBxA2DWxxUrZ8"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-cta bg-magenta text-white px-4 py-2 rounded-full hover:bg-magentaSoft transition-colors inline-block text-sm"
+                  >
+                    Dejar mi reseña →
+                  </a>
+                  <div className="mt-3">
+                    <a
+                      href="https://www.linkedin.com/company/rivara-hr-academy/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-cta bg-sage text-white px-4 py-2 rounded-full hover:opacity-90 transition-colors inline-block text-sm"
+                    >
+                      Compartir en LinkedIn →
+                    </a>
+                  </div>
+                </div>
+              );
+            })()}
+
             <div className="flex flex-wrap gap-4 text-sm">
-              {c.certificadoUrl && (
+              {c.certificadoUrl && !(c.certificadoTipo && certificados[c.certificadoTipo]) && (
                 <a href={c.certificadoUrl} className="text-magenta hover:underline">
                   🏆 Pedí tu certificado →
                 </a>

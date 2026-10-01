@@ -47,6 +47,10 @@ type Props = {
   // indicador de progreso ("X de Y módulos completados") sin esperar a un
   // reload — ver app/(academy)/dashboard/page.tsx.
   onComplete?: (videoId: string) => void;
+  // Se llama apenas el certificado queda generado, para que el dashboard
+  // lo muestre también fijo más abajo (fuera del acordeón del módulo) sin
+  // esperar a recargar la página.
+  onCertificado?: (cert: { id: string; nombre: string }) => void;
 };
 
 type CertState =
@@ -66,6 +70,7 @@ export default function ModuleVideoPlayer({
   userEmail,
   userName,
   onComplete,
+  onCertificado,
 }: Props) {
   const iframeId = `yt-player-${videoId}`;
   const yaTerminado = useRef(false);
@@ -132,6 +137,7 @@ export default function ModuleVideoPlayer({
       if (res.ok && data.correcta) {
         setCert({ paso: "listo", id: data.id, nombre });
         setCertificadoGenerado(certificadoTipo, { id: data.id, nombre });
+        onCertificado?.({ id: data.id, nombre });
       } else {
         setCert({ paso: "error" });
       }
