@@ -48,7 +48,7 @@ export default function CertificadoClaudeSeleccionPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-20">
+    <div className={estado.paso === "ok" ? "max-w-4xl mx-auto px-6 py-20" : "max-w-2xl mx-auto px-6 py-20"}>
       <meta name="robots" content="noindex, nofollow" />
       <p className="eyebrow mb-4">Claude para Selección</p>
       <h1 className="font-display text-3xl text-bone mb-3">

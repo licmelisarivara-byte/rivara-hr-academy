@@ -137,22 +137,22 @@ export async function GET(
                 resalte (en vez de usarlo "pelado"). */}
             <div
               style={{
-                width: 64,
-                height: 64,
+                width: 100,
+                height: 100,
                 background: "#FFFFFF",
-                borderRadius: 16,
+                borderRadius: 22,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={logoDataUri} width={48} height={48} style={{ borderRadius: 10 }} />
+              <img src={logoDataUri} width={76} height={76} style={{ borderRadius: 16 }} />
             </div>
-            <div style={{ marginTop: 16, fontSize: 34, fontWeight: 800, color: "#FFFFFF", letterSpacing: 2 }}>
+            <div style={{ marginTop: 22, fontSize: 50, fontWeight: 800, color: "#FFFFFF", letterSpacing: 2, lineHeight: 1 }}>
               RIVARA
             </div>
-            <div style={{ fontSize: 17, fontWeight: 700, color: "#FFFFFF", letterSpacing: 5, marginTop: 4 }}>
+            <div style={{ fontSize: 24, fontWeight: 700, color: "#FFFFFF", letterSpacing: 6, marginTop: 8 }}>
               HR ACADEMY
             </div>
           </div>
