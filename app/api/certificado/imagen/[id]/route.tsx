@@ -47,21 +47,21 @@ export async function GET(
       evento: CERTIFICADO_CURSO_BOT_ATS,
       duracion: "Duración: 2 clases en vivo de 90 minutos",
       descripcion: (evento: typeof CERTIFICADO_CURSO_BOT_ATS) =>
-        `Por completar el curso en vivo "${evento.titulo}" (2 clases), dictado los días ${evento.fecha} por RIVARA HR Academy.`,
+        `Por completar el curso en vivo "${evento.titulo}" (2 clases, dictadas los días ${evento.fecha}): armado de un asistente de selección con IA y de un ATS propio, con pipeline de candidatos, desarrollado por RIVARA HR Academy.`,
       fechaLabel: "Fechas del curso",
     },
     "curso-bot-ats-3": {
       evento: CERTIFICADO_CURSO_BOT_ATS_3,
       duracion: "Duración: 2 clases en vivo de 90 minutos",
       descripcion: (evento: typeof CERTIFICADO_CURSO_BOT_ATS_3) =>
-        `Por completar el curso en vivo "${evento.titulo}" (2 clases), dictado los días ${evento.fecha} por RIVARA HR Academy.`,
+        `Por completar el curso en vivo "${evento.titulo}" (2 clases, dictadas los días ${evento.fecha}): armado de un asistente de selección con IA y de un ATS propio, con pipeline de candidatos, desarrollado por RIVARA HR Academy.`,
       fechaLabel: "Fechas del curso",
     },
     "claude-seleccion": {
       evento: CERTIFICADO_CLAUDE_SELECCION,
       duracion: "Duración: 6 módulos + 1 bonus (2h10 de contenido)",
       descripcion: (evento: typeof CERTIFICADO_CLAUDE_SELECCION) =>
-        `Por completar el curso "${evento.titulo}", dictado por RIVARA HR Academy.`,
+        `Por completar el curso "${evento.titulo}": análisis de CVs, preguntas de entrevista por competencias (STAR), comparación de candidatos e informes ejecutivos con IA, desarrollado por RIVARA HR Academy.`,
       fechaLabel: "Modalidad",
     },
     masterclass: {
@@ -101,6 +101,13 @@ export async function GET(
     loadGoogleFont("Montserrat", 800, fontText),
   ]);
 
+  // Layout de dos paneles (panel izquierdo de color + panel derecho con el
+  // nombre), tomado como referencia del certificado que se hizo para TBO
+  // Group — pero con la paleta oscura de siempre del sitio, no la clara de
+  // ese certificado puntual, para no romper la identidad del resto del
+  // sitio.
+  const duracionLimpia = plantilla.duracion.replace(/^Duración:\s*/i, "");
+
   const image = new ImageResponse(
     (
       <div
@@ -108,187 +115,144 @@ export async function GET(
           width: "100%",
           height: "100%",
           display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
           backgroundColor: "#0D0D14",
-          backgroundImage:
-            "radial-gradient(circle at 15% 10%, rgba(232,0,111,0.16) 0%, rgba(13,13,20,0) 45%), radial-gradient(circle at 85% 90%, rgba(224,7,126,0.14) 0%, rgba(13,13,20,0) 45%)",
-          position: "relative",
           fontFamily: "Montserrat",
         }}
       >
-        {/* Barras decorativas superior/inferior */}
-        <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: 10, background: "#E8006F", display: "flex" }} />
-        <div style={{ position: "absolute", bottom: 0, left: 0, width: "100%", height: 10, background: "#E8006F", display: "flex" }} />
-
-        {/* Marco */}
+        {/* PANEL IZQUIERDO — degradé magenta, datos del curso */}
         <div
           style={{
+            width: 540,
+            height: "100%",
             display: "flex",
             flexDirection: "column",
-            alignItems: "center",
-            width: WIDTH - 96,
-            height: HEIGHT - 96,
-            border: "1.5px solid rgba(232,0,111,0.45)",
-            borderRadius: 28,
-            padding: "56px 64px",
-            position: "relative",
+            justifyContent: "space-between",
+            padding: "56px 48px",
+            backgroundImage: "linear-gradient(160deg, #E8006F 0%, #8A0E4C 100%)",
           }}
         >
-          {/* Logo + wordmark */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <div style={{ display: "flex", flexDirection: "column" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={logoDataUri} width={108} height={108} style={{ borderRadius: 24 }} />
-            <div
-              style={{
-                marginTop: 12,
-                fontSize: 22,
-                fontWeight: 800,
-                color: "#FFFFFF",
-                letterSpacing: 2,
-              }}
-            >
+            <img src={logoDataUri} width={64} height={64} style={{ borderRadius: 14 }} />
+            <div style={{ marginTop: 14, fontSize: 24, fontWeight: 800, color: "#FFFFFF", letterSpacing: 2 }}>
               RIVARA
             </div>
-            <div
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                color: "#E8006F",
-                letterSpacing: 4,
-                marginTop: 2,
-              }}
-            >
+            <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: 4, marginTop: 2 }}>
               HR ACADEMY
             </div>
           </div>
 
-          <div
-            style={{
-              marginTop: 40,
-              fontSize: 15,
-              fontWeight: 700,
-              color: "#E8006F",
-              letterSpacing: 4,
-            }}
-          >
-            CERTIFICADO DE PARTICIPACIÓN
+          <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.65)", letterSpacing: 2 }}>
+                {plantilla.fechaLabel.toUpperCase()}
+              </div>
+              <div style={{ marginTop: 4, fontSize: 19, fontWeight: 700, color: "#FFFFFF" }}>
+                {evento.fechaCorta}
+              </div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.65)", letterSpacing: 2 }}>
+                DURACIÓN
+              </div>
+              <div style={{ marginTop: 4, fontSize: 19, fontWeight: 700, color: "#FFFFFF" }}>
+                {duracionLimpia}
+              </div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.65)", letterSpacing: 2 }}>
+                DICTADO POR
+              </div>
+              <div style={{ marginTop: 4, fontSize: 19, fontWeight: 700, color: "#FFFFFF" }}>
+                Lic. Melisa Rivara
+              </div>
+            </div>
           </div>
 
+          {/* Firma */}
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {/* Foto de la firma real (fondo ya removido, PNG transparente),
+                recortada con overflow hidden ya que este renderer (satori)
+                no soporta object-fit/object-position de forma confiable.
+                Los offsets están calculados a mano para
+                public/images/firma-melisa.png (433x576) — si se reemplaza
+                esa foto por otra con distinto encuadre, hay que reajustar
+                left/top/width/height de abajo. */}
+            <div style={{ width: 190, height: 95, overflow: "hidden", position: "relative", display: "flex", marginBottom: 8 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={firmaDataUri}
+                width={272}
+                height={361}
+                style={{
+                  position: "absolute",
+                  left: -32,
+                  top: -170,
+                  filter: "brightness(0) invert(1)",
+                }}
+              />
+            </div>
+            <div style={{ width: 190, height: 1, background: "rgba(255,255,255,0.4)", display: "flex" }} />
+            <div style={{ marginTop: 10, fontSize: 15, fontWeight: 700, color: "#FFFFFF" }}>
+              Lic. Melisa Rivara
+            </div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.7)" }}>
+              Fundadora · RIVARA HR Academy
+            </div>
+          </div>
+        </div>
+
+        {/* PANEL DERECHO — título y nombre, con la "R" de marca de agua */}
+        <div
+          style={{
+            flex: 1,
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            padding: "0 72px",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          {/* "R" gigante de fondo, tomada de la marca de agua del certificado
+              de TBO Group — muy tenue, solo de textura. */}
           <div
             style={{
-              marginTop: 18,
-              fontSize: 38,
+              position: "absolute",
+              right: -60,
+              bottom: -140,
+              fontSize: 620,
               fontWeight: 800,
-              color: "#FFFFFF",
-              textAlign: "center",
-              maxWidth: 1150,
+              color: "rgba(232,0,111,0.07)",
+              lineHeight: 1,
+              display: "flex",
             }}
           >
-            {evento.titulo}
+            R
           </div>
 
-          <div style={{ marginTop: 10, fontSize: 17, fontWeight: 700, color: "#FFFFFF" }}>
-            {plantilla.duracion}
+          <div style={{ fontSize: 64, fontWeight: 800, color: "#FFFFFF", lineHeight: 1.05 }}>
+            CERTIFICADO
+          </div>
+          <div style={{ fontSize: 17, fontWeight: 700, color: "#E8006F", letterSpacing: 5, marginTop: 6 }}>
+            DE PARTICIPACIÓN
           </div>
 
-          <div style={{ marginTop: 40, fontSize: 20, color: "rgba(247,244,238,0.55)" }}>
-            Otorgado a
+          <div style={{ marginTop: 44, fontSize: 16, color: "rgba(247,244,238,0.55)" }}>
+            RIVARA HR Academy otorga a
           </div>
-
-          <div
-            style={{
-              marginTop: 8,
-              fontSize: 58,
-              fontWeight: 800,
-              color: "#E8006F",
-              textAlign: "center",
-              maxWidth: 1200,
-            }}
-          >
+          <div style={{ marginTop: 6, fontSize: 52, fontWeight: 800, color: "#E8006F", maxWidth: 820 }}>
             {nombre}
           </div>
 
-          <div style={{ marginTop: 20, width: 460, height: 2, background: "#C0185A", display: "flex" }} />
+          <div style={{ marginTop: 24, width: 420, height: 2, background: "#C0185A", display: "flex" }} />
 
-          <div
-            style={{
-              marginTop: 36,
-              fontSize: 21,
-              fontWeight: 700,
-              lineHeight: 1.6,
-              color: "#FFFFFF",
-              textAlign: "center",
-              maxWidth: 1180,
-            }}
-          >
+          <div style={{ marginTop: 28, fontSize: 19, fontWeight: 700, lineHeight: 1.6, color: "#FFFFFF", maxWidth: 760 }}>
             {plantilla.descripcion(evento as never)}
           </div>
 
-          {/* Firma + fecha */}
-          <div
-            style={{
-              marginTop: "auto",
-              width: "100%",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-end",
-              paddingTop: 40,
-            }}
-          >
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 320 }}>
-              {/* Foto de la firma real (fondo ya removido, PNG transparente),
-                  recortada con overflow hidden ya que este renderer (satori)
-                  no soporta object-fit/object-position de forma confiable.
-                  Los offsets están calculados a mano para
-                  public/images/firma-melisa.png (433x576) — si se reemplaza
-                  esa foto por otra con distinto encuadre, hay que reajustar
-                  left/top/width/height de abajo. */}
-              <div
-                style={{
-                  width: 220,
-                  height: 110,
-                  overflow: "hidden",
-                  position: "relative",
-                  display: "flex",
-                  marginBottom: 10,
-                }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={firmaDataUri}
-                  width={316}
-                  height={419}
-                  style={{
-                    position: "absolute",
-                    left: -37,
-                    top: -199,
-                    // Birome azul -> blanco, para que combine con el resto
-                    // del texto del certificado.
-                    filter: "brightness(0) invert(1)",
-                  }}
-                />
-              </div>
-              <div style={{ width: "100%", height: 1, background: "rgba(247,244,238,0.3)", display: "flex" }} />
-              <div style={{ marginTop: 10, fontSize: 16, fontWeight: 700, color: "#FFFFFF" }}>
-                Lic. Melisa Rivara
-              </div>
-              <div style={{ fontSize: 13, color: "rgba(247,244,238,0.55)" }}>
-                Fundadora · RIVARA HR Academy
-              </div>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 260 }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: "#FFFFFF" }}>
-                {evento.fechaCorta}
-              </div>
-              <div style={{ fontSize: 13, color: "rgba(247,244,238,0.55)" }}>
-                {plantilla.fechaLabel}
-              </div>
-            </div>
-          </div>
-
-          <div style={{ marginTop: 28, fontSize: 13, color: "rgba(247,244,238,0.35)" }}>
+          <div style={{ marginTop: 48, fontSize: 13, color: "rgba(247,244,238,0.35)" }}>
             hracademy.rivaraconsultora.com.ar
           </div>
         </div>
