@@ -121,8 +121,6 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
         </a>
       </div>
 
-      {showAboutAndTestimonials.has(course.slug) && <AboutMeSummary />}
-
       {course.modules.length > 3 && (
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-bone/50 mb-8">
           <span>Ir a:</span>
@@ -206,6 +204,8 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
       {course.slug === "de-cero-a-tu-asistente-3ra-edicion" && (
         <Testimonials extra={[jessikaTestimonial]} />
       )}
+
+      {showAboutAndTestimonials.has(course.slug) && <AboutMeSummary />}
 
       {course.faqs && (
         <div>

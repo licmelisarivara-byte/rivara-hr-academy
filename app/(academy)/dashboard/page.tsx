@@ -44,10 +44,44 @@ function DashboardContent() {
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState("");
   const [savingName, setSavingName] = useState(false);
+  const [editingPassword, setEditingPassword] = useState(false);
+  const [passwordInput, setPasswordInput] = useState("");
+  const [savingPassword, setSavingPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordSaved, setPasswordSaved] = useState(false);
 
   function startEditingName() {
     setNameInput(userName || "");
     setEditingName(true);
+  }
+
+  function startEditingPassword() {
+    setPasswordInput("");
+    setPasswordError("");
+    setPasswordSaved(false);
+    setEditingPassword(true);
+  }
+
+  // Cambio de contraseña desde el dashboard — antes solo se podía desde
+  // "¿Olvidaste tu contraseña?" en /login (que manda un mail), no había
+  // forma de cambiarla estando ya logueada.
+  async function savePassword() {
+    if (!supabase) return;
+    if (passwordInput.length < 6) {
+      setPasswordError("Tiene que tener al menos 6 caracteres.");
+      return;
+    }
+    setPasswordError("");
+    setSavingPassword(true);
+    const { error } = await supabase.auth.updateUser({ password: passwordInput });
+    setSavingPassword(false);
+    if (error) {
+      setPasswordError("No se pudo cambiar. Probá de nuevo en un rato.");
+      return;
+    }
+    setPasswordInput("");
+    setEditingPassword(false);
+    setPasswordSaved(true);
   }
 
   // Este nombre es el que se usa en el certificado (ver ModuleVideoPlayer
@@ -88,15 +122,29 @@ function DashboardContent() {
 
   // Qué cursos dejó plegados la alumna (acordeón) — también en
   // localStorage, así que si cerró "Creá tu propio asistente" para
-  // enfocarse en el otro, sigue cerrado la próxima vez que entra.
+  // enfocarse en el otro, sigue cerrado la próxima vez que entra. Si
+  // todavía no tocó nada (primera vez) y tiene más de un curso, arrancan
+  // plegados todos menos el primero — si no, con 2 o 3 cursos el dashboard
+  // es una sola pantalla larguísima de scroll antes de ver nada útil.
   useEffect(() => {
+    if (purchases.length === 0) return;
     try {
       const raw = window.localStorage.getItem("rivara_cursos_colapsados");
-      if (raw) setCollapsedCourses(new Set(JSON.parse(raw)));
+      if (raw) {
+        setCollapsedCourses(new Set(JSON.parse(raw)));
+        return;
+      }
+      const purchasedSlugs = new Set(
+        purchases.filter((p) => p.kind === "course").map((p) => p.resource_slug)
+      );
+      const slugsInOrder = courses.filter((c) => purchasedSlugs.has(c.slug)).map((c) => c.slug);
+      if (slugsInOrder.length > 1) {
+        setCollapsedCourses(new Set(slugsInOrder.slice(1)));
+      }
     } catch {
       // Si falla, arrancan todos expandidos — no es grave.
     }
-  }, []);
+  }, [purchases]);
 
   function toggleCourseCollapsed(slug: string) {
     setCollapsedCourses((prev) => {
@@ -432,7 +480,7 @@ function DashboardContent() {
       <p className="text-bone/50 mb-2">{userEmail}</p>
 
       {editingName ? (
-        <div className="flex flex-wrap items-center gap-2 mb-10">
+        <div className="flex flex-wrap items-center gap-2 mb-2">
           <input
             value={nameInput}
             onChange={(e) => setNameInput(e.target.value)}
@@ -457,7 +505,7 @@ function DashboardContent() {
           </button>
         </div>
       ) : (
-        <p className="text-sm text-bone/50 mb-10">
+        <p className="text-sm text-bone/50 mb-2">
           {userName ? `Nombre: ${userName}` : "Todavía no cargaste tu nombre"} ·{" "}
           <button type="button" onClick={startEditingName} className="text-magenta hover:underline">
             ✏️ Editar
@@ -466,6 +514,46 @@ function DashboardContent() {
             <span className="block text-xs text-bone/40 mt-0.5">
               (así aparece en tu certificado)
             </span>
+          )}
+        </p>
+      )}
+
+      {editingPassword ? (
+        <div className="mb-10">
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              type="password"
+              value={passwordInput}
+              onChange={(e) => setPasswordInput(e.target.value)}
+              placeholder="Nueva contraseña"
+              autoFocus
+              className="rounded-lg bg-panel border border-black/10 px-3 py-1.5 text-sm text-bone focus:border-magenta outline-none"
+            />
+            <button
+              type="button"
+              onClick={savePassword}
+              disabled={savingPassword}
+              className="btn-cta bg-magenta text-white px-4 py-1.5 rounded-full text-sm hover:bg-magentaSoft transition-colors disabled:opacity-50"
+            >
+              {savingPassword ? "Guardando..." : "Guardar"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditingPassword(false)}
+              className="text-xs text-bone/50 hover:underline"
+            >
+              Cancelar
+            </button>
+          </div>
+          {passwordError && <p className="text-xs text-magenta mt-1.5">{passwordError}</p>}
+        </div>
+      ) : (
+        <p className="text-sm text-bone/50 mb-10">
+          <button type="button" onClick={startEditingPassword} className="text-magenta hover:underline">
+            🔒 Cambiar contraseña
+          </button>
+          {passwordSaved && (
+            <span className="block text-xs text-sage mt-0.5">✅ Contraseña actualizada.</span>
           )}
         </p>
       )}
