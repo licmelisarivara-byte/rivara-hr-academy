@@ -148,6 +148,25 @@ function DashboardContent() {
       } catch {
         // Si falla, simplemente no mostramos la sección de compras.
       }
+
+      // Certificados ya generados, desde la base (no solo localStorage) —
+      // así se ven también si la alumna entra desde otro dispositivo o
+      // navegador distinto al que usó para generarlo. Se combina con lo
+      // que ya había en localStorage en vez de reemplazarlo, por si la
+      // base tarda un poco más en responder.
+      try {
+        const res = await fetch("/api/mis-certificados", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const body = await res.json();
+          if (body.certificados) {
+            setCertificados((prev) => ({ ...prev, ...body.certificados }));
+          }
+        }
+      } catch {
+        // Si falla, queda lo que ya se haya leído de localStorage.
+      }
     });
   }, []);
 
