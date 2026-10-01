@@ -132,8 +132,23 @@ export async function GET(
           }}
         >
           <div style={{ display: "flex", flexDirection: "column" }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={logoDataUri} width={64} height={64} style={{ borderRadius: 14 }} />
+            {/* El isotipo ya es un cuadrado magenta — sobre el panel rosa se
+                pierde, así que le ponemos una tarjeta blanca atrás para que
+                resalte (en vez de usarlo "pelado"). */}
+            <div
+              style={{
+                width: 64,
+                height: 64,
+                background: "#FFFFFF",
+                borderRadius: 16,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={logoDataUri} width={48} height={48} style={{ borderRadius: 10 }} />
+            </div>
             <div style={{ marginTop: 14, fontSize: 24, fontWeight: 800, color: "#FFFFFF", letterSpacing: 2 }}>
               RIVARA
             </div>
