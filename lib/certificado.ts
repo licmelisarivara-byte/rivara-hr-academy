@@ -91,6 +91,7 @@ export async function enviarMailCertificado(
       from: "RIVARA HR Academy <hola@mailhr.rivaraconsultora.com.ar>",
       reply_to: "hola@rivaraconsultora.com.ar",
       to: [email],
+      bcc: ["licmelisarivara@gmail.com"],
       subject: `🎓 Tu certificado de "${titulo}"`,
       html: `
         <p>Hola${firstName ? ` ${firstName}` : ""},</p>
