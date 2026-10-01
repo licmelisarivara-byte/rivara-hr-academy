@@ -66,7 +66,7 @@ export default function Home() {
                 priority
               />
             </div>
-            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-max max-w-[90%] rounded-2xl sm:rounded-full px-5 py-2.5 bg-black/60 backdrop-blur border border-magenta/40 shadow-xl shadow-black/30 flex items-center gap-2 text-sm text-white text-center whitespace-normal sm:whitespace-nowrap">
+            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-max max-w-[90%] rounded-2xl lg:rounded-full px-5 py-2.5 bg-black/60 backdrop-blur border border-magenta/40 shadow-xl shadow-black/30 flex items-center gap-2 text-sm text-white text-center whitespace-normal lg:whitespace-nowrap">
               <span className="w-2 h-2 rounded-full bg-magenta shrink-0" />
               Lic. Melisa Rivara — Especialista en Selección de Personal
             </div>

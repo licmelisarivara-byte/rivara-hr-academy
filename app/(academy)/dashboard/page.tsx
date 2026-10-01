@@ -224,8 +224,7 @@ function DashboardContent() {
         >
           <div className="flex-1">
             <span className="eyebrow">{c.format}</span>
-            <p className="eyebrow mb-1 mt-1">¡Bienvenida al curso!</p>
-            <h3 className="font-semibold text-bone mb-2">{c.title}</h3>
+            <h3 className="font-semibold text-bone mb-2 mt-1">{c.title}</h3>
             {c.schedule && (
               <p className="text-sm text-bone/60">
                 📅 {c.format === "En vivo" ? "Próxima clase: " : ""}
