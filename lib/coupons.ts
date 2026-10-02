@@ -53,7 +53,8 @@ export const COUPONS: Coupon[] = [
   {
     code: "BOT",
     percentOff: 25,
-    description: "25% off en el curso en vivo (Bot + ATS)",
+    description: "25% off en el curso en vivo (Bot + ATS), hasta el sábado 10/10",
+    activeUntil: "2026-10-10T23:59:59-03:00",
     courses: ["de-cero-a-tu-asistente-3ra-edicion"],
   },
   {
