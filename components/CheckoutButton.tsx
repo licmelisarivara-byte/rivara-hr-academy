@@ -5,8 +5,8 @@ import Link from "next/link";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import type { Course } from "@/lib/courses";
 
-// Mercado Pago no acepta cupones: siempre cobra el precio sin descuento.
-// Si el que llama ya sabe el mail del comprador (por ejemplo, porque lo
+// El cupón (si hay) viaja al servidor, que lo valida y calcula el monto. Si
+// el que llama ya sabe el mail del comprador (por ejemplo, porque lo
 // acaba de pedir en un formulario propio), lo puede pasar por prop y nos
 // salteamos el chequeo de sesión y el cartel de "Registrarme".
 export default function CheckoutButton({
@@ -15,6 +15,7 @@ export default function CheckoutButton({
   buyerName,
   addonSlug,
   fallbackLink,
+  couponCode,
 }: {
   course: Course;
   buyerEmail?: string;
@@ -24,6 +25,7 @@ export default function CheckoutButton({
   // falla (solo existe para los combos del curso de Claude).
   addonSlug?: string;
   fallbackLink?: string;
+  couponCode?: string;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -110,8 +112,8 @@ export default function CheckoutButton({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
           addonSlug
-            ? { kind: "bundle", slug: course.slug, addonSlug, buyerEmail, buyerName }
-            : { kind: "course", slug: course.slug, buyerEmail, buyerName }
+            ? { kind: "bundle", slug: course.slug, addonSlug, buyerEmail, buyerName, couponCode }
+            : { kind: "course", slug: course.slug, buyerEmail, buyerName, couponCode }
         ),
       });
       if (!res.ok) throw new Error("no-config");
@@ -122,7 +124,9 @@ export default function CheckoutButton({
       }
       throw new Error("no-init-point");
     } catch (e) {
-      const linkRespaldo = addonSlug ? fallbackLink : course.mpPaymentLink;
+      // Los links fijos de respaldo cobran el precio de lista: con cupón no
+      // se usan, para no cobrar de más.
+      const linkRespaldo = couponCode ? undefined : addonSlug ? fallbackLink : course.mpPaymentLink;
       if (linkRespaldo) {
         // window.open() acá se bloquea como popup en varios navegadores
         // (Safari sobre todo): al llegar después de un await, el navegador

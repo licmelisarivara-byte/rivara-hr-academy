@@ -6,8 +6,8 @@ import { getCoupon } from "@/lib/coupons";
 import { applyDiscount } from "@/lib/discount";
 
 // Igual que /api/manual-purchase, pero para el combo curso + recurso pago:
-// el curso se cobra tal cual (con cupón si corresponde — nunca por
-// Mercado Pago, que no acepta cupones — sin descontarlo una segunda vez)
+// el curso se cobra tal cual (con cupón si corresponde, en pesos — sin
+// descontarlo una segunda vez)
 // y al recurso se le aplica un % sobre su precio de lista, en reemplazo
 // de su 10% individual (no se acumulan): 15% por transferencia/Payoneer,
 // 5% por Mercado Pago (más chico porque ahí el curso no tiene ningún
@@ -33,16 +33,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
 
-  // El cupón solo aplica por transferencia — Mercado Pago nunca tuvo
-  // descuento, y los links de Payoneer de combo son de monto fijo (no se
-  // les puede aplicar un % dinámicamente sin armar un link nuevo por cada
-  // combinación cupón × combo).
-  const coupon = method !== "transferencia" ? null : getCoupon(couponCode, { courseSlug: course.slug });
+  // El cupón aplica en pesos (transferencia y Mercado Pago), nunca en
+  // dólares.
+  const coupon = method === "payoneer" ? null : getCoupon(couponCode, { courseSlug: course.slug });
   const courseAmount =
     method === "payoneer"
       ? getPayoneerAmountUSD(course)
       : method === "mercadopago"
-      ? course.priceARS ?? 0
+      ? applyDiscount(course.priceARS ?? 0, coupon?.percentOff)
       : applyDiscount(getTransferenciaAmountARS(course), coupon?.percentOff);
   // Precio de LISTA del recurso (no el de transferencia individual): el
   // % del combo reemplaza ese 10%, no se suma a él.

@@ -28,7 +28,7 @@ export type Course = {
   seoTitle?: string; // title tag de la página del curso, si difiere de `title`
   seoDescription?: string; // meta description de la página del curso, si difiere de `description`
   price: string; // texto mostrado en pantalla
-  priceARS?: number; // monto real que se cobra por Mercado Pago (nunca tiene descuento)
+  priceARS?: number; // precio de lista en pesos, el que cobra Mercado Pago (el descuento solo entra por cupón, ver lib/coupons.ts)
   priceNote?: string;
   earlyBirdUntil?: string; // ISO datetime; hasta acá rige el precio early bird de transferencia/Payoneer
   priceARSEarlyBird?: number; // monto real de transferencia antes de earlyBirdUntil
@@ -238,18 +238,19 @@ export const courses: Course[] = [
       "Grabación incluida de las dos clases",
       "Certificado de asistencia",
     ],
-    // Precios 3ra edición: early bird por transferencia $72.000 (25% off) hasta el
-    // miércoles 7/10; después $96.000. Mercado Pago siempre $96.000 (sin
-    // descuento), con 2 y 3 cuotas sin interés ya activadas en la cuenta de
-    // Mercado Pago. Sin Payoneer por ahora (no hay payoneerLink). Falta
-    // cargar el link de Meet (meetLink).
+    // Precios 3ra edición: lista $96.000 en pesos (transferencia o Mercado
+    // Pago, este último hasta 3 cuotas sin interés — solo sin cupón) y USD
+    // 62 en dólares. El descuento es solo por cupón (25% con BOT/RHENACCION,
+    // ver lib/coupons.ts), no hay early bird. Los cupones no valen en
+    // dólares. Todavía no hay link de pago en dólares (payoneerLink): hasta
+    // que exista, el botón lleva a WhatsApp. Falta cargar el link de Meet
+    // (meetLink).
     price: "$96.000 ARS",
     priceARS: 96000,
     priceNote:
-      "Early bird por transferencia: $72.000 (25% off) hasta el miércoles 7/10 · Precio regular $96.000 · Mercado Pago: $96.000 o hasta 3 cuotas sin interés",
-    earlyBirdUntil: "2026-10-07T23:59:59-03:00",
-    priceARSEarlyBird: 72000,
+      "Transferencia o Mercado Pago: $96.000 (con Mercado Pago, hasta 3 cuotas sin interés) · USD 62 en dólares",
     priceARSRegular: 96000,
+    priceUSDRegular: 62,
     mercadoPagoNote: "o hasta 3 cuotas sin interés",
     previewClipUrl: "/videos/3ra-edicion-whatsapp-bot-demo.mp4",
     previewClipCaption:
@@ -464,10 +465,15 @@ export const courses: Course[] = [
     ],
     price: "$70.000 ARS",
     priceARS: 70000,
-    priceUSDRegular: 50,
-    priceNote: "$70.000 ARS por transferencia o Mercado Pago · USD 50 por Payoneer",
+    priceUSDRegular: 45,
+    priceNote: "$70.000 ARS por transferencia o Mercado Pago · USD 45 en dólares",
     bankDetails,
-    payoneerLink: "https://link.payoneer.com/Token?t=936ECCB5D89D4398B04DE68B156D1EF3&src=pl",
+    // Sin payoneerLink a propósito: el link anterior
+    // (https://link.payoneer.com/Token?t=936ECCB5D89D4398B04DE68B156D1EF3&src=pl)
+    // cobraba USD 50 y el precio ahora es USD 45. Hasta cargar el link nuevo,
+    // el botón de dólares lleva a WhatsApp. Los links de combo con recurso
+    // (payoneerLinkWithCourse en lib/resources.ts) también están hechos con
+    // el precio viejo: rehacerlos junto con este.
     // Link fijo de MP a $70.000, mientras la cuenta de Melisa no tenga
     // aprobada la exención de impuestos y el cobro automático (Checkout
     // Pro vía /api/checkout) siga bloqueado por MP con 403
@@ -530,9 +536,8 @@ export function isEarlyBird(course: Course): boolean {
   return Date.now() < new Date(course.earlyBirdUntil).getTime();
 }
 
-// Monto real por transferencia bancaria, según si el early bird sigue
-// vigente hoy o no. Mercado Pago nunca usa esto: siempre cobra
-// `course.priceARS`, sin descuento.
+// Monto de lista por transferencia bancaria (antes del cupón). Si el curso
+// tiene early bird vigente, rige ese; si no, el precio de lista.
 export function getTransferenciaAmountARS(course: Course): number {
   const early = isEarlyBird(course);
   return (early ? course.priceARSEarlyBird : course.priceARSRegular) ?? course.priceARS ?? 0;
@@ -567,10 +572,10 @@ export function getCoursePriceSummary(course: Course) {
         price: `$${transferenciaARS.toLocaleString("es-AR")} ARS`,
         note: earlyBirdActive ? `Antes del ${earlyBirdDateLabel(course)} (después $${(course.priceARSRegular ?? mercadoPagoARS).toLocaleString("es-AR")})` : undefined,
       },
-      ...(course.payoneerLink
+      ...(course.priceUSDRegular
         ? [
             {
-              method: "Payoneer",
+              method: "Dólares (USD)",
               price: `USD ${payoneerUSD}`,
               note: earlyBirdActive ? `Antes del ${earlyBirdDateLabel(course)} (después USD ${course.priceUSDRegular})` : undefined,
             },
@@ -580,8 +585,8 @@ export function getCoursePriceSummary(course: Course) {
         method: "Mercado Pago",
         price: `$${mercadoPagoARS.toLocaleString("es-AR")} ARS`,
         note: course.mercadoPagoNote
-          ? `Pago online inmediato, sin descuento ${course.mercadoPagoNote}`
-          : "Pago online inmediato, sin descuento",
+          ? `Pago online inmediato ${course.mercadoPagoNote}`
+          : "Pago online inmediato",
       },
     ] as PaymentOption[],
   };

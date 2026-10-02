@@ -18,10 +18,9 @@ type AppliedCoupon = { code: string; percentOff: number };
 
 // % sobre el PRECIO DE LISTA del addon elegido — reemplaza su descuento
 // individual del 10% (no se acumulan). El precio del curso no se toca:
-// se suma tal cual, con o sin cupón (nunca en Mercado Pago, que no
-// acepta cupones), para no descontarlo dos veces. Permanente, sin fecha
-// de vencimiento. Por transferencia/Payoneer el addon baja un 15%; por
-// Mercado Pago solo un 5% (el curso ahí no tiene ningún descuento).
+// se suma tal cual, con o sin cupón, para no descontarlo dos veces.
+// Permanente, sin fecha de vencimiento. Por transferencia/dólares el addon
+// baja un 15%; por Mercado Pago solo un 5%.
 const BUNDLE_DISCOUNT_PERCENT = 15;
 const MP_BUNDLE_DISCOUNT_PERCENT = 5;
 
@@ -200,12 +199,11 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
     );
   }
 
-  // El cupón solo aplica pagando por transferencia. Payoneer y Mercado
-  // Pago quedan siempre a precio de lista: los links de Payoneer son de
-  // monto fijo (no se puede aplicar un % dinámicamente sin armar un link
-  // nuevo por cada combinación cupón × combo), y Mercado Pago nunca tuvo
-  // descuento a propósito.
-  const transferenciaARS = applyDiscount(getTransferenciaAmountARS(course), appliedCoupon?.percentOff);
+  // El cupón aplica en pesos (transferencia y Mercado Pago). En dólares
+  // siempre rige el precio de lista: los links de pago en USD son de monto
+  // fijo. Con cupón, Mercado Pago es un solo pago (sin cuotas).
+  const transferenciaListARS = getTransferenciaAmountARS(course);
+  const transferenciaARS = applyDiscount(transferenciaListARS, appliedCoupon?.percentOff);
   const payoneerUSD = getPayoneerAmountUSD(course);
 
   // Combo curso + recurso pago (Kit/Guía/Combo de ebooks): el curso se
@@ -221,8 +219,12 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
   // transferencia se calcula bien con el precio de cada curso).
   const combosFijos = course.slug === "claude-para-seleccion";
   const mpComboLink = combosFijos ? addon?.mpPaymentLinkWithCourse : undefined;
-  const payoneerComboLink = combosFijos ? addon?.payoneerLinkWithCourse : undefined;
-  const mpCourseARS = course.priceARS ?? 0; // Mercado Pago nunca tiene cupón ni descuento en el curso
+  // Solo si el curso tiene su propio link de dólares: el link de combo está
+  // armado con el precio del curso, y si ese precio cambia queda desfasado.
+  const payoneerComboLink =
+    combosFijos && course.payoneerLink ? addon?.payoneerLinkWithCourse : undefined;
+  const mpCourseListARS = course.priceARS ?? 0;
+  const mpCourseARS = applyDiscount(mpCourseListARS, appliedCoupon?.percentOff);
   const addonBundleARS = addon ? applyDiscount(addon.priceARS, BUNDLE_DISCOUNT_PERCENT) : 0;
   const addonBundleUSD = addon ? applyDiscount(addon.priceUSD, BUNDLE_DISCOUNT_PERCENT) : 0;
   const addonBundleMP = addon ? applyDiscount(addon.priceARS, MP_BUNDLE_DISCOUNT_PERCENT) : 0;
@@ -252,7 +254,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
       ? (course.priceUSDRegular ?? 0) + (addon.priceUSD ?? 0) - bundlePayoneerUSD
       : 0;
   const bundleSavingsMP =
-    addon && !bundleErrorMP ? mpCourseARS + (addon.priceARS ?? 0) - bundleMercadoPagoARS : 0;
+    addon && !bundleErrorMP ? mpCourseListARS + (addon.priceARS ?? 0) - bundleMercadoPagoARS : 0;
 
   function handleContactSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -276,7 +278,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
       payment_method: m,
     });
     const label =
-      m === "transferencia" ? "Transferencia bancaria" : m === "payoneer" ? "Payoneer" : "Mercado Pago";
+      m === "transferencia" ? "Transferencia bancaria" : m === "payoneer" ? "Pago en dólares (USD)" : "Mercado Pago";
     const couponLine = appliedCoupon
       ? `\n🎟️ Cupón: ${appliedCoupon.code} (${appliedCoupon.percentOff}% off)`
       : "";
@@ -316,9 +318,25 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
         {couponInput && (appliedCoupon || couponInvalid) && (
           <p className={`text-xs mt-1 ${appliedCoupon ? "text-sage" : "text-magenta"}`}>
             {appliedCoupon
-              ? `✅ Cupón aplicado: ${appliedCoupon.percentOff}% off pagando por transferencia`
+              ? `✅ Cupón aplicado: ${appliedCoupon.percentOff}% off en pesos (transferencia o Mercado Pago)`
               : "Ese cupón no es válido."}
           </p>
+        )}
+        {couponInput && appliedCoupon && (
+          <>
+            <p className="mt-1.5 text-bone">
+              <span className="line-through text-bone/40 mr-2">
+                ${transferenciaListARS.toLocaleString("es-AR")}
+              </span>
+              <span className="font-display text-xl">
+                ${transferenciaARS.toLocaleString("es-AR")} ARS
+              </span>
+            </p>
+            <p className="text-xs text-bone/50 mt-1">
+              Con cupón, Mercado Pago es un solo pago (sin cuotas). El cupón no aplica a pagos en
+              dólares.
+            </p>
+          </>
         )}
       </div>
 
@@ -343,7 +361,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
           >
             Transferencia bancaria — ${bundleTransferenciaARS.toLocaleString("es-AR")} ARS
           </button>
-          {course.payoneerLink && (
+          {course.priceUSDRegular && (
             <button
               type="button"
               role="radio"
@@ -355,7 +373,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
                   : "border-black/10 bg-panel/50 text-bone/70 hover:border-magenta/40"
               }`}
             >
-              Payoneer — USD {bundlePayoneerUSD}
+              Dólares — USD {bundlePayoneerUSD}
             </button>
           )}
           <button
@@ -370,7 +388,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
             }`}
           >
             Mercado Pago — ${bundleMercadoPagoARS.toLocaleString("es-AR")} ARS
-            {!addon && course.mercadoPagoNote ? ` ${course.mercadoPagoNote}` : ""}
+            {!addon && !appliedCoupon && course.mercadoPagoNote ? ` ${course.mercadoPagoNote}` : ""}
           </button>
         </div>
       </div>
@@ -509,7 +527,12 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
       )}
 
       {method === "mercadopago" && buyer && !addon && (
-        <CheckoutButton course={course} buyerEmail={buyer.email} buyerName={buyer.name} />
+        <CheckoutButton
+          course={course}
+          buyerEmail={buyer.email}
+          buyerName={buyer.name}
+          couponCode={appliedCoupon?.code}
+        />
       )}
 
       {/* Combo por Mercado Pago con cobro automático: el servidor calcula el
@@ -523,20 +546,22 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
           buyerName={buyer.name}
           addonSlug={addon.slug}
           fallbackLink={mpComboLink}
+          couponCode={appliedCoupon?.code}
         />
       )}
 
-      {method === "payoneer" && buyer && (course.payoneerLink || addon) && (
+      {method === "payoneer" && buyer && (course.priceUSDRegular || addon) && (
         <div className="card-alt rounded-lg p-4 mb-4 text-sm text-bone/70">
-          {addon && !payoneerComboLink ? (
-            // Todavía no existe un link de Payoneer específico para este
-            // combo (curso + este recurso) — se completa
-            // `payoneerLinkWithCourse` en lib/resources.ts apenas esté
-            // creado. Mientras tanto, se coordina el pago a mano.
+          {(addon && !payoneerComboLink) || !course.payoneerLink ? (
+            // Sin link de pago en dólares (el del curso, o el de este combo
+            // puntual en lib/resources.ts): se coordina el pago por
+            // WhatsApp hasta que exista.
             <>
               <p className="text-xs text-bone/60 mb-3">
-                Todavía no tenemos armado el link de Payoneer para este combo puntual. Escribinos y
-                coordinamos el pago en USD directamente por WhatsApp.
+                {addon
+                  ? "Todavía no tenemos armado el link de pago en dólares para este combo puntual. "
+                  : "Todavía no tenemos armado el link de pago en dólares. "}
+                Escribinos y coordinamos el pago en USD directamente por WhatsApp.
               </p>
               <button
                 type="button"

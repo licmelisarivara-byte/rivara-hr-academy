@@ -31,7 +31,7 @@ export default function CoursePricingTeaser({ course }: { course: Course }) {
       {summary.earlyBirdActive ? (
         <>
           <div className="text-sm text-magenta mb-1">
-            Por transferencia{course.payoneerLink ? " o Payoneer" : ""}, hasta el{" "}
+            Por transferencia{course.priceUSDRegular ? " o en dólares" : ""}, hasta el{" "}
             {earlyBirdDateLabel(course)}
           </div>
           <div className="detail-text mb-6">
@@ -40,7 +40,8 @@ export default function CoursePricingTeaser({ course }: { course: Course }) {
         </>
       ) : (
         <div className="detail-text mb-6">
-          Transferencia{course.payoneerLink ? ", Payoneer" : ""} o Mercado Pago
+          Transferencia o Mercado Pago
+          {course.priceUSDRegular ? ` · USD ${course.priceUSDRegular}` : ""}
         </div>
       )}
       <Link
