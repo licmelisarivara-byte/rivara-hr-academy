@@ -332,7 +332,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
                 ${transferenciaARS.toLocaleString("es-AR")} ARS
               </span>
             </p>
-            <p className="text-xs text-bone/50 mt-1">
+            <p className="text-xs text-bone/70 mt-1">
               Con cupón, Mercado Pago es un solo pago (sin cuotas). El cupón no aplica a pagos en
               dólares.
             </p>
@@ -355,8 +355,8 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
             onClick={() => setMethod("transferencia")}
             className={`w-full text-left rounded-lg border px-4 py-2.5 text-sm transition-colors ${
               method === "transferencia"
-                ? "border-magenta bg-panel text-bone"
-                : "border-black/10 bg-panel/50 text-bone/70 hover:border-magenta/40"
+                ? "border-magenta ring-1 ring-magenta bg-magenta/10 text-bone font-bold"
+                : "border-black/25 bg-panel text-bone font-semibold hover:border-magenta/60"
             }`}
           >
             Transferencia bancaria — ${bundleTransferenciaARS.toLocaleString("es-AR")} ARS
@@ -369,8 +369,8 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
               onClick={() => setMethod("payoneer")}
               className={`w-full text-left rounded-lg border px-4 py-2.5 text-sm transition-colors ${
                 method === "payoneer"
-                  ? "border-magenta bg-panel text-bone"
-                  : "border-black/10 bg-panel/50 text-bone/70 hover:border-magenta/40"
+                  ? "border-magenta ring-1 ring-magenta bg-magenta/10 text-bone font-bold"
+                  : "border-black/25 bg-panel text-bone font-semibold hover:border-magenta/60"
               }`}
             >
               Dólares — USD {bundlePayoneerUSD}
@@ -383,8 +383,8 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
             onClick={() => setMethod("mercadopago")}
             className={`w-full text-left rounded-lg border px-4 py-2.5 text-sm transition-colors ${
               method === "mercadopago"
-                ? "border-magenta bg-panel text-bone"
-                : "border-black/10 bg-panel/50 text-bone/70 hover:border-magenta/40"
+                ? "border-magenta ring-1 ring-magenta bg-magenta/10 text-bone font-bold"
+                : "border-black/25 bg-panel text-bone font-semibold hover:border-magenta/60"
             }`}
           >
             Mercado Pago — ${bundleMercadoPagoARS.toLocaleString("es-AR")} ARS
@@ -429,8 +429,8 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
                 onClick={() => setAddonSlug("")}
                 className={`w-full text-left rounded-lg border px-4 py-2.5 text-sm transition-colors ${
                   addonSlug === ""
-                    ? "border-magenta bg-panel text-bone"
-                    : "border-black/10 bg-panel/50 text-bone/70 hover:border-magenta/40"
+                    ? "border-magenta ring-1 ring-magenta bg-magenta/10 text-bone font-bold"
+                    : "border-black/25 bg-panel text-bone font-semibold hover:border-magenta/60"
                 }`}
               >
                 Ninguno
@@ -444,8 +444,8 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
                   onClick={() => setAddonSlug(r.slug)}
                   className={`w-full text-left rounded-lg border px-4 py-2.5 text-sm transition-colors ${
                     addonSlug === r.slug
-                      ? "border-magenta bg-panel text-bone"
-                      : "border-black/10 bg-panel/50 text-bone/70 hover:border-magenta/40"
+                      ? "border-magenta ring-1 ring-magenta bg-magenta/10 text-bone font-bold"
+                      : "border-black/25 bg-panel text-bone font-semibold hover:border-magenta/60"
                   }`}
                 >
                   {r.title} — ${applyDiscount(r.priceARS, addonPercent).toLocaleString("es-AR")}
