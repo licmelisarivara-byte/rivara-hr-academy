@@ -130,10 +130,8 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
   // nuevo por cada combinación cupón × producto), y Mercado Pago nunca
   // tuvo descuento a propósito — mismo criterio que CoursePaymentActions
   // y que ya aplica /api/manual-purchase server-side.
-  const transferenciaARS = applyDiscount(
-    resource.priceARSTransferencia ?? resource.priceARS,
-    appliedCoupon?.percentOff
-  );
+  const transferenciaListARS = resource.priceARSTransferencia ?? resource.priceARS;
+  const transferenciaARS = applyDiscount(transferenciaListARS, appliedCoupon?.percentOff);
   const payoneerUSD = resource.priceUSD;
 
   function handleContactSubmit(e: React.FormEvent) {
@@ -188,13 +186,30 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
               : "Ese cupón no es válido."}
           </p>
         )}
+        {couponInput && appliedCoupon && (
+          <>
+            <p className="mt-1.5 text-bone">
+              <span className="line-through text-bone/40 mr-2">
+                ${transferenciaListARS.toLocaleString("es-AR")}
+              </span>
+              <span className="font-display text-lg">
+                ${transferenciaARS.toLocaleString("es-AR")} ARS
+              </span>{" "}
+              <span className="text-xs font-semibold">por transferencia</span>
+            </p>
+            <p className="text-xs text-bone/70 mt-1">
+              El cupón aplica solo pagando por transferencia. Con Mercado Pago o en dólares se
+              paga el precio de lista.
+            </p>
+          </>
+        )}
       </div>
 
       <div className="mb-3">
         <select
           value={method}
           onChange={(e) => setMethod(e.target.value as Method)}
-          className="w-full rounded-lg bg-panel border border-black/10 px-3 py-2 text-sm text-bone focus:border-magenta outline-none"
+          className="w-full rounded-lg bg-panel border border-black/25 px-3 py-2 text-sm text-bone font-semibold focus:border-magenta outline-none"
         >
           <option value="">¿Cómo querés pagar?</option>
           <option value="mercadopago">

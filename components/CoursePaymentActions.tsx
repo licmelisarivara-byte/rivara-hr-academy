@@ -199,9 +199,9 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
     );
   }
 
-  // El cupón aplica en pesos (transferencia y Mercado Pago). En dólares
-  // siempre rige el precio de lista: los links de pago en USD son de monto
-  // fijo. Con cupón, Mercado Pago es un solo pago (sin cuotas).
+  // El cupón aplica solo pagando por transferencia. Mercado Pago (con sus
+  // cuotas sin interés) y los dólares quedan a precio de lista: los links de
+  // pago en USD son de monto fijo y Mercado Pago cobra siempre la lista.
   const transferenciaListARS = getTransferenciaAmountARS(course);
   const transferenciaARS = applyDiscount(transferenciaListARS, appliedCoupon?.percentOff);
   const payoneerUSD = getPayoneerAmountUSD(course);
@@ -223,8 +223,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
   // armado con el precio del curso, y si ese precio cambia queda desfasado.
   const payoneerComboLink =
     combosFijos && course.payoneerLink ? addon?.payoneerLinkWithCourse : undefined;
-  const mpCourseListARS = course.priceARS ?? 0;
-  const mpCourseARS = applyDiscount(mpCourseListARS, appliedCoupon?.percentOff);
+  const mpCourseARS = course.priceARS ?? 0; // Mercado Pago nunca tiene cupón ni descuento en el curso
   const addonBundleARS = addon ? applyDiscount(addon.priceARS, BUNDLE_DISCOUNT_PERCENT) : 0;
   const addonBundleUSD = addon ? applyDiscount(addon.priceUSD, BUNDLE_DISCOUNT_PERCENT) : 0;
   const addonBundleMP = addon ? applyDiscount(addon.priceARS, MP_BUNDLE_DISCOUNT_PERCENT) : 0;
@@ -254,7 +253,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
       ? (course.priceUSDRegular ?? 0) + (addon.priceUSD ?? 0) - bundlePayoneerUSD
       : 0;
   const bundleSavingsMP =
-    addon && !bundleErrorMP ? mpCourseListARS + (addon.priceARS ?? 0) - bundleMercadoPagoARS : 0;
+    addon && !bundleErrorMP ? mpCourseARS + (addon.priceARS ?? 0) - bundleMercadoPagoARS : 0;
 
   function handleContactSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -318,7 +317,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
         {couponInput && (appliedCoupon || couponInvalid) && (
           <p className={`text-xs mt-1 ${appliedCoupon ? "text-sage" : "text-magenta"}`}>
             {appliedCoupon
-              ? `✅ Cupón aplicado: ${appliedCoupon.percentOff}% off en pesos (transferencia o Mercado Pago)`
+              ? `✅ Cupón aplicado: ${appliedCoupon.percentOff}% off pagando por transferencia`
               : "Ese cupón no es válido."}
           </p>
         )}
@@ -330,11 +329,12 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
               </span>
               <span className="font-display text-xl">
                 ${transferenciaARS.toLocaleString("es-AR")} ARS
-              </span>
+              </span>{" "}
+              <span className="text-sm font-semibold">por transferencia</span>
             </p>
             <p className="text-xs text-bone/70 mt-1">
-              Con cupón, Mercado Pago es un solo pago (sin cuotas). El cupón no aplica a pagos en
-              dólares.
+              El cupón aplica solo pagando por transferencia. Con Mercado Pago (cuotas) o en
+              dólares se paga el precio de lista.
             </p>
           </>
         )}
@@ -388,7 +388,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
             }`}
           >
             Mercado Pago — ${bundleMercadoPagoARS.toLocaleString("es-AR")} ARS
-            {!addon && !appliedCoupon && course.mercadoPagoNote ? ` ${course.mercadoPagoNote}` : ""}
+            {!addon && course.mercadoPagoNote ? ` ${course.mercadoPagoNote}` : ""}
           </button>
         </div>
       </div>
@@ -527,12 +527,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
       )}
 
       {method === "mercadopago" && buyer && !addon && (
-        <CheckoutButton
-          course={course}
-          buyerEmail={buyer.email}
-          buyerName={buyer.name}
-          couponCode={appliedCoupon?.code}
-        />
+        <CheckoutButton course={course} buyerEmail={buyer.email} buyerName={buyer.name} />
       )}
 
       {/* Combo por Mercado Pago con cobro automático: el servidor calcula el
@@ -546,7 +541,6 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
           buyerName={buyer.name}
           addonSlug={addon.slug}
           fallbackLink={mpComboLink}
-          couponCode={appliedCoupon?.code}
         />
       )}
 

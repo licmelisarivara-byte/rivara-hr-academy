@@ -28,7 +28,7 @@ export type Course = {
   seoTitle?: string; // title tag de la página del curso, si difiere de `title`
   seoDescription?: string; // meta description de la página del curso, si difiere de `description`
   price: string; // texto mostrado en pantalla
-  priceARS?: number; // precio de lista en pesos, el que cobra Mercado Pago (el descuento solo entra por cupón, ver lib/coupons.ts)
+  priceARS?: number; // precio de lista en pesos, el que cobra Mercado Pago (nunca tiene descuento; el cupón solo aplica por transferencia, ver lib/coupons.ts)
   priceNote?: string;
   earlyBirdUntil?: string; // ISO datetime; hasta acá rige el precio early bird de transferencia/Payoneer
   priceARSEarlyBird?: number; // monto real de transferencia antes de earlyBirdUntil
@@ -239,10 +239,9 @@ export const courses: Course[] = [
       "Certificado de asistencia",
     ],
     // Precios 3ra edición: lista $96.000 en pesos (transferencia o Mercado
-    // Pago, este último hasta 3 cuotas sin interés — solo sin cupón) y USD
-    // 62 en dólares. El descuento es solo por cupón (25% con BOT/RHENACCION,
-    // ver lib/coupons.ts), no hay early bird. Los cupones no valen en
-    // dólares. Todavía no hay link de pago en dólares (payoneerLink): hasta
+    // Pago, este último hasta 3 cuotas sin interés) y USD 62 en dólares. El
+    // descuento es solo por cupón (25% con BOT/RHENACCION, ver
+    // lib/coupons.ts) y solo pagando por transferencia; no hay early bird. Todavía no hay link de pago en dólares (payoneerLink): hasta
     // que exista, el botón lleva a WhatsApp. Falta cargar el link de Meet
     // (meetLink).
     price: "$96.000 ARS",

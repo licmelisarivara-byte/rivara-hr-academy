@@ -30,8 +30,11 @@ export async function POST(req: NextRequest) {
   // Monto real según el método (antes acá siempre se usaba el precio de
   // Mercado Pago sin descuento, aunque fuera transferencia o Payoneer en
   // pleno early bird/con el descuento permanente de los recursos). El
-  // cupón solo aplica en pesos: por transferencia (acá) y por Mercado Pago
-  // (/api/checkout); nunca en dólares.
+  // cupón solo aplica por transferencia — los links de Payoneer son de
+  // monto fijo, así que no se les puede aplicar un % dinámicamente sin
+  // armar un link nuevo por cada combinación cupón × producto (ver
+  // components/CoursePaymentActions.tsx). Mercado Pago sigue siempre sin
+  // descuento, a propósito.
   const coupon =
     method !== "transferencia"
       ? null

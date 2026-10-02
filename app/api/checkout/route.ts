@@ -3,7 +3,6 @@ import { getCourseBySlug } from "@/lib/courses";
 import { getPaidResourceBySlug } from "@/lib/resources";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { applyDiscount } from "@/lib/discount";
-import { getCoupon } from "@/lib/coupons";
 
 // Descuento del recurso cuando se compra junto con un curso por Mercado
 // Pago (5%, más chico que el 15% de transferencia porque ahí el curso no
@@ -16,10 +15,9 @@ const MP_BUNDLE_DISCOUNT_PERCENT = 5;
 // variable, este endpoint devuelve 501 y el botón de compra muestra el
 // mensaje de contacto en vez de romperse.
 //
-// Cursos: cobra el precio de lista, o el de lista con el cupón aplicado
-// (validado acá, nunca se confía en el monto del navegador). Con cupón se
-// cobra en un solo pago: las cuotas sin interés son solo para el precio de
-// lista. Los recursos pagos no llevan cupón en Mercado Pago.
+// Mercado Pago nunca tiene descuento (ni early bird ni cupón DESCARGA5):
+// es a propósito, así el precio "sin descuento" queda siempre disponible
+// como opción de pago inmediato.
 export async function POST(req: NextRequest) {
   const accessToken = process.env.MP_ACCESS_TOKEN;
 
@@ -27,7 +25,7 @@ export async function POST(req: NextRequest) {
   // recurso): un solo cobro por el total, con dos filas en `compras` que
   // comparten bundle_group_id (mismo esquema que /api/manual-purchase-bundle);
   // el webhook / la sincronización aprueban y entregan las dos juntas.
-  const { kind, slug, buyerEmail, buyerName, addonSlug, couponCode } = await req.json();
+  const { kind, slug, buyerEmail, buyerName, addonSlug } = await req.json();
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL || "https://hracademy.rivaraconsultora.com.ar";
 
@@ -37,7 +35,6 @@ export async function POST(req: NextRequest) {
   let failureUrl = `${siteUrl}?compra=fallida`;
   let purchaseId: string | null = null;
   let bundleIds: string[] = [];
-  let appliedCouponCode: string | null = null;
 
   // Registramos la intención de compra como "pending" en cuanto alguien
   // toca "Comprar/Inscribirme", ANTES de chequear si Mercado Pago está
@@ -81,11 +78,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "not_found" }, { status: 404 });
     }
     // Los montos se calculan SIEMPRE acá (nunca se confía en lo que
-    // mande el navegador): el curso a precio de lista (con el cupón, si
-    // es válido) y el recurso con el 5% del combo.
-    const coupon = getCoupon(couponCode, { courseSlug: course.slug });
-    appliedCouponCode = coupon?.code ?? null;
-    const courseAmount = applyDiscount(course.priceARS ?? 0, coupon?.percentOff);
+    // mande el navegador): el curso a precio de Mercado Pago, sin
+    // descuento, y el recurso con el 5% del combo.
+    const courseAmount = course.priceARS ?? 0;
     const resourceAmount = applyDiscount(resource.priceARS, MP_BUNDLE_DISCOUNT_PERCENT);
     title = `${course.title} + ${resource.title}`;
     unitPrice = courseAmount + resourceAmount;
@@ -100,7 +95,6 @@ export async function POST(req: NextRequest) {
         buyer_email: buyerEmail || null,
         buyer_name: buyerName || null,
         bundle_group_id: bundleGroupId,
-        discount_code: appliedCouponCode,
       };
       const { data: rows, error } = await supabaseAdmin
         .from("compras")
@@ -131,10 +125,8 @@ export async function POST(req: NextRequest) {
     if (!course) {
       return NextResponse.json({ error: "course_not_found" }, { status: 404 });
     }
-    const coupon = getCoupon(couponCode, { courseSlug: course.slug });
-    appliedCouponCode = coupon?.code ?? null;
     title = course.title;
-    unitPrice = applyDiscount(course.priceARS ?? 0, coupon?.percentOff);
+    unitPrice = course.priceARS ?? 0;
     failureUrl = `${siteUrl}/cursos/${course.slug}?compra=fallida`;
 
     if (supabaseAdmin) {
@@ -150,7 +142,6 @@ export async function POST(req: NextRequest) {
           payment_method: "mercadopago",
           buyer_email: buyerEmail || null,
           buyer_name: buyerName || null,
-          discount_code: appliedCouponCode,
         })
         .select("id")
         .single();
@@ -188,11 +179,6 @@ export async function POST(req: NextRequest) {
     auto_return: "approved",
     notification_url: `${siteUrl}/api/mp-webhook`,
   };
-  // Con cupón, un solo pago: las cuotas sin interés son solo para el
-  // precio de lista.
-  if (appliedCouponCode) {
-    preference.payment_methods = { installments: 1 };
-  }
   if (purchaseId) {
     preference.external_reference = purchaseId;
   }

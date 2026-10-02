@@ -20,9 +20,10 @@ export type Coupon = {
   resources?: string[]; // si está definido, el cupón solo vale para estos slugs de recurso pago (sin definir = todos)
 };
 
-// Los cupones valen en pesos (transferencia y Mercado Pago), nunca en
-// dólares. Solo se usa UNO por compra: el formulario tiene un único campo y
-// el servidor recibe un solo código, así que no se acumulan entre sí.
+// Los cupones valen solo pagando por transferencia (Mercado Pago, con sus
+// cuotas, y los dólares quedan a precio de lista). Solo se usa UNO por
+// compra: el formulario tiene un único campo y el servidor recibe un solo
+// código, así que no se acumulan entre sí.
 export const COUPONS: Coupon[] = [
   {
     code: "DESCARGA5",
