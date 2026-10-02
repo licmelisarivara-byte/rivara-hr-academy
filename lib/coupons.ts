@@ -44,10 +44,16 @@ export const COUPONS: Coupon[] = [
     courses: ["claude-para-seleccion"],
   },
   {
+    code: "CLAUDE25",
+    percentOff: 25,
+    description: "25% off en Claude para Selección",
+    courses: ["claude-para-seleccion"],
+  },
+  {
     code: "BOT",
     percentOff: 25,
-    description: "25% off en el curso en vivo (Bot + ATS) y en Claude para Selección",
-    courses: ["de-cero-a-tu-asistente-3ra-edicion", "claude-para-seleccion"],
+    description: "25% off en el curso en vivo (Bot + ATS)",
+    courses: ["de-cero-a-tu-asistente-3ra-edicion"],
   },
   {
     code: "RHENACCION",
