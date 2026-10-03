@@ -37,13 +37,23 @@ const testimonials: Testimonial[] = [
 // permite sumar testimonios propios de un curso puntual (por ejemplo, de
 // una edición anterior de este mismo curso) sin duplicar la lista base
 // en otras páginas que también usan este componente.
-export default function Testimonials({ extra = [] }: { extra?: Testimonial[] }) {
+export default function Testimonials({
+  extra = [],
+  hideHeading = false,
+}: {
+  extra?: Testimonial[];
+  // Cuando el que lo usa ya pone el título (por ejemplo, una sección
+  // colapsable en celular).
+  hideHeading?: boolean;
+}) {
   const all = [...testimonials, ...extra];
   return (
-    <div className="mb-10">
-      <h2 className="font-display text-2xl text-bone mb-6">
-        Lo que dicen quienes ya participaron de mis talleres
-      </h2>
+    <div className={hideHeading ? "" : "mb-10"}>
+      {!hideHeading && (
+        <h2 className="font-display text-2xl text-bone mb-6">
+          Lo que dicen quienes ya participaron de mis talleres
+        </h2>
+      )}
       <div className="grid sm:grid-cols-2 gap-4">
         {all.map((t) => (
           <div key={t.name} className="card-alt rounded-xl p-6 border border-black/5">

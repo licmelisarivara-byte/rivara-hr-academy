@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import CheckoutButton from "@/components/CheckoutButton";
+import { trackEvent, trackLead } from "@/lib/analytics";
 import { applyDiscount } from "@/lib/discount";
 import {
   getTransferenciaAmountARS,
@@ -47,6 +48,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
   const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
   const [couponInvalid, setCouponInvalid] = useState(false);
   const [addonSlug, setAddonSlug] = useState("");
+  const lastTrackedCoupon = useRef<string | null>(null);
 
   // El código y el % de descuento nunca viajan en el bundle de JS (no se
   // importa lib/coupons acá) — se valida contra /api/coupon, que solo
@@ -71,6 +73,14 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
           if (data.valid) {
             setAppliedCoupon({ code: data.code, percentOff: data.percentOff });
             setCouponInvalid(false);
+            if (lastTrackedCoupon.current !== data.code) {
+              lastTrackedCoupon.current = data.code;
+              trackEvent("coupon_applied", {
+                coupon_code: data.code,
+                percent_off: data.percentOff,
+                course_slug: course.slug,
+              });
+            }
           } else {
             setAppliedCoupon(null);
             setCouponInvalid(true);
@@ -138,9 +148,14 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
           buyerPhone: buyer.phone,
           couponCode: appliedCoupon?.code,
         }),
-      }).catch(() => {
-        // No bloqueamos la UI si esto falla; Melisa igual recibe el WhatsApp/mail.
-      });
+      })
+        .then((res) => {
+          // Lead real: el servidor registró la compra con los datos de la persona.
+          if (res.ok) trackLead(buyer.email, `curso_${method}`, course.slug);
+        })
+        .catch(() => {
+          // No bloqueamos la UI si esto falla; Melisa igual recibe el WhatsApp/mail.
+        });
       return;
     }
     if (method !== "transferencia" && method !== "payoneer") return;
@@ -156,11 +171,25 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
         buyerPhone: buyer.phone,
         couponCode: appliedCoupon?.code,
       }),
-    }).catch(() => {
-      // No bloqueamos la UI si esto falla; Melisa igual recibe el WhatsApp/mail.
-    });
+    })
+      .then((res) => {
+        if (res.ok) trackLead(buyer.email, `curso_${method}`, course.slug);
+      })
+      .catch(() => {
+        // No bloqueamos la UI si esto falla; Melisa igual recibe el WhatsApp/mail.
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [buyer, method, addonSlug]);
+
+  // Paso "Tus datos": primera vez que se le muestra el formulario de registro
+  // a quien ya eligió cómo pagar.
+  const trackedDatosView = useRef(false);
+  useEffect(() => {
+    if (method && !buyer && !trackedDatosView.current) {
+      trackedDatosView.current = true;
+      trackEvent("view_registro", { step: "form_datos", course_slug: course.slug });
+    }
+  }, [method, buyer, course.slug]);
 
   if (course.comingSoon) {
     return (
@@ -255,6 +284,14 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
   const bundleSavingsMP =
     addon && !bundleErrorMP ? mpCourseARS + (addon.priceARS ?? 0) - bundleMercadoPagoARS : 0;
 
+  function selectMethod(m: Exclude<Method, "">) {
+    setMethod(m);
+    trackEvent("payment_method_selected", {
+      method: m === "payoneer" ? "dolares" : m,
+      course_slug: course.slug,
+    });
+  }
+
   function handleContactSubmit(e: React.FormEvent) {
     e.preventDefault();
     setContactSubmitted(true);
@@ -271,11 +308,6 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
         keepalive: true,
       }).catch(() => {});
     }
-    (window as any).gtag?.("event", "generate_lead", {
-      event_category: "curso",
-      event_label: course.slug,
-      payment_method: m,
-    });
     const label =
       m === "transferencia" ? "Transferencia bancaria" : m === "payoneer" ? "Pago en dólares (USD)" : "Mercado Pago";
     const couponLine = appliedCoupon
@@ -353,7 +385,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
             type="button"
             role="radio"
             aria-checked={method === "transferencia"}
-            onClick={() => setMethod("transferencia")}
+            onClick={() => selectMethod("transferencia")}
             className={`w-full text-left rounded-lg border px-4 py-2.5 text-sm transition-colors ${
               method === "transferencia"
                 ? "border-magenta ring-1 ring-magenta bg-magenta/10 text-bone font-bold"
@@ -367,7 +399,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
               type="button"
               role="radio"
               aria-checked={method === "payoneer"}
-              onClick={() => setMethod("payoneer")}
+              onClick={() => selectMethod("payoneer")}
               className={`w-full text-left rounded-lg border px-4 py-2.5 text-sm transition-colors ${
                 method === "payoneer"
                   ? "border-magenta ring-1 ring-magenta bg-magenta/10 text-bone font-bold"
@@ -381,7 +413,7 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
             type="button"
             role="radio"
             aria-checked={method === "mercadopago"}
-            onClick={() => setMethod("mercadopago")}
+            onClick={() => selectMethod("mercadopago")}
             className={`w-full text-left rounded-lg border px-4 py-2.5 text-sm transition-colors ${
               method === "mercadopago"
                 ? "border-magenta ring-1 ring-magenta bg-magenta/10 text-bone font-bold"

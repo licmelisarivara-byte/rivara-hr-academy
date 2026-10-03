@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import type { Course } from "@/lib/courses";
+import { trackLead } from "@/lib/analytics";
 
 // Mercado Pago no acepta cupones: siempre cobra el precio sin descuento.
 // Si el que llama ya sabe el mail del comprador (por ejemplo, porque lo
@@ -99,11 +100,11 @@ export default function CheckoutButton({
   async function handleClick() {
     setLoading(true);
     setError(null);
-    (window as any).gtag?.("event", "generate_lead", {
-      event_category: "curso",
-      event_label: course.slug,
-      payment_method: "mercadopago",
-    });
+    // El lead se cuenta recién cuando hay a dónde mandar a la persona (el
+    // checkout se creó o cae al link de respaldo), no al primer toque.
+    const registrarLead = () => {
+      if (buyerEmail) trackLead(buyerEmail, "curso_mercadopago", course.slug);
+    };
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
@@ -117,6 +118,7 @@ export default function CheckoutButton({
       if (!res.ok) throw new Error("no-config");
       const data = await res.json();
       if (data.init_point) {
+        registrarLead();
         window.location.href = data.init_point;
         return;
       }
@@ -131,6 +133,7 @@ export default function CheckoutButton({
         // probando el flujo real con el link fijo de respaldo activo.
         // Redirigir en la misma pestaña, igual que el caso de éxito de
         // arriba, no tiene ese problema.
+        registrarLead();
         window.location.href = linkRespaldo;
       } else {
         setError(

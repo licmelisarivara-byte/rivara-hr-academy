@@ -1,10 +1,11 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import ConfigNotice from "@/components/ConfigNotice";
+import { getUtm, trackEvent, trackLead } from "@/lib/analytics";
 
 export default function RegistroPage() {
   return (
@@ -25,6 +26,10 @@ function RegistroForm() {
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    trackEvent("view_registro", { step: "registro_page" });
+  }, []);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!supabase) return;
@@ -34,7 +39,8 @@ function RegistroForm() {
       email,
       password,
       options: {
-        data: { full_name: name, phone },
+        // Los UTM del anuncio viajan con el alta, para saber de dónde vino.
+        data: { full_name: name, phone, ...getUtm() },
         emailRedirectTo: `${window.location.origin}/dashboard?verified=1&next=${encodeURIComponent(next)}`,
       },
     });
@@ -43,6 +49,8 @@ function RegistroForm() {
       setError(error.message);
       return;
     }
+    // Cuenta creada de verdad (no solo un clic en el botón).
+    trackLead(email, "registro");
     setDone(true);
   }
 

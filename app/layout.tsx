@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
+import UtmCapture from "@/components/UtmCapture";
 import "./globals.css";
 
 const siteUrl = "https://hracademy.rivaraconsultora.com.ar";
@@ -126,6 +127,7 @@ export default function RootLayout({
             </noscript>
           </>
         )}
+        <UtmCapture />
         {children}
         <Analytics />
       </body>
