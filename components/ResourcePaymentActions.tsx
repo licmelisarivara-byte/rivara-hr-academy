@@ -151,18 +151,19 @@ export default function ResourcePaymentActions({ resource }: { resource: PaidRes
     }
     const label = m === "transferencia" ? "Transferencia bancaria" : "Payoneer";
     const couponLine = appliedCoupon
-      ? `\n🎟️ Cupón: ${appliedCoupon.code} (${appliedCoupon.percentOff}% off)`
+      ? `\nCupón: ${appliedCoupon.code} (${appliedCoupon.percentOff}% off)`
       : "";
     // Se repiten CBU/alias acá como respaldo — por si no los copió de la
     // página, los tiene igual en el mensaje que nos manda.
     const bankLine =
       m === "transferencia"
-        ? `\n🏦 CBU/CVU: ${bankDetails.cbu}\n🏦 Alias: ${bankDetails.alias}`
+        ? `\nCBU/CVU: ${bankDetails.cbu}\nAlias: ${bankDetails.alias}`
         : "";
-    const phoneLine = buyer?.phone ? `\n📱 Celular: ${buyer.phone}` : "";
-    const nameLine = buyer?.name ? `\n🙋 Nombre: ${buyer.name}` : "";
+    // Sin emojis a propósito: en el WhatsApp de Melisa llegaban como "�".
+    const phoneLine = buyer?.phone ? `\nCelular: ${buyer.phone}` : "";
+    const nameLine = buyer?.name ? `\nNombre: ${buyer.name}` : "";
     const message = encodeURIComponent(
-      `Hola Melisa 👋\n\nQuiero comprar: ${resource.title}\n${nameLine}\n📧 Email: ${buyer?.email}${phoneLine}\n💳 Forma de pago: ${label}${couponLine}${bankLine}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
+      `Hola Melisa!\n\nQuiero comprar: ${resource.title}\n${nameLine}\nEmail: ${buyer?.email}${phoneLine}\nForma de pago: ${label}${couponLine}${bankLine}\n\nVoy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
     );
     window.open(`https://wa.me/5491123912820?text=${message}`, "_blank");
     router.push("/");

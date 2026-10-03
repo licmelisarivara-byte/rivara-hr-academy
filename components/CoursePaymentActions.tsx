@@ -279,13 +279,14 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
     const label =
       m === "transferencia" ? "Transferencia bancaria" : m === "payoneer" ? "Pago en dólares (USD)" : "Mercado Pago";
     const couponLine = appliedCoupon
-      ? `\n🎟️ Cupón: ${appliedCoupon.code} (${appliedCoupon.percentOff}% off)`
+      ? `\nCupón: ${appliedCoupon.code} (${appliedCoupon.percentOff}% off)`
       : "";
     // Se repiten CBU/alias acá como respaldo — por si no los copió de la
     // página, los tiene igual en el mensaje que nos manda.
+    // Sin emojis a propósito: en el WhatsApp de Melisa llegaban como "�".
     const bankLine =
       m === "transferencia" && course.bankDetails
-        ? `\n🏦 CBU/CVU: ${course.bankDetails.cbu}\n🏦 Alias: ${course.bankDetails.alias}`
+        ? `\nCBU/CVU: ${course.bankDetails.cbu}\nAlias: ${course.bankDetails.alias}`
         : "";
     const comboAmount =
       m === "payoneer"
@@ -293,11 +294,11 @@ export default function CoursePaymentActions({ course }: { course: Course }) {
         : m === "mercadopago"
         ? `$${bundleMercadoPagoARS.toLocaleString("es-AR")} ARS`
         : `$${bundleTransferenciaARS.toLocaleString("es-AR")} ARS`;
-    const comboLine = addon ? `\n📦 Combo: + ${addon.title}\n💰 Total con combo: ${comboAmount}` : "";
-    const phoneLine = buyer?.phone ? `\n📱 Celular: ${buyer.phone}` : "";
-    const nameLine = buyer?.name ? `\n🙋 Nombre: ${buyer.name}` : "";
+    const comboLine = addon ? `\nCombo: + ${addon.title}\nTotal con combo: ${comboAmount}` : "";
+    const phoneLine = buyer?.phone ? `\nCelular: ${buyer.phone}` : "";
+    const nameLine = buyer?.name ? `\nNombre: ${buyer.name}` : "";
     const message = encodeURIComponent(
-      `Hola Melisa 👋\n\nQuiero inscribirme al curso "${course.title}" de RIVARA HR Academy.\n${nameLine}\n📧 Email: ${buyer?.email}${phoneLine}\n💳 Forma de pago: ${label}${couponLine}${bankLine}${comboLine}\n\n📎 Voy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
+      `Hola Melisa!\n\nQuiero inscribirme al curso "${course.title}" de RIVARA HR Academy.\n${nameLine}\nEmail: ${buyer?.email}${phoneLine}\nForma de pago: ${label}${couponLine}${bankLine}${comboLine}\n\nVoy a enviar el comprobante de pago.\n\nQuedo a la espera de la confirmación. ¡Gracias!`
     );
     window.open(`https://wa.me/5491123912820?text=${message}`, "_blank");
     router.push("/");
