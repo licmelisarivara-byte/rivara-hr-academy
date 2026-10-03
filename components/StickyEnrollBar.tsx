@@ -41,10 +41,12 @@ export default function StickyEnrollBar({
   }, []);
 
   return (
+    // `invisible` (visibility: hidden) lo saca del orden de tabulación y de
+    // los lectores de pantalla mientras está escondido; aria-hidden dejaba un
+    // enlace enfocable adentro.
     <div
-      aria-hidden={!visible}
       className={`md:hidden fixed bottom-0 inset-x-0 z-50 bg-[#0D0D14] border-t border-white/10 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex items-center gap-3 transition-transform duration-200 ${
-        visible ? "translate-y-0" : "translate-y-full pointer-events-none"
+        visible ? "translate-y-0" : "translate-y-full invisible pointer-events-none"
       }`}
     >
       <div className="min-w-0 flex-1">

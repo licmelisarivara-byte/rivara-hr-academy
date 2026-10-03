@@ -10,7 +10,7 @@ export default function CourseHero({ course }: { course: Course }) {
     <section className="bg-[#0D0D14]">
       <div className="max-w-4xl mx-auto px-5 pt-6 pb-8 md:px-6 md:py-14 md:grid md:grid-cols-[1.25fr_0.75fr] md:gap-10 md:items-center">
         <div>
-          <p className="eyebrow">{course.format} · 3ra edición</p>
+          <p className="eyebrow !text-magentaSoft">{course.format} · 3ra edición</p>
           <h1 className="font-display text-white mt-2 mb-3 !text-[1.65rem] !leading-[1.15] md:!text-[2.4rem]">
             {course.pageH1 ?? course.title.replace(/\s*\(3ra edición\)\s*$/, "")}
           </h1>
